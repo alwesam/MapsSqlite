@@ -9,10 +9,12 @@ public class MySQLHelper extends SQLiteOpenHelper {
 	
 	public static final String TABLE_NAME = "locations";	
 	
-	public static final String COLUMN_ID = "_id";
+	public static final String COLUMN_ID = "id";
 	public static final String TITLE = "title";
 	public static final String SNIPPET = "snippet";
 	public static final String POSITION = "position";
+	public static final String STATUS = "updateStatus";
+	public static final String DEL_STATUS = "delStatus";
 
 	private static final String DATABASE_NAME = "markerlocations.db";
 	private static final int DATABASE_VERSION = 1;
@@ -23,8 +25,9 @@ public class MySQLHelper extends SQLiteOpenHelper {
 	      + COLUMN_ID     + " integer primary key autoincrement, " 
 	      + TITLE + " text, "
 	      + SNIPPET + " text, "
-	      + POSITION + " text);";
-	
+	      + POSITION + " text, "
+	      + STATUS + " text, "	
+	      + DEL_STATUS + " text );";
 
 	  public MySQLHelper(Context context) {
 	    super(context, DATABASE_NAME, null, DATABASE_VERSION);

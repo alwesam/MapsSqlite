@@ -50,16 +50,16 @@ public class NoticeDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Build the dialog and set up the button click handlers
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());        
-        builder.setMessage("What to do with Marker?")
+        builder.setMessage("Delete marker?")
                .setView(input)
-               .setPositiveButton("Add Details", new DialogInterface.OnClickListener() {
+               .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                        // Send the positive button event back to the host activity
                 	   String value = input.getText().toString();
                        mListener.onDialogPositiveClick(NoticeDialogFragment.this, value);
                    }
                })
-               .setNegativeButton("Delete Marker", new DialogInterface.OnClickListener() {
+               .setNegativeButton("No", new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                        // Send the negative button event back to the host activity
                        mListener.onDialogNegativeClick(NoticeDialogFragment.this);

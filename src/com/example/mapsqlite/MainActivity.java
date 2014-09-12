@@ -1,9 +1,12 @@
 package com.example.mapsqlite;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -13,6 +16,9 @@ import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import android.location.Address;
 import android.location.Criteria;
@@ -24,21 +30,27 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.app.ProgressDialog;
 import android.content.Context;
 //import android.content.Intent;
 //import android.text.Editable;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
 public class MainActivity extends Activity implements LocationListener,NoticeDialogFragment.NoticeDialogListener {
 
 	Context context = this;
 	private GoogleMap map;	
+	private static final int zoom = 13;
 	
+	//move to utilities class?
 	private String address;
 	private String snippet;
 	private LatLng loc;
 	
+	//TODO find a better way to handle address and snippet and locations
 	public String getAddress() {
 		return address;
 	}
@@ -54,7 +66,6 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
 	public void setSnippet(String snippet) {
 		this.snippet = snippet;
 	}
-
 	
 	public LatLng getLoc() {
 		return loc;
@@ -63,13 +74,10 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
 	public void setLoc(LatLng loc) {
 		this.loc = loc;
 	}
-
-	double mLatitude=0;
-    double mLongitude=0;
 	
 	MarkerDataSource data;
 	
-	HashMap<String, String> mMarkerPlaceLink = new HashMap<String, String>();	
+	ProgressDialog prgDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,29 +85,23 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
 		setContentView(R.layout.activity_main);
 				
 		map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
-		        .getMap();
-		
+		        .getMap();		
 		 // Enabling MyLocation in Google Map
         map.setMyLocationEnabled(true);
-
         // Getting LocationManager object from System Service LOCATION_SERVICE
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
         // Creating a criteria object to retrieve provider
         Criteria criteria = new Criteria();
-
         // Getting the name of the best provider
         String provider = locationManager.getBestProvider(criteria, true);
-
         // Getting Current Location From GPS
         Location location = locationManager.getLastKnownLocation(provider);
-
+        // Find location from gps
         if(location!=null){
             onLocationChanged(location);
-        }
-
-        locationManager.requestLocationUpdates(provider, 20000, 0, this);
-			
+        }                
+        
+        locationManager.requestLocationUpdates(provider, 20000, 0, this);			
 		//create new database to store markers
 		data = new MarkerDataSource(context);		    
 		try {
@@ -111,60 +113,46 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
 		//show available markers
 		listMarker();
 
-		//add markers			
+		//add markers	
+		//TODO go to a new activity to enter details and address! (fetch address)
 	    map.setOnMapClickListener(new OnMapClickListener() {	    	    
 	            @Override
 	            public void onMapClick(LatLng latlng) { 
-	            	setLoc(new LatLng(latlng.latitude,latlng.longitude));
-	            	GetAddressTask getAddress = new GetAddressTask(context);	        	    
-	        	    getAddress.execute(latlng);
-	            	//String slatlng = String.valueOf(latlng.latitude)+" "+String.valueOf(latlng.longitude);
-	                //data.addMarker(new MyMarkerObj("mAddress", "Press to add details", slatlng) );
-	                //listMarker(); //to show on map
+	            	//setLoc(new LatLng(latlng.latitude,latlng.longitude));
+	            	//GetAddressTask getAddress = new GetAddressTask(context);	        	    
+	        	    //getAddress.execute(latlng);
+	            	String slatlng = String.valueOf(latlng.latitude)+" "+String.valueOf(latlng.longitude);
+	                data.addMarker(new MyMarkerObj("Title TBD", "Position:"+slatlng, slatlng) );
+	                listMarker(); //to show on map
 	            }
 	    });	 
 	    
-	    //TODO fix that later, incorprate a function to delete marker along with entering details as show below
+	    //delete markers
 	    map.setOnInfoWindowClickListener(new OnInfoWindowClickListener(){
 			@Override
-			public void onInfoWindowClick(Marker marker) {
-				//marker.remove(); //to remove from map immediately
-				//data.deleteMarker( new MyMarkerObj(marker.getTitle(),marker.getSnippet(), 
-				//		marker.getPosition().latitude+" "+marker.getPosition().longitude));
-				//listMarker();	
-				
-				//TODO explore passing the object instead of using getters and setters 
-				///MyMarkerObj m = new MyMarkerObj(marker.getTitle(),marker.getSnippet(), 
-					//			marker.getPosition().latitude+" "+marker.getPosition().longitude);
-				
+			public void onInfoWindowClick(Marker marker) {	
+				//saved concerned datapoints, TODO save Id instead?
 				setAddress(marker.getTitle());
 				setSnippet(marker.getSnippet());
 				setLoc(new LatLng(marker.getPosition().latitude,marker.getPosition().longitude));				
 				showNoticeDialog();
 			}	    	
-	    });	   	    
+	    });	   	  
 	    
-	    //new stuff! TODO get an activity where I can enter details about location marker
-	 /*   map.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {	    	 
-            @Override
-            public void onInfoWindowClick(Marker marker) {
-                Intent intent = new Intent(getBaseContext(), PlaceDetailsActivity.class);
-                String location = marker.getPosition().latitude+","+marker.getPosition().longitude;
-                intent.putExtra("location", location);
-                // Starting the Place Details Activity
-                startActivity(intent);
-            }
-        });   */	    
-		    
+	  //Initialize Progress Dialog properties
+        prgDialog = new ProgressDialog(this);
+        prgDialog.setMessage("Synching SQLite Data with Remote MySQL DB. Please wait...");
+        prgDialog.setCancelable(false);
+ 		    
 	}
-
+	//end oncreate method
 	
+	//dialog methods
 	public void showNoticeDialog() {
         // Create an instance of the dialog fragment and show it
         DialogFragment dialog = new NoticeDialogFragment(context);
         dialog.show(getFragmentManager(), "NoticeDialogFragment");
     }
-
     
     @Override
     public void onDialogPositiveClick(DialogFragment dialog, String value) {
@@ -172,31 +160,23 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
     	String oldTitle = this.getAddress();
     	String oldSnippet = this.getSnippet();
     	String slatlng = String.valueOf(getLoc().latitude)+" "+String.valueOf(getLoc().longitude);    	
-    	//delete old record
-    	data.deleteMarker( new MyMarkerObj(oldTitle, oldSnippet, slatlng));  
-    	//replace with new record
-    	data.addMarker(new MyMarkerObj(oldTitle, value, slatlng) );
-    	dialog.dismiss();        
+    	//delete record
+    	data.deleteMarker( new MyMarkerObj(oldTitle, oldSnippet, slatlng));      	
+    	dialog.dismiss();  
+    	Toast.makeText(getApplicationContext(), value, Toast.LENGTH_LONG).show();
     	listMarker();
     }
 
     @Override
-    public void onDialogNegativeClick(DialogFragment dialog) {  
-    	String oldTitle = this.getAddress();
-    	String oldSnippet = this.getSnippet();
-    	String slatlng = String.valueOf(getLoc().latitude)+" "+String.valueOf(getLoc().longitude);    	
-    	//delete old record
-    	data.deleteMarker( new MyMarkerObj(oldTitle, oldSnippet, slatlng));
-    	dialog.dismiss();
-    	listMarker();
+    public void onDialogNegativeClick(DialogFragment dialog) {    
+    	dialog.dismiss();    	
     }	
 	
-	//list markers
+	//list markers on the map
 	private void listMarker(){
 		
 		map.clear();
-		List <MyMarkerObj> n = data.getMyMarkers();	
-		
+		List <MyMarkerObj> n = data.getMyMarkers();			
 		for (int i=0; i < n.size(); i++){
 			String[] slatlng = n.get(i).getPosition().split(" ");
 			LatLng latlng = new LatLng (Double.valueOf(slatlng[0]), Double.valueOf(slatlng[1]));
@@ -204,11 +184,7 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
 			   .title(n.get(i).getTitle())
 			   .snippet(n.get(i).getSnippet())
 			   .position(latlng)
-			   .draggable(true));
-			
-			// Getting a place from the places list
-            //String hmPlace = n.get(i).getSnippet();			
-			//mMarkerPlaceLink.put(m.getId(), hmPlace);			
+			   .draggable(true));			
 		}	
 	}
 
@@ -219,15 +195,30 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
 		return true;
 	}
 	
-	 /**
-	    * A subclass of AsyncTask that calls getFromLocation() in the
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        //When Sync action button is clicked
+        if (id == R.id.refresh) {
+            //Sync SQLite DB data to remote MySQL DB
+            syncSQLiteMySQLDB();
+            return true;
+        } 
+        return super.onOptionsItemSelected(item);
+    }
+	
+	/**
+	  * A subclass of AsyncTask that calls getFromLocation() in the
 	    * background. The class definition has these generic types:
 	    * Location - A Location object containing
 	    * the current location.
 	    * Void     - indicates that progress units are not used
 	    * String   - An address passed to onPostExecute()
-	    */
-	    private class GetAddressTask extends AsyncTask<LatLng, Void, String> {
+	 **/
+	private class GetAddressTask extends AsyncTask<LatLng, Void, String> {
 	        Context mContext;
 	        
 	        public GetAddressTask(Context context) {
@@ -310,25 +301,87 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
 	
    @Override
     public void onLocationChanged(Location location) {
-        mLatitude = location.getLatitude();
-        mLongitude = location.getLongitude();
+        double mLatitude = location.getLatitude();
+        double mLongitude = location.getLongitude();
         LatLng latLng = new LatLng(mLatitude, mLongitude);	 
         map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        map.animateCamera(CameraUpdateFactory.zoomTo(14));
+        map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
     }	
+   
+   //syncing sqlite to mysql
+   public void syncSQLiteMySQLDB(){
+       //Create AsycHttpClient object
+       AsyncHttpClient client = new AsyncHttpClient();
+       RequestParams params = new RequestParams();
+      // ArrayList<HashMap<String, String>> locList =  data.getAllLocations();
+     //  if(locList.size()!=0){
+     //      if(data.dbSyncCount() != 0){
+               prgDialog.show();
+               params.put("locationsJSON", data.composeJSONfromSQLite());
+               client.post("http://192.168.0.11/sqlitemysqlsyncMarkers/insertmarker.php",params ,new AsyncHttpResponseHandler() {
+                   @Override
+                   public void onSuccess(String response) {        
+                       System.out.println(response);
+                       prgDialog.hide();
+                       try {
+                           JSONArray arr = new JSONArray(response);                            
+                           System.out.println(arr.length());
+                           for(int i=0; i<arr.length();i++){
+                               JSONObject obj = (JSONObject)arr.get(i);                               
+                               System.out.println(obj.get("id"));                               
+                               System.out.println(obj.get("status"));
+                               data.updateSyncStatus(obj.get("id").toString(),obj.get("status").toString());
+                           }
+                           Toast.makeText(getApplicationContext(), "DB Sync completed!", Toast.LENGTH_LONG).show();
+                       } catch (JSONException e) {
+                           // TODO Auto-generated catch block
+                           Toast.makeText(getApplicationContext(), "Error Occured [Server's JSON response might be invalid]!", Toast.LENGTH_LONG).show();
+                           e.printStackTrace();
+                       }
+                   }
+                   @Override
+                   public void onFailure(int statusCode, Throwable error,
+                       String content) {
+                       // TODO Auto-generated method stub
+                       prgDialog.hide();
+                       if(statusCode == 404){
+                           Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
+                       }else if(statusCode == 500){
+                           Toast.makeText(getApplicationContext(), "Something went wrong at server end", Toast.LENGTH_LONG).show();
+                       }else{
+                           Toast.makeText(getApplicationContext(), "Unexpected Error occcured! [Most common Error: Device might not be connected to Internet]", Toast.LENGTH_LONG).show();
+                       }
+                   }
+               });
+       //    }else{
+       //        Toast.makeText(getApplicationContext(), "SQLite and Remote MySQL DBs are in Sync!", Toast.LENGTH_LONG).show();
+       //    }
+     //  }else{
+       //        Toast.makeText(getApplicationContext(), "No data in SQLite DB, please do enter a location first", Toast.LENGTH_LONG).show();
+     //  }
+               
+   }
+   //end method
+   
+   
 	
 	  @Override
-	  protected void onResume() {
+	protected void onResume() {
 	    data.open();
 	    super.onResume();
 	  }
 
 	  @Override
-	  protected void onPause() {
+	protected void onPause() {
 	    data.close();
 	    super.onPause();
 	  }
 
+	  /**
+	   * unimplemented methods of the listener class
+	   * @return -  void
+	   * @param - not used
+	   */
 	@Override
 	public void onProviderDisabled(String arg0) {
 			

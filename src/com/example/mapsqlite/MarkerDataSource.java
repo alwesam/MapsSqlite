@@ -2,19 +2,23 @@ package com.example.mapsqlite;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 public class MarkerDataSource {
 
 	MySQLHelper dbhelper;
-	SQLiteDatabase db;
-	
+	SQLiteDatabase db;	
 	String[] cols = { MySQLHelper.TITLE, MySQLHelper.SNIPPET, MySQLHelper.POSITION };	
 	
 	public MarkerDataSource(Context c){
@@ -31,39 +35,25 @@ public class MarkerDataSource {
 	}
 	
 	public void addMarker(MyMarkerObj n) {
-		ContentValues v = new ContentValues();
-		
+		ContentValues v = new ContentValues();		
 		v.put(MySQLHelper.TITLE, n.getTitle());
 		v.put(MySQLHelper.SNIPPET, n.getSnippet());
 		v.put(MySQLHelper.POSITION, n.getPosition());
-		
-		db.insert(MySQLHelper.TABLE_NAME, null, v);
-		
+		v.put(MySQLHelper.STATUS, "no");
+		//v.put(MySQLHelper.DEL_STATUS, "no");
+		db.insert(MySQLHelper.TABLE_NAME, null, v);		
 	}
 	
 	public void deleteMarker(MyMarkerObj n) {
 	    	    
 	    db.delete(MySQLHelper.TABLE_NAME, MySQLHelper.POSITION
 	        + " = '" + n.getPosition() + "'", null);
-	  }
-	
-	//modify database based on one value
-	//TODO finish it up
-	public void modifyMarker(String var, String anchor1, String anchor2, String anchor3){
-		
-		deleteMarker( new MyMarkerObj(anchor1,anchor2, anchor3));  
-    	//replace with new record
-    	addMarker(new MyMarkerObj(anchor1, var, anchor3) );		
-		
-	}
-	
+	  }	
 	
 	public List<MyMarkerObj> getMyMarkers(){
 		
-		List<MyMarkerObj> markers = new ArrayList<MyMarkerObj>();
-		
-		Cursor cursor = db.query(MySQLHelper.TABLE_NAME, cols, null, null, null, null, null);
-		
+		List<MyMarkerObj> markers = new ArrayList<MyMarkerObj>();		
+		Cursor cursor = db.query(MySQLHelper.TABLE_NAME, cols, null, null, null, null, null);		
 		cursor.moveToFirst();
 		
 		while (!cursor.isAfterLast()){
@@ -82,5 +72,54 @@ public class MarkerDataSource {
 		m.setPosition(cursor.getString(2));
 		return m;
 	}
+	
+	/**
+     * Compose JSON out of SQLite records
+     * @return
+     */
+    public String composeJSONfromSQLite(){
+        ArrayList<HashMap<String, String>> wordList;
+        wordList = new ArrayList<HashMap<String, String>>();
+        String selectQuery = "SELECT  * FROM locations where updateStatus = '"+"no"+"'";
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                HashMap<String, String> map = new HashMap<String, String>();
+                map.put(MySQLHelper.COLUMN_ID, cursor.getString(0));
+                map.put(MySQLHelper.TITLE, cursor.getString(1));
+                map.put(MySQLHelper.SNIPPET, cursor.getString(2));
+                map.put(MySQLHelper.POSITION, cursor.getString(3));
+                wordList.add(map);
+            } while (cursor.moveToNext());
+        }
+        Gson gson = new GsonBuilder().create();
+        //Use GSON to serialize Array List to JSON
+        return gson.toJson(wordList);
+    }
+    
+    /**
+     * Get SQLite records that are yet to be Synced
+     * @return
+     */
+    public int dbSyncCount(){
+        int count = 0;
+        String selectQuery = "SELECT  * FROM users where udpateStatus = '"+"no"+"'";        
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        count = cursor.getCount();        
+        return count;
+    }
+    
+    /**
+     * Update Sync status against each User ID
+     * @param id
+     * @param status
+     */
+    public void updateSyncStatus(String id, String status){    
+        String updateQuery = "Update locations set updateStatus = '"
+                                + status +"' where id="+"'"+ id +"'";
+        Log.d("query",updateQuery);        
+        db.execSQL(updateQuery);
+        
+    }
 	
 }
