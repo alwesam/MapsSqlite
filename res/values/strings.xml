@@ -3,6 +3,12 @@
 
     <string name="app_name">mapsqlite</string>
     <string name="action_settings">Settings</string>
+    <string name="action_sync_mysql">Sync from Server</string>
     <string name="hello_world">Hello world!</string>
+    <string name="addlocation">"Selected address:"</string>
+    <string name="address">""</string>   
+    <string name="hint">"Enter Comment"</string>
+    <string name="save">"Save"</string>
+    <string name="cancel">"Cancel"</string>
 
 </resources>

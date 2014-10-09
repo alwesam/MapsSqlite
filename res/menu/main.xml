@@ -1,10 +1,26 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity" >
 
+    <item
+        android:id="@+id/search"
+        android:icon="@drawable/ic_search"
+        android:orderInCategory="400"
+        android:showAsAction="always"
+        />
+    
     <item
         android:id="@+id/refresh"
         android:icon="@drawable/ic_action_refresh"
-        android:orderInCategory="100"
+        android:orderInCategory="300"
         android:showAsAction="always"
-        android:title="@string/action_settings"/>
+        />
+    
+    <item
+        android:id="@+id/refresh2"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_sync_mysql"/>
 
 </menu>

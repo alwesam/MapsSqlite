@@ -21,6 +21,11 @@ public class MyMarkerObj {
 		this.setSnippet(snippet);
 		this.setPosition(position);		
 	}
+	
+	//so as to access data based on position only
+	public MyMarkerObj (String position){	
+		this.setPosition(position);		
+	}
 
 	public long getId() {
 		return id;

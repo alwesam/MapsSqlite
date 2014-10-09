@@ -3,7 +3,6 @@ package com.example.mapsqlite;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -13,79 +12,84 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
 public class NewLocation extends Activity {
 
-	private Context context;
-	private LatLng coordinates;
-	
-	private String address; //one address at a time? Not convinced, TODO review later
-	
+	private Context context = this;	
+	private String coordinates;
 	MarkerDataSource data;
-	
-	public NewLocation(LatLng latlng, Context c){
-		this.coordinates = latlng;
-		//this.context = c;
-	}	
+	private TextView addressTextView;
+	private EditText userComment;
+	private EditText editAddress;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_new_location);
-        //userName = (EditText) findViewById(R.id.userName);
         
-        //TODO add fields to enter the stuff and buttons including 
-        //button to retrieve address!
-        
+        userComment = (EditText) findViewById(R.id.Comment); 
+        editAddress = (EditText) findViewById(R.id.Location);
+        addressTextView = (TextView) findViewById(R.id.addressText);
         
         data = new MarkerDataSource(context);
         try {
 			data.open();
 		} catch (Exception e){
 			Log.i("hello", "hello");
-		}
-    }
-	
-	
-	/**
-	 * called when new marker is saved
-	 */
-	public void addNewLocation(View view){
-		
-		GetAddressTask getAddress = new GetAddressTask(context);	        	    
+		}        
+        
+        Intent intent = this.getIntent();
+        coordinates = intent.getStringExtra(Intent.EXTRA_TEXT);
+        
+        //decoding address and calling async function to get result
+        GetAddressTask getAddress = new GetAddressTask(context);	        	    
 	    getAddress.execute(coordinates);
-		//TODO, get decoded address    
-	    this.address = "";
-		String slatlng = String.valueOf(coordinates.latitude)+" "+String.valueOf(coordinates.longitude);
-		data.addMarker(new MyMarkerObj(this.address, "Position:"+slatlng, slatlng) );
+       
+    }		
+	
+	public void updateAddress (String address){
+		addressTextView.setText("Selected address: "+address);
+		editAddress.setText(address);
+	}
+		
+	public void addNewLocation(View view){		
+		//TODO add conditionals to ensure legal data is entered into database
+		data.addMarker(new MyMarkerObj(userComment.getText().toString(), //enter comments
+				                       editAddress.getText().toString(), //edit or enter address
+				                       coordinates) 
+		               );
 		data.close();
+		Toast.makeText(getApplicationContext(), "Marker added", Toast.LENGTH_LONG).show();
 		//go back home
 		this.callHomeActivity(view);
-	}
+	}	
+	 
+    /**
+     * Called when Cancel button is clicked
+     * @param view
+     */
+    public void cancelAddLocation(View view) {
+        this.callHomeActivity(view);
+    }
 	
 	/**
      * Navigate to Home Screen 
      * @param view
      */
     public void callHomeActivity(View view) {
-        Intent objIntent = new Intent(getApplicationContext(),
-                MainActivity.class);
+        Intent objIntent = new Intent(getApplicationContext(),MainActivity.class);
         startActivity(objIntent);
-    }
- 
-    /**
-     * Called when Cancel button is clicked
-     * @param view
-     */
-    public void cancelAddUser(View view) {
-        this.callHomeActivity(view);
     }
 	
     //alternatively, find a jar file that does this already!!
     //or even better create a jarfile that does this for me!
-	
+    //TODO there is an occasional problem with Network locator (in which case the phone
+    //is rebooted to make it work again
 	/**
 	  * A subclass of AsyncTask that calls getFromLocation() in the
 	    * background. The class definition has these generic types:
@@ -94,13 +98,8 @@ public class NewLocation extends Activity {
 	    * Void     - indicates that progress units are not used
 	    * String   - An address passed to onPostExecute()
 	 **/
-	private class GetAddressTask extends AsyncTask<LatLng, Void, String> {
+	private class GetAddressTask extends AsyncTask<String, Void, String> {
 	        private Context mContext;	       
-	        private String decodedAddress;
-	        
-	        public void setdecodedAddress(String result){
-	        	this.decodedAddress = result;
-	        }
 	        
 	        public GetAddressTask(Context context) {
 	            super();
@@ -110,18 +109,18 @@ public class NewLocation extends Activity {
 	        /**
 	         * Get a Geocoder instance, get the latitude and longitude
 	         * look up the address, and return it
-	         *
 	         * @params params One or more Location objects
 	         * @return A string containing the address of the current
 	         * location, or an empty string if no address can be found,
 	         * or an error message
 	         */
 	        @Override
-	        protected String doInBackground(LatLng... params) {
+	        protected String doInBackground(String... params) {
 	            Geocoder geocoder =
 	                    new Geocoder(mContext, Locale.getDefault());
-	            // Get the current location from the input parameter list
-	            LatLng loc = params[0];
+	            // Get the current location from the input parameter list	            
+	            String[] splited = params[0].split("\\s+");
+	            LatLng loc = new LatLng(Double.parseDouble(splited[0]),Double.parseDouble(splited[1]));
 	            // Create a list to contain the result address
 	            List<Address> addresses = null;
 	            try {
@@ -170,8 +169,8 @@ public class NewLocation extends Activity {
 	            }
 	        }
 	    
-	        protected void onPostExecute(String address) {
-	            setdecodedAddress(address);	        		        	
+	        protected void onPostExecute(String result) {
+	        	updateAddress(result);
 	        }	    
 	    }
 	

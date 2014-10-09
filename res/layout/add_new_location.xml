@@ -2,7 +2,74 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:background="#CCCCCC"
+    android:orientation="vertical"
+    android:paddingTop="1dp" >  
     
+    <TextView android:id="@+id/addressText"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:background="#cc0000"
+              android:padding="5dp"
+              android:text="@string/addlocation"
+              android:textAppearance="?android:attr/textAppearanceLarge"
+              android:textColor="#FFFFFF" />
+    
+    <RelativeLayout
+     android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:orientation="vertical"
+        android:padding="10dp" >
+    
+    <TextView android:id="@+id/addressText"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignParentLeft="true"
+              android:layout_alignParentTop="true"
+              android:layout_marginLeft="24dp"
+              android:layout_marginTop="30dp"
+              android:text="@string/address" />
+    
+   <EditText
+        android:id="@+id/Location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:ems="20"> 
+        <requestFocus />
+    </EditText>
+    
+   <EditText
+        android:id="@+id/Comment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Location"
+        android:inputType="text"
+        android:ems="20" android:hint="@string/hint"> 
+        <requestFocus />
+    </EditText>
+    
+    <Button
+        android:id="@+id/btnadd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/Comment"
+        android:layout_below="@+id/Comment"
+        android:layout_marginTop="32dp"
+        android:text="@string/save"     
+        android:onClick="addNewLocation" />
+    
+      <Button
+        android:id="@+id/btnCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Comment"
+        android:layout_toRightOf="@+id/btnadd"
+        android:layout_marginTop="32dp"
+        android:text="@string/cancel"     
+        android:onClick="cancelAddLocation" />
 
+      </RelativeLayout>
+      
 </LinearLayout>

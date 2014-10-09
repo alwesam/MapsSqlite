@@ -103,7 +103,7 @@ public class MarkerDataSource {
      */
     public int dbSyncCount(){
         int count = 0;
-        String selectQuery = "SELECT  * FROM users where udpateStatus = '"+"no"+"'";        
+        String selectQuery = "SELECT  * FROM locations where udpateStatus = '"+"no"+"'";        
         Cursor cursor = db.rawQuery(selectQuery, null);
         count = cursor.getCount();        
         return count;
@@ -121,5 +121,38 @@ public class MarkerDataSource {
         db.execSQL(updateQuery);
         
     }
-	
+    
+    //TODO update comments
+    public void updateComments(String id, String comment){
+    	
+    	String updateQuery = "Update locations set snippet = '"
+                + comment +"' where id="+"'"+ id +"'";
+        Log.d("query",updateQuery);        
+        db.execSQL(updateQuery);
+        
+    }
+    
+    /**
+     * a function to query if coordinates are in the database
+     * @param pos
+     * @return boolean
+     */
+    public boolean queryPosition (String pos) {    	
+    	String selectQuery = "SELECT  * FROM locations where position = '"+pos+"'";
+    	Cursor cursor = db.rawQuery(selectQuery, null);    	
+    	if (cursor.getCount()<=0)
+    	   return false; //doesn't exist
+    	else
+    	   return true; //exists
+    }
+    
+    public boolean queryAddress (String address) {    	
+    	String selectQuery = "SELECT  * FROM locations where title = '"+address+"'";
+    	Cursor cursor = db.rawQuery(selectQuery, null);    	
+    	if (cursor.getCount()<=0)
+    	   return false; //doesn't exist
+    	else
+    	   return true; //exists
+    }
+
 }
