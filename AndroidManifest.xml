@@ -47,7 +47,7 @@
         <!-- Specifies the Android API Key, which is obtained from Google API Console -->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyA-kdHHwytXj9WbMlWvpiwu6SeTqRobX70" />   
+            android:value="@string/api_value" />   
                   
         <activity
             android:name="com.example.mapsqlite.MainActivity"
