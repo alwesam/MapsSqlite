@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.mapsqlite"
+    package="com.vandevsam.shareloc.beta"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -9,7 +9,7 @@
         android:targetSdkVersion="16" />
     
     <!-- Allows to receive map -->
-    <uses-permission android:name="com.example.mapsqlite.permission.MAPS_RECEIVE" />
+    <uses-permission android:name="com.vandevsam.shareloc.beta.permission.MAPS_RECEIVE" />
  
     <!-- Used by the Google Maps Android API V2 to download map tiles from Google Maps servers -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -50,7 +50,7 @@
             android:value="@string/api_value" />   
                   
         <activity
-            android:name="com.example.mapsqlite.MainActivity"
+            android:name="com.vandevsam.shareloc.beta.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -60,13 +60,23 @@
         </activity>
         
         <activity
-            android:name="com.example.mapsqlite.NewLocation"
+            android:name="com.vandevsam.shareloc.beta.NewLocation"
             android:label="Enter New Location" 
-            android:parentActivityName="com.example.mapsqlite.MainActivity">          
+            android:parentActivityName="com.vandevsam.shareloc.beta.MainActivity">          
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.mapsqlite.MainActivity" />
+                android:value="com.vandevsam.shareloc.beta.MainActivity" />
         </activity>
+        
+        <activity
+            android:name=".SettingsActivity"
+            android:label="Settings"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.vandevsam.shareloc.beta.MainActivity" />
+        </activity>
+        
        
     </application>
 
