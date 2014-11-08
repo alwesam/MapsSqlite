@@ -53,15 +53,38 @@
             android:name="com.vandevsam.shareloc.beta.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>           
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>                     
+        </activity>     
+        
+        <activity
+            android:name="com.vandevsam.shareloc.beta.SearchActivity"
+            android:label="Search a Location" 
+            android:parentActivityName="com.vandevsam.shareloc.beta.MainActivity"> 
+            <intent-filter>
+               <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data
+              android:name="android.app.searchable"
+              android:resource="@xml/searchable" />         
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.vandevsam.shareloc.beta.MainActivity" />            
         </activity>
         
         <activity
             android:name="com.vandevsam.shareloc.beta.NewLocation"
             android:label="Enter New Location" 
+            android:parentActivityName="com.vandevsam.shareloc.beta.MainActivity">          
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.vandevsam.shareloc.beta.MainActivity" />
+        </activity>
+        
+        <activity
+            android:name="com.vandevsam.shareloc.beta.ProfileActivity"
+            android:label="Profile" 
             android:parentActivityName="com.vandevsam.shareloc.beta.MainActivity">          
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
