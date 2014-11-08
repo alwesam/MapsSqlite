@@ -3,21 +3,36 @@
 
     <string name="app_name">ShareLoc</string>
     <string name="action_settings">Settings</string>
-    <string name="action_sync_mysql">Sync from Server</string>
+    <string name="action_search">Search</string>
+    <string name="action_sync_mysql">Sync Data</string>
     <string name="hello_world">Hello world!</string>
     <string name="addlocation">"Selected address:"</string>
     <string name="address">""</string>   
     <string name="hint">"Enter Comment"</string>
+    <string name="search_hint">"Search Address"</string>
     <string name="save">"Save"</string>
     <string name="cancel">"Cancel"</string>
+    
+    <string name="group_a">"Group A"</string>
+    <string name="group_b">"Group B"</string>
+    <string name="group_c">"Group C"</string>
+    <string name="group_d">"Group D"</string>
     
     <string-array name="sidepane_array">
         <item>Search</item>        
         <item>Log-in</item>
         <item>Sign-up</item>
+        <item>Profile</item>
         <item>Settings</item>
         <item>Help</item>
         <item>Send Feedback</item>
+    </string-array>
+    
+    <string-array name="groups_array">
+        <item>Group A</item>
+        <item>Group B</item>
+        <item>Group C</item>
+        <item>Group D</item>        
     </string-array>
 
 </resources>

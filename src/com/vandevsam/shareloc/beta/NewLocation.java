@@ -12,7 +12,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +28,7 @@ public class NewLocation extends Activity {
 	private TextView addressTextView;
 	private EditText userComment;
 	private EditText editAddress;
+	private Spinner spinner;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,6 +38,14 @@ public class NewLocation extends Activity {
         userComment = (EditText) findViewById(R.id.Comment); 
         editAddress = (EditText) findViewById(R.id.Location);
         addressTextView = (TextView) findViewById(R.id.addressText);
+        
+        spinner = (Spinner) findViewById(R.id.groups_spinner);
+        
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.groups_array, android.R.layout.simple_spinner_item);
+     // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);        
+        spinner.setAdapter(adapter);
         
         data = new MarkerDataSource(context);
         try {

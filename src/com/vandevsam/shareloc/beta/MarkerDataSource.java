@@ -50,7 +50,7 @@ public class MarkerDataSource {
 	        + " = '" + n.getPosition() + "'", null);
 	  }	
 	
-	public List<MyMarkerObj> getMyMarkers(){
+	public List<MyMarkerObj> getAllMarkers(){
 		
 		List<MyMarkerObj> markers = new ArrayList<MyMarkerObj>();		
 		Cursor cursor = db.query(MySQLHelper.TABLE_NAME, cols, null, null, null, null, null);		
@@ -64,6 +64,22 @@ public class MarkerDataSource {
 		
 		return markers;
 	}
+	
+	//TODO: REVISIT
+	/**
+	 * This method returns a single marker based
+	 * @param pos
+	 * @return
+	 */
+     public MyMarkerObj getSelectMarker(String pos){
+		
+    	 MyMarkerObj markers;		
+    	 String selectQuery = "SELECT  * FROM locations where position = '"+pos+"'";
+     	 Cursor cursor = db.rawQuery(selectQuery, null);
+     	 cursor.moveToFirst();
+		 markers = cursorToMarker(cursor);
+		 return markers;
+	 }
 
 	private MyMarkerObj cursorToMarker(Cursor cursor) {
 		MyMarkerObj m = new MyMarkerObj();
@@ -154,5 +170,29 @@ public class MarkerDataSource {
     	else
     	   return true; //exists
     }
+    
+    public ArrayList<String> getAddresses (String query) { 
+    	
+    	ArrayList<String> addresses = new ArrayList<String>();
+    	String selectQuery = " SELECT  * FROM locations WHERE title LIKE '%"+query+"%' ";
+    	Cursor cursor = db.rawQuery(selectQuery, null);
+    	
+    	/*if (cursor.getCount()<=0){
+    		addresses.add("No Address Found");
+    		return addresses;
+    	}*/
+    	
+		if (cursor.moveToFirst()) {
+            do {
+            	addresses.add(cursor.getString(2));
+            } while (cursor.moveToNext());
+        } else
+        {
+        	addresses.add("No Address Found");
+    		return addresses;
+        }
+		
+		return addresses;
+    }   
 
 }

@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.model.LatLng;
@@ -26,11 +27,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.app.Fragment;
-import android.app.FragmentManager;
+import android.content.Loader;
+import android.database.Cursor;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
@@ -41,7 +43,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements LocationListener,NoticeDialogFragment.NoticeDialogListener {
+public class MainActivity extends Activity 
+                          implements LocationListener,
+                          NoticeDialogFragment.NoticeDialogListener,
+                          LoaderCallbacks<Cursor>{
 
 	Context context = this;
 	private GoogleMap map;	
@@ -65,7 +70,7 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
 	
 	MarkerDataSource data;	
 	ProgressDialog prgDialog;
-	private static final String webServer = "146.148.91.48"; //my google CE
+	private static final String webServer = "146.148.91.48"; //my google CE ip address
 	//private static final String webServer = "192.168.0.11"; //localhost
 
 	@Override
@@ -86,7 +91,7 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
         		 selectItem(position);
              }
 
-		});	     
+		});    
                         
         //related to main framgment: map
 		map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();		
@@ -104,7 +109,12 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
         // Find location from gps
         if(location!=null){
             onLocationChanged(location);
-        }			
+        }	else {
+        	//in case gps code not working
+    	    LatLng latLng = new LatLng(49.28964841702669, -122.7909402921796);	 
+            map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            map.animateCamera(CameraUpdateFactory.zoomTo(13));
+        }
 		//create new database to store markers
 		data = new MarkerDataSource(context);		    
 		try {
@@ -116,8 +126,7 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
 		//show available markers
 		listMarker();
 
-		//add markers	
-		//TODO go to a new activity to enter details and address! (fetch address)
+		//add markers			
 	    map.setOnMapClickListener(new OnMapClickListener() {	    	    
 	            @Override
 	            public void onMapClick(LatLng latlng) { 	            	
@@ -137,8 +146,8 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
 				//save coordinates of location marker to be deleted
 				setLoc(new LatLng(marker.getPosition().latitude,marker.getPosition().longitude));				
 				showNoticeDialog();
-			}	    	
-	    });	   	  
+			}
+	    }); 
 	    
 	  //Initialize Progress Dialog properties
         prgDialog = new ProgressDialog(this);
@@ -151,24 +160,28 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
 	/** Swaps fragments in the map view */
 	private void selectItem(int position) {
 		 // update the main content by replacing fragments and/or activities
-        Fragment fragment = null;
+        
         switch (position) {
         case 0: //search
-            fragment = null;
+        	//data.close();
+        	startActivityForResult(new Intent(this, SearchActivity.class), 0);
             break;
         case 1: //login
-            fragment = null;
+            //fragment = null;
             break;
         case 2:  //signup
-            fragment = null;
+            //fragment = null;
             break;
-        case 3://settings activity
+        case 3:  //profile
+        	startActivity(new Intent(this, ProfileActivity.class));
+            break;
+        case 4://settings activity
         	startActivity(new Intent(this, SettingsActivity.class));
             break;
-        case 4: //Help
-            fragment = null;
+        case 5: //Help
+            //fragment = null;
             break;
-        case 5: //send feedback
+        case 6: //send feedback
         	sendEmail();
             break; 
         default:
@@ -242,7 +255,7 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
 	//list markers on the map
 	private void listMarker(){		
 		map.clear();
-		List <MyMarkerObj> n = data.getMyMarkers();			
+		List <MyMarkerObj> n = data.getAllMarkers();			
 		for (int i=0; i < n.size(); i++){
 			String[] slatlng = n.get(i).getPosition().split(" ");
 			LatLng latlng = new LatLng (Double.valueOf(slatlng[0]), Double.valueOf(slatlng[1]));
@@ -252,6 +265,49 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
 			   .position(latlng)
 			   .draggable(true));			
 		}	
+	}
+	
+	//TODO: finish
+	private Marker listMarker(String pos){
+		map.clear();
+		MyMarkerObj n = data.getSelectMarker(pos);		
+	    String[] slatlng = n.getPosition().split(" ");
+		LatLng latlng = new LatLng (Double.valueOf(slatlng[0]), Double.valueOf(slatlng[1]));
+		Marker marker = map.addMarker(new MarkerOptions()			   
+		               .title(n.getTitle())
+		        	   .snippet(n.getSnippet())
+			           .position(latlng)
+			           .draggable(true));		
+		return marker;
+	}
+	
+	//TODO finish
+	private void findMarker(String slatlng){
+		
+		Marker marker = listMarker(slatlng);
+		LatLng latLng = marker.getPosition();	 
+        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        map.animateCamera(CameraUpdateFactory.zoomTo(13));
+		marker.showInfoWindow();
+		
+	}
+	
+	/**
+	 * call back from SearchActivity
+	 */	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	  super.onActivityResult(requestCode, resultCode, data);
+	  switch(requestCode) {
+	    case 0 : {
+	      if (resultCode == Activity.RESULT_OK) {
+	    	  String coordinates = data.getStringExtra(Intent.EXTRA_TEXT);
+	    	  findMarker(coordinates);
+	    	  //listMarker();
+	      }
+	      break;
+	    } 
+	  }
 	}
 
 	@Override
@@ -265,7 +321,13 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         //When Sync action button is clicked
+        if (id == R.id.action_search){
+           //data.close();
+           startActivity(new Intent(this, SearchActivity.class));
+           return true;
+        }
         if (id == R.id.action_settings) {
+        	data.close();
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
@@ -411,8 +473,15 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
 	protected void onStart() {
 	    super.onStart();
 	    data.open();
-	    listMarker();	    
+	    listMarker();
 	}
+   
+   /*protected void onStop(){
+	   super.onStop();
+	   data.close();
+   }*/
+   
+   //search and insert
 
 	/**
 	   * unimplemented methods of the listener class
@@ -432,6 +501,22 @@ public class MainActivity extends Activity implements LocationListener,NoticeDia
 	@Override
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
 				
+	}
+	
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }
