@@ -22,7 +22,7 @@ public class MyMarkerObj {
 		this.setPosition(position);		
 	}
 	
-	//so as to access data based on position only
+	//so as to access data based on position (coordinates) only
 	public MyMarkerObj (String position){	
 		this.setPosition(position);		
 	}

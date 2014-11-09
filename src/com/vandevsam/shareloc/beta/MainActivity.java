@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.model.LatLng;
@@ -50,7 +49,7 @@ public class MainActivity extends Activity
 
 	Context context = this;
 	private GoogleMap map;	
-	private static final int zoom = 15;
+	private static final int zoom = 13;
 		
 	//move to utilities class?
 	private LatLng loc;			
@@ -110,10 +109,10 @@ public class MainActivity extends Activity
         if(location!=null){
             onLocationChanged(location);
         }	else {
-        	//in case gps code not working
+        	//TODO: clean up code
     	    LatLng latLng = new LatLng(49.28964841702669, -122.7909402921796);	 
             map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            map.animateCamera(CameraUpdateFactory.zoomTo(13));
+            map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
         }
 		//create new database to store markers
 		data = new MarkerDataSource(context);		    
@@ -164,7 +163,7 @@ public class MainActivity extends Activity
         switch (position) {
         case 0: //search
         	//data.close();
-        	startActivityForResult(new Intent(this, SearchActivity.class), 0);
+        	startActivityForResult(new Intent(this, SearchActivity.class), 90);
             break;
         case 1: //login
             //fragment = null;
@@ -268,7 +267,7 @@ public class MainActivity extends Activity
 	}
 	
 	//TODO: finish
-	private Marker listMarker(String pos){
+	private Marker listAMarker(String pos){
 		map.clear();
 		MyMarkerObj n = data.getSelectMarker(pos);		
 	    String[] slatlng = n.getPosition().split(" ");
@@ -279,15 +278,17 @@ public class MainActivity extends Activity
 			           .position(latlng)
 			           .draggable(true));		
 		return marker;
-	}
+	}	
 	
-	//TODO finish
 	private void findMarker(String slatlng){
 		
-		Marker marker = listMarker(slatlng);
+		Marker marker = listAMarker(slatlng);
 		LatLng latLng = marker.getPosition();	 
         map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        map.animateCamera(CameraUpdateFactory.zoomTo(13));
+        map.animateCamera(CameraUpdateFactory.zoomTo(zoom+2));
+        Toast.makeText(getApplicationContext(), 
+  			  "Found marker!", 
+  			  Toast.LENGTH_LONG).show();
 		marker.showInfoWindow();
 		
 	}
@@ -297,17 +298,24 @@ public class MainActivity extends Activity
 	 */	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-	  super.onActivityResult(requestCode, resultCode, data);
-	  switch(requestCode) {
-	    case 0 : {
-	      if (resultCode == Activity.RESULT_OK) {
-	    	  String coordinates = data.getStringExtra(Intent.EXTRA_TEXT);
+	  //super.onActivityResult(requestCode, resultCode, data);
+     if (data != null){
+	    switch(requestCode) {
+	      case 90 : {	    	
+	        if (resultCode == RESULT_OK) {
+	    	  String coordinates = data.getStringExtra("note");
 	    	  findMarker(coordinates);
 	    	  //listMarker();
-	      }
-	      break;
-	    } 
-	  }
+	        }
+	       break;
+	      } 
+	    }
+      }  else {
+    	  Toast.makeText(getApplicationContext(), 
+    			  "Data Null", 
+    			  Toast.LENGTH_LONG).show();
+      }    	  
+     
 	}
 
 	@Override
@@ -323,7 +331,8 @@ public class MainActivity extends Activity
         //When Sync action button is clicked
         if (id == R.id.action_search){
            //data.close();
-           startActivity(new Intent(this, SearchActivity.class));
+           //startActivity(new Intent(this, SearchActivity.class));
+           startActivityForResult(new Intent(this, SearchActivity.class), 90);
            return true;
         }
         if (id == R.id.action_settings) {
@@ -473,16 +482,8 @@ public class MainActivity extends Activity
 	protected void onStart() {
 	    super.onStart();
 	    data.open();
-	    listMarker();
 	}
    
-   /*protected void onStop(){
-	   super.onStop();
-	   data.close();
-   }*/
-   
-   //search and insert
-
 	/**
 	   * unimplemented methods of the listener class
 	   * @return -  void

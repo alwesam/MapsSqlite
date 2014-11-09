@@ -65,20 +65,24 @@ public class MarkerDataSource {
 		return markers;
 	}
 	
-	//TODO: REVISIT
 	/**
-	 * This method returns a single marker based
+	 * 
 	 * @param pos
 	 * @return
 	 */
      public MyMarkerObj getSelectMarker(String pos){
 		
-    	 MyMarkerObj markers;		
+    	 MyMarkerObj marker = new MyMarkerObj();		
     	 String selectQuery = "SELECT  * FROM locations where position = '"+pos+"'";
      	 Cursor cursor = db.rawQuery(selectQuery, null);
      	 cursor.moveToFirst();
-		 markers = cursorToMarker(cursor);
-		 return markers;
+    		    //markers = cursorToMarker(cursor);
+     	 //TODO quick n dirty fix
+     	marker.setTitle(cursor.getString(1));
+		marker.setSnippet(cursor.getString(2));
+		marker.setPosition(cursor.getString(3));
+		 
+		 return marker;
 	 }
 
 	private MyMarkerObj cursorToMarker(Cursor cursor) {

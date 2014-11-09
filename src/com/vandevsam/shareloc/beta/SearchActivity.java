@@ -3,9 +3,6 @@ package com.vandevsam.shareloc.beta;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
@@ -67,11 +64,11 @@ public class SearchActivity extends Activity {
         });        
 	}	
 	
-	private void returnResults (String pos){
-		//data.close();
+	private void returnResults (String slatlng){
+				
 		Intent resultIntent = new Intent();
-		resultIntent.putExtra(Intent.EXTRA_TEXT, pos);
-		setResult(Activity.RESULT_OK, resultIntent);		
+		resultIntent.putExtra("note", slatlng);
+		setResult(RESULT_OK, resultIntent);
 		finish();		
 	}
 	
