@@ -1,10 +1,6 @@
-MapsSqlite
+ShareLoc
 ==========
 
-This is my first code check-in
-
-The objective as follows:
-- Demonstrate knowledge of Java and Android App development
-- Develop an App that make use of Google's Map API
-- Demonstrate knowledge of SQLite
-- Demonstrate knowledge of several features of Android libraries (e.g. Alert dialog, locationgps, etc)
+- Complete Authenticate and Register activity classes
+- Fix search result activity
+- Find a way to separate authentication methods into separate classes
