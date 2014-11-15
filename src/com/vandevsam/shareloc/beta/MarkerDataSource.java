@@ -63,13 +63,8 @@ public class MarkerDataSource {
 		}
 		
 		return markers;
-	}
-	
-	/**
-	 * 
-	 * @param pos
-	 * @return
-	 */
+	}	
+
      public MyMarkerObj getSelectMarker(String pos){
 		
     	 MyMarkerObj marker = new MyMarkerObj();		
@@ -167,7 +162,7 @@ public class MarkerDataSource {
     }
     
     public boolean queryAddress (String address) {    	
-    	String selectQuery = "SELECT  * FROM locations where title = '"+address+"'";
+    	String selectQuery = "SELECT  * FROM locations where snippet = '"+address+"'";
     	Cursor cursor = db.rawQuery(selectQuery, null);    	
     	if (cursor.getCount()<=0)
     	   return false; //doesn't exist
@@ -175,20 +170,27 @@ public class MarkerDataSource {
     	   return true; //exists
     }
     
+    public String getPosition (String address) {    	
+    	String selectQuery = "SELECT  * FROM locations where snippet = '"+address+"'";
+    	Cursor cursor = db.rawQuery(selectQuery, null);
+    	cursor.moveToFirst();
+        return cursor.getString(3);     	
+    }
+    
     public ArrayList<String> getAddresses (String query) { 
     	
     	ArrayList<String> addresses = new ArrayList<String>();
-    	String selectQuery = " SELECT  * FROM locations WHERE title LIKE '%"+query+"%' ";
-    	Cursor cursor = db.rawQuery(selectQuery, null);
-    	
-    	/*if (cursor.getCount()<=0){
-    		addresses.add("No Address Found");
-    		return addresses;
-    	}*/
+    	//TODO temp solution
+    	Cursor cursor;
+    	if (query == "ALL")    		
+    		cursor = db.rawQuery("SELECT * FROM locations", null);    	    
+    	else 
+	        cursor = db.rawQuery("SELECT * FROM locations WHERE snippet LIKE '%"+query+"%'", null);    	
     	
 		if (cursor.moveToFirst()) {
-            do {
-            	addresses.add(cursor.getString(2));
+            do {            	            	
+            	addresses.add(cursor.getString(2));            	
+            	
             } while (cursor.moveToNext());
         } else
         {

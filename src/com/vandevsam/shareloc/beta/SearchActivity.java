@@ -23,6 +23,7 @@ public class SearchActivity extends Activity {
 	private List<String> list;
 	private ArrayAdapter<String> searchListAdapter;
 	MarkerDataSource data;
+	String coordinates;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,64 +35,94 @@ public class SearchActivity extends Activity {
 			data.open();
 		} catch (Exception e){
 			Log.i("hello", "hello");
-		} 
-	
-	    searchIntent(getIntent());
-	   		
-        searchListAdapter = new ArrayAdapter<String>(
-                            //the current context (this fragement's parent activity)
-                            this,
-                            //ID of list item layout
-                            R.layout.list_search_item,
-                            //ID of textView to populate
-                            R.id.list_search_item_textview,
-                            //forecast data
-                             list);
-        ListView listView = (ListView) findViewById(R.id.listview_search);
-        listView.setAdapter(searchListAdapter); 
+		} 	
         
-        //now when I click on a result!
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                //String address = searchListAdapter.getItem(position);
-            	//TODO a test
-            	//data.close();
-            	String address = "49.28964841702669 -122.7909402921796";
-                returnResults(address);
-            }
-			
-        });        
+        list = doMySearch("ALL");
+        
+	    searchIntent(getIntent());
+	    
+	    searchListAdapter = new ArrayAdapter<String>(
+                //the current context (this fragement's parent activity)
+                this,
+                //ID of list item layout
+                R.layout.list_search_item,
+                //ID of textView to populate
+                R.id.list_search_item_textview,
+                //forecast data
+                list);
+
+         ListView listView = (ListView) findViewById(R.id.listview_search);
+         listView.setAdapter(searchListAdapter); 
+    
+       //now when I click on a result!
+         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+           @Override
+           public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+	         coordinates = data.getPosition(searchListAdapter.getItem(position));
+             returnResults(coordinates);	       
+           }			
+         });	
 	}	
 	
 	private void returnResults (String slatlng){
-				
+		
 		Intent resultIntent = new Intent();
 		resultIntent.putExtra("note", slatlng);
 		setResult(RESULT_OK, resultIntent);
 		finish();		
 	}
 	
-	private void searchIntent (Intent intent){
-		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-	         String query = intent.getStringExtra(SearchManager.QUERY);	         
-	         list = doMySearch(query);
-	    } 
-	    else {
-	         list = fakeList("fine");
-	    }
+  /*	
+	private void returnList (List<String> alist){
+		
+		Toast.makeText(getApplicationContext(), 
+  			  "I'm running", 
+  			  Toast.LENGTH_LONG).show();
+		Intent resultIntent = new Intent();
+		resultIntent.putStringArrayListExtra("note2", (ArrayList<String>) alist);
+		setResult(RESULT_OK, resultIntent);
+		finish();
 	}
 	
-   private ArrayList<String> fakeList(String search){		
+	/*@Override
+	public void onBackPressed() {
+	   //super.onBackPressed();
+	   Toast.makeText(getApplicationContext(), 
+ 			  coordinates, 
+ 			  Toast.LENGTH_LONG).show();
+	    Intent intent = new Intent();
+	    intent.putExtra("note", coordinates);
+	    setResult(RESULT_OK, intent);
+	    finish();
+	    returnResults(coordinates);
+	} 
+		
+   private ArrayList<String> fakeList(){		
 		ArrayList<String> searchList = new ArrayList<String>();		
-		searchList.add("one");
-		searchList.add("two");
-		searchList.add("three");
-		searchList.add("four");		
+		searchList.add("Nothing");			
 		return searchList;		
+	}	*/
+	
+	@Override
+	protected void onNewIntent(Intent intent) {
+	    setIntent(intent);
+	    searchIntent(intent);
+	}
+	
+	private void searchIntent (Intent intent){
+		//wait for user
+		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+			
+	         String query = intent.getStringExtra(SearchManager.QUERY);	         
+	         list = doMySearch(query);
+	    }
+	   /* else {	         
+	         
+	    } */
 	}
    
-	private ArrayList<String> doMySearch (String search){		
+	private ArrayList<String> doMySearch (String search){	
+		    //searchListAdapter.clear();
 		    ArrayList<String> searchList = new ArrayList<String>();
 	        searchList = data.getAddresses(search);
 	        return searchList;		
@@ -110,11 +141,5 @@ public class SearchActivity extends Activity {
 	    searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
 	    return true;
 	}
-	
-	@Override
-	protected void onStop(){
-		super.onStop();
-		data.close();
-	}
-	
+		
 }

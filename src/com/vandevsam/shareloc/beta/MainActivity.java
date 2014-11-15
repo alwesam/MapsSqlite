@@ -26,12 +26,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.DialogFragment;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.Loader;
-import android.database.Cursor;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
@@ -44,13 +41,14 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity 
                           implements LocationListener,
-                          NoticeDialogFragment.NoticeDialogListener,
-                          LoaderCallbacks<Cursor>{
+                          NoticeDialogFragment.NoticeDialogListener
+                          {
 
 	Context context = this;
 	private GoogleMap map;	
 	private static final int zoom = 13;
 		
+	SessionManager session;
 	//move to utilities class?
 	private LatLng loc;			
 	public LatLng getLoc() {
@@ -63,35 +61,50 @@ public class MainActivity extends Activity
 	private String[] mListTitles;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;	
-    private CharSequence mTitle;
-    
+    private CharSequence mTitle;      
     //private ArrayAdapter<String> listAdapter;
 	
 	MarkerDataSource data;	
 	ProgressDialog prgDialog;
-	private static final String webServer = "146.148.91.48"; //my google CE ip address
-	//private static final String webServer = "192.168.0.11"; //localhost
+	//private static final String webServer = "146.148.91.48"; //my google CE ip address
+	private static final String webServer = "192.168.0.11"; //localhost
+	private ArrayAdapter<String> mDrawerAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);		
 		
-		//initializing the drawpane
-		mListTitles = getResources().getStringArray(R.array.sidepane_array);
+		/**
+		 * Here I'm initialzing drawer pane list variables and setting the
+		 * onItemclicklistnere method
+		 */		
+		session = new SessionManager(getApplicationContext());		
+		
+        if (session.checkLogin())
+		   mListTitles = getResources().getStringArray(R.array.sidepane_array);
+        else
+           mListTitles = getResources().getStringArray(R.array.sidepane_array_guest);			
+		
+		mDrawerAdapter = new ArrayAdapter<String>(this,
+				                                  R.layout.drawer_list_item, 
+				                                  mListTitles);
+		
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         // Set the adapter for the list view
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this,R.layout.drawer_list_item, mListTitles));
+        mDrawerList.setAdapter(mDrawerAdapter);
         // Set the list's click listener
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
         	 @Override
-             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {               
-        		 selectItem(position);
+             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {  
+        		 //String item = mDrawerAdapter.getItem(position);
+        		 selectItem(mDrawerAdapter.getItem(position),position);
              }
-
 		});    
-                        
+        /**
+		 * Map initialization
+		 */	             
         //related to main framgment: map
 		map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();		
 		 // Enabling MyLocation in Google Map
@@ -115,16 +128,17 @@ public class MainActivity extends Activity
             map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
         }
 		//create new database to store markers
+        /**
+         * SQLITE database open
+         */
 		data = new MarkerDataSource(context);		    
 		try {
 			data.open();
 		} catch (Exception e){
 			Log.i("Error!", "Cannot open SQLite DB");
-		}	
-		
+		}			
 		//show available markers
 		listMarker();
-
 		//add markers			
 	    map.setOnMapClickListener(new OnMapClickListener() {	    	    
 	            @Override
@@ -157,39 +171,41 @@ public class MainActivity extends Activity
 	//end onCreate method
 	
 	/** Swaps fragments in the map view */
-	private void selectItem(int position) {
+	private void selectItem(String item, int position) {
 		 // update the main content by replacing fragments and/or activities
+		DrawerListEnum enumval = DrawerListEnum.valueOf(item.toUpperCase());
         
-        switch (position) {
-        case 0: //search
+        switch (enumval) {
+        case SEARCH: //search
         	//data.close();
         	startActivityForResult(new Intent(this, SearchActivity.class), 90);
             break;
-        case 1: //login
-            //fragment = null;
-            break;
-        case 2:  //signup
-            //fragment = null;
-            break;
-        case 3:  //profile
+        case PROFILE:  //profile
         	startActivity(new Intent(this, ProfileActivity.class));
-            break;
-        case 4://settings activity
+            break; 
+        case SETTINGS://settings activity
         	startActivity(new Intent(this, SettingsActivity.class));
             break;
-        case 5: //Help
-            //fragment = null;
-            break;
-        case 6: //send feedback
+        case LOGOUT: //Log out        
+        	session.logoutSession();
+        	//to reload activity
+        	reloadActivity();
+            break; 
+        case CONTACT: //send feedback
         	sendEmail();
             break; 
+        case LOGIN: //login
+        	startActivity(new Intent(this, AuthenticateActivity.class));
+        	finish();
+            break; 
+        case REGISTER: //register 
+        	//TODO find out diff between this and getapplicationcontext()
+        	startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
+        	finish();
+            break;
         default:
             break;
         }
-        
-         /* FragmentManager fragmentManager = getFragmentManager();
-          fragmentManager.beginTransaction()
-                .replace(R.id.map, fragment).commit(); */
         
 	    // Highlight the selected item, update the title, and close the drawer
 	    mDrawerList.setItemChecked(position, true);
@@ -197,23 +213,23 @@ public class MainActivity extends Activity
 	    mDrawerLayout.closeDrawer(mDrawerList);
 	    
 	}
-
+	
 	@Override
 	public void setTitle(CharSequence title) {
 	    mTitle = title;
 	    getActionBar().setTitle(mTitle);
 	}
 	
+	//TODO review
 	protected void sendEmail() {
 	      Log.i("Send email", "");
 
 	      String[] TO = {"alwesam@gmail.com"};
 	      Intent emailIntent = new Intent(Intent.ACTION_SEND);
+	      emailIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 	      emailIntent.setData(Uri.parse("mailto:"));
 	      emailIntent.setType("text/plain");
-
-	      emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
-	      
+	      emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);	      
 	      emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
 	      emailIntent.putExtra(Intent.EXTRA_TEXT, "Feedback");
 
@@ -266,7 +282,7 @@ public class MainActivity extends Activity
 		}	
 	}
 	
-	//TODO: finish
+	
 	private Marker listAMarker(String pos){
 		map.clear();
 		MyMarkerObj n = data.getSelectMarker(pos);		
@@ -295,7 +311,7 @@ public class MainActivity extends Activity
 	
 	/**
 	 * call back from SearchActivity
-	 */	
+	 */		
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 	  //super.onActivityResult(requestCode, resultCode, data);
@@ -335,17 +351,25 @@ public class MainActivity extends Activity
            startActivityForResult(new Intent(this, SearchActivity.class), 90);
            return true;
         }
+        if (id == R.id.refresh){
+        	reloadActivity();
+        	return true;
+        }
         if (id == R.id.action_settings) {
         	data.close();
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
-        if (id == R.id.refresh) {
+        if (id == R.id.sync_to_DB) {
             //Sync SQLite DB data to remote MySQL DB
-            syncSQLiteMySQLDB();            
+        	if (session.checkLogin())
+               syncSQLiteMySQLDB(); 
+        	else
+        		Toast.makeText(getApplicationContext(), "You have to login to upload markers", 
+        				Toast.LENGTH_LONG).show();
             return true;
         } 
-        if (id == R.id.refresh2) {            
+        if (id == R.id.sync_from_DB) {            
             syncMySQLDBSQLite();
             return true;
         }        
@@ -385,7 +409,6 @@ public class MainActivity extends Activity
                            }
                            Toast.makeText(getApplicationContext(), "DB Sync completed!", Toast.LENGTH_LONG).show();
                        } catch (JSONException e) {
-                           // TODO Auto-generated catch block
                            Toast.makeText(getApplicationContext(), "Error Occured [Server's JSON response might be invalid]!", Toast.LENGTH_LONG).show();
                            e.printStackTrace();
                        }
@@ -393,7 +416,6 @@ public class MainActivity extends Activity
                    @Override
                    public void onFailure(int statusCode, Throwable error,
                        String content) {
-                       // TODO Auto-generated method stub
                        prgDialog.hide();
                        if(statusCode == 404){
                            Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
@@ -450,14 +472,12 @@ public class MainActivity extends Activity
                            reloadActivity();
                        }
                    } catch (JSONException e) {
-                       // TODO Auto-generated catch block
                        e.printStackTrace();
                    }
                }
                // When error occured
                @Override
-               public void onFailure(int statusCode, Throwable error, String content) {
-                   // TODO Auto-generated method stub
+               public void onFailure(int statusCode, Throwable error, String content) {                   
                    // Hide ProgressBar
                    prgDialog.hide();
                    if (statusCode == 404) {
@@ -465,7 +485,7 @@ public class MainActivity extends Activity
                    } else if (statusCode == 500) {
                        Toast.makeText(getApplicationContext(), "Something went terrible at server end", Toast.LENGTH_LONG).show();
                    } else {
-                       Toast.makeText(getApplicationContext(), "Unexpected Error occcured! [Most common Error: Device might not be connected to Internet]",
+                       Toast.makeText(getApplicationContext(), "Device might not be connected to network",
                                Toast.LENGTH_LONG).show();
                    }
                }
@@ -476,19 +496,16 @@ public class MainActivity extends Activity
    public void reloadActivity() {
        Intent objIntent = new Intent(getApplicationContext(), MainActivity.class);
        startActivity(objIntent);
-   }
-     
+   }     
+   
+   //TODO check if this is needed
    @Override
 	protected void onStart() {
 	    super.onStart();
 	    data.open();
 	}
    
-	/**
-	   * unimplemented methods of the listener class
-	   * @return -  void
-	   * @param - not used
-	*/
+	
 	@Override
 	public void onProviderDisabled(String arg0) {
 			
@@ -504,20 +521,5 @@ public class MainActivity extends Activity
 				
 	}
 	
-	@Override
-	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public void onLoadFinished(Loader<Cursor> arg0, Cursor arg1) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void onLoaderReset(Loader<Cursor> arg0) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 }

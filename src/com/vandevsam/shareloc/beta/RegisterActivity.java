@@ -1,0 +1,116 @@
+package com.vandevsam.shareloc.beta;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
+
+
+public class RegisterActivity extends Activity {
+	
+	SessionManager session;
+	ProgressDialog prgDialog;
+	private EditText usernameField, passwordField, passwordField2;
+	//private static final String webServer = "146.148.91.48"; //my google CE ip address
+	private static final String webServer = "192.168.0.11"; //localhost	
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_register);				
+		
+		usernameField = (EditText)findViewById(R.id.enterUser);
+	    passwordField = (EditText)findViewById(R.id.enterPass);
+	    passwordField2 = (EditText)findViewById(R.id.reenterPass);
+		
+		prgDialog = new ProgressDialog(this);
+        prgDialog.setMessage("Creating account, please wait...");
+        prgDialog.setCancelable(false);
+		
+	}	
+	
+	//add a method to connect with login db
+	public void submitInfo(View view){			
+		 
+		   //TODO remove final, do something about it
+	       final String username = usernameField.getText().toString();
+	       String password = passwordField.getText().toString();
+	       String password2 = passwordField2.getText().toString();
+	       
+	       if(password != password2){
+	    	   Toast.makeText(getApplicationContext(), "Passwords aren't identicale", 
+	                     Toast.LENGTH_LONG).show();		    	   
+	       } else if (username == null || password == null){
+	    	   Toast.makeText(getApplicationContext(), "Username and/or Password fields are blank", 
+	                     Toast.LENGTH_LONG).show();	
+	       } else {
+	       
+	    // Create AsycHttpClient object
+	       AsyncHttpClient client = new AsyncHttpClient();	       
+	       // Http Request Params Object
+	       RequestParams params = new RequestParams();
+	       // Show ProgressBar
+	       prgDialog.show();
+	       params.put("user", username);
+	       params.put("pass", password);
+	       //TODO connect via https
+	       //TODO write a register php file
+	       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/phplogin/register.php", params, new AsyncHttpResponseHandler() {
+	               @Override
+	               public void onSuccess(String response) {
+	                   // Hide ProgressBar
+	            	   prgDialog.hide();
+	            	   //TODO fix and finish
+	            	   try {
+						JSONObject jObject = new JSONObject(response);						
+						 if (jObject.getBoolean("status")) {
+							 session.loginSession(username, "alwesam@gmail.com");
+							 Toast.makeText(getApplicationContext(), "Welcome "+username, 
+            		                     Toast.LENGTH_LONG).show();							 
+		                     loadMainActivity();
+		                   } 
+					    } catch (JSONException e) {					
+						   e.printStackTrace();
+					    }                	                   
+	                                
+	               }
+	               // When error occured
+	               @Override
+	               public void onFailure(int statusCode, Throwable error, String content) {	                   
+	                   // Hide ProgressBar
+	                   prgDialog.hide();
+	                   if (statusCode == 404) {
+	                       Toast.makeText(getApplicationContext(), "Usernmae and/or password incorrect", 
+	                    		   Toast.LENGTH_LONG).show();
+	                   } else if (statusCode == 500) {
+	                       Toast.makeText(getApplicationContext(), "Something went terrible at server end", 
+	                    		   Toast.LENGTH_LONG).show();
+	                   } else {
+	                       Toast.makeText(getApplicationContext(), "Device might not be connected to network",
+	                               Toast.LENGTH_LONG).show();
+	                   }
+	               }
+	       });	
+	     }
+	}
+	
+	public void loadMainActivity() {
+        Intent objIntent = new Intent(getApplicationContext(), MainActivity.class);                                     
+        objIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        objIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(objIntent);
+        finish();
+    }
+
+
+}
