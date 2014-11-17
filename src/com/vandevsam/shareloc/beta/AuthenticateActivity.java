@@ -20,8 +20,8 @@ public class AuthenticateActivity extends Activity {
 	SessionManager session;
 	ProgressDialog prgDialog;
 	private EditText usernameField, passwordField;
-	//private static final String webServer = "146.148.91.48"; //my google CE ip address
-	private static final String webServer = "192.168.0.11"; //localhost
+	private static final String webServer = "146.148.91.48"; //my google CE ip address
+	//private static final String webServer = "192.168.0.11"; //localhost
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,20 +61,18 @@ public class AuthenticateActivity extends Activity {
 	               @Override
 	               public void onSuccess(String response) {
 	                   // Hide ProgressBar
-	            	   prgDialog.hide();
-	            	   
+	            	   prgDialog.hide();	            	   	            	   
 	            	   try {
 						JSONObject jObject = new JSONObject(response);						
 						 if (jObject.getBoolean("status")) {
-							 session.loginSession(username, "alwesam@gmail.com");
-							 Toast.makeText(getApplicationContext(), "Welcome "+username, 
+							 session.loginSession(jObject.getString("name"), username);
+							 Toast.makeText(getApplicationContext(), "Welcome "+jObject.getString("name"), 
                		                     Toast.LENGTH_LONG).show();							 
 		                     loadMainActivity();
 		                   } 
 					    } catch (JSONException e) {					
 						   e.printStackTrace();
-					    }                	                   
-	                                
+					    }            
 	               }
 	               // When error occured
 	               @Override

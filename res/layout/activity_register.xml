@@ -11,9 +11,15 @@
     <EditText
         android:layout_width="fill_parent"
         android:layout_height="50dp"
+        android:hint="Enter Name"       
+        android:id="@+id/enterName"/>
+    
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/enterName"
         android:hint="Enter Email (username)"       
-        android:id="@+id/enterUser"
-        android:digits="12345" />
+        android:id="@+id/enterUser" />
 
     <EditText
         android:layout_width="fill_parent"

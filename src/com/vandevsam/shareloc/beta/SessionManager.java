@@ -12,6 +12,7 @@ public class SessionManager {
     private static final String PREFER_NAME = "AuthenticateShareLoc";
     private static final String SESSION_LOGIN = "IsLoggedIn";
     public static final String KEY_NAME = "name";
+    public static final String KEY_EMAIL = "email";
      
     // Constructor
     public SessionManager(Context context){
@@ -21,10 +22,11 @@ public class SessionManager {
     }
      
     //Create login session
-    public void loginSession(String name, String email){
+    public void loginSession(String name, String username){
         // Storing login value as TRUE
         editor.putBoolean(SESSION_LOGIN, true);
         editor.putString(KEY_NAME, name);
+        editor.putString(KEY_EMAIL, username);
         editor.commit();
     }        
     

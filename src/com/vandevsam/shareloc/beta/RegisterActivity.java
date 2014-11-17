@@ -18,20 +18,25 @@ import android.widget.Toast;
 
 public class RegisterActivity extends Activity {
 	
-	SessionManager session;
+	//SessionManager session;
 	ProgressDialog prgDialog;
-	private EditText usernameField, passwordField, passwordField2;
-	//private static final String webServer = "146.148.91.48"; //my google CE ip address
-	private static final String webServer = "192.168.0.11"; //localhost	
+	private EditText nameField, usernameField, passwordField, passwordField2;
+	private static final String webServer = "146.148.91.48"; //my google CE ip address
+	//private static final String webServer = "192.168.0.11"; //localhost	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_register);				
 		
+		nameField = (EditText)findViewById(R.id.enterName);
 		usernameField = (EditText)findViewById(R.id.enterUser);
 	    passwordField = (EditText)findViewById(R.id.enterPass);
 	    passwordField2 = (EditText)findViewById(R.id.reenterPass);
+	    
+	    //save entered data
+	    nameField.setText(nameField.getText().toString());
+	    usernameField.setText(usernameField.getText().toString());
 		
 		prgDialog = new ProgressDialog(this);
         prgDialog.setMessage("Creating account, please wait...");
@@ -40,20 +45,14 @@ public class RegisterActivity extends Activity {
 	}	
 	
 	//add a method to connect with login db
-	public void submitInfo(View view){			
-		 
-		   //TODO remove final, do something about it
-	       final String username = usernameField.getText().toString();
+	public void submitInfo(View view){					 
+		   
+		   String name =  nameField.getText().toString();
+	       String username = usernameField.getText().toString();
 	       String password = passwordField.getText().toString();
 	       String password2 = passwordField2.getText().toString();
 	       
-	       if(password != password2){
-	    	   Toast.makeText(getApplicationContext(), "Passwords aren't identicale", 
-	                     Toast.LENGTH_LONG).show();		    	   
-	       } else if (username == null || password == null){
-	    	   Toast.makeText(getApplicationContext(), "Username and/or Password fields are blank", 
-	                     Toast.LENGTH_LONG).show();	
-	       } else {
+	       //NOTE: remember to compare string values, use .equals(), the == compares references (objects) not values
 	       
 	    // Create AsycHttpClient object
 	       AsyncHttpClient client = new AsyncHttpClient();	       
@@ -61,8 +60,10 @@ public class RegisterActivity extends Activity {
 	       RequestParams params = new RequestParams();
 	       // Show ProgressBar
 	       prgDialog.show();
+	       params.put("name", name);
 	       params.put("user", username);
 	       params.put("pass", password);
+	       params.put("repass", password2);
 	       //TODO connect via https
 	       //TODO write a register php file
 	       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/phplogin/register.php", params, new AsyncHttpResponseHandler() {
@@ -71,13 +72,14 @@ public class RegisterActivity extends Activity {
 	                   // Hide ProgressBar
 	            	   prgDialog.hide();
 	            	   //TODO fix and finish
+	            	   //Toast.makeText(getApplicationContext(), response, 
+                    	//	   Toast.LENGTH_LONG).show();
 	            	   try {
 						JSONObject jObject = new JSONObject(response);						
 						 if (jObject.getBoolean("status")) {
-							 session.loginSession(username, "alwesam@gmail.com");
-							 Toast.makeText(getApplicationContext(), "Welcome "+username, 
-            		                     Toast.LENGTH_LONG).show();							 
-		                     loadMainActivity();
+							 Toast.makeText(getApplicationContext(), "Account successfully created!", 
+		                    		   Toast.LENGTH_LONG).show();						 						 
+		                     loadLoginActivity();
 		                   } 
 					    } catch (JSONException e) {					
 						   e.printStackTrace();
@@ -101,11 +103,11 @@ public class RegisterActivity extends Activity {
 	                   }
 	               }
 	       });	
-	     }
+	     
 	}
 	
-	public void loadMainActivity() {
-        Intent objIntent = new Intent(getApplicationContext(), MainActivity.class);                                     
+	public void loadLoginActivity() {
+        Intent objIntent = new Intent(getApplicationContext(), AuthenticateActivity.class);                                     
         objIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         objIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(objIntent);

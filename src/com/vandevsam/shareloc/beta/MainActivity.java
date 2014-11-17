@@ -66,8 +66,8 @@ public class MainActivity extends Activity
 	
 	MarkerDataSource data;	
 	ProgressDialog prgDialog;
-	//private static final String webServer = "146.148.91.48"; //my google CE ip address
-	private static final String webServer = "192.168.0.11"; //localhost
+	private static final String webServer = "146.148.91.48"; //my google CE ip address
+	//private static final String webServer = "192.168.0.11"; //localhost
 	private ArrayAdapter<String> mDrawerAdapter;
 
 	@Override
