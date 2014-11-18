@@ -91,7 +91,7 @@
         </activity>
         
         <activity
-            android:name="com.vandevsam.shareloc.beta.NewLocation"
+            android:name="com.vandevsam.shareloc.beta.NewLocationActivity"
             android:label="Enter New Location" 
             android:parentActivityName="com.vandevsam.shareloc.beta.MainActivity">          
             <meta-data
