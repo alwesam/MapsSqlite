@@ -38,5 +38,11 @@
         android:layout_height="wrap_content"
         android:text="Register"     
         android:onClick="createAccount" />
+   
+   <TextView
+        android:id="@+id/textView"
+        android:layout_below="@+id/btnRegister"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
     
 </LinearLayout>
