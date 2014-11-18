@@ -195,6 +195,7 @@ public class MainActivity extends Activity
         	sendEmail();
             break; 
         case LOGIN: //login
+        	map.clear();
         	startActivity(new Intent(this, AuthenticateActivity.class));
         	finish();
             break; 

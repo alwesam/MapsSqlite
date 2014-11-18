@@ -11,8 +11,10 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -23,6 +25,7 @@ public class RegisterActivity extends Activity {
 	private EditText nameField, usernameField, passwordField, passwordField2;
 	private static final String webServer = "146.148.91.48"; //my google CE ip address
 	//private static final String webServer = "192.168.0.11"; //localhost	
+	private TextView textView;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +44,15 @@ public class RegisterActivity extends Activity {
 		prgDialog = new ProgressDialog(this);
         prgDialog.setMessage("Creating account, please wait...");
         prgDialog.setCancelable(false);
+        
+        textView = (TextView) findViewById(R.id.textView);
+        String htmlText = "<p> Disclaimer: The developer is still working on" +
+        		"developing the security of the information given to this app." +
+        		"As a precaution, please don't provide sensitive information or a" +
+        		"password you're using to access sensitive information such as your email" +
+        		"or online bank account.</p>";
+        textView.setText(Html.fromHtml(htmlText));
+        
 		
 	}	
 	

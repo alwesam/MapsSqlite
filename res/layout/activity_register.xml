@@ -18,7 +18,7 @@
         android:layout_width="fill_parent"
         android:layout_height="50dp"
         android:layout_below="@+id/enterName"
-        android:hint="Enter Email (username)"       
+        android:hint="Enter Username"       
         android:id="@+id/enterUser" />
 
     <EditText
@@ -44,5 +44,11 @@
         android:id="@+id/subBtn"
         android:text="Submit"
         android:onClick="submitInfo" />
+    
+    <TextView
+        android:id="@+id/textView"
+        android:layout_below="@+id/subBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
 </RelativeLayout>

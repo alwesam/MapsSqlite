@@ -61,11 +61,13 @@ public class AuthenticateActivity extends Activity {
 	               @Override
 	               public void onSuccess(String response) {
 	                   // Hide ProgressBar
-	            	   prgDialog.hide();	            	   	            	   
+	            	   prgDialog.hide();	
+	            	   Toast.makeText(getApplicationContext(), response, 
+                    		   Toast.LENGTH_LONG).show();
 	            	   try {
 						JSONObject jObject = new JSONObject(response);						
 						 if (jObject.getBoolean("status")) {
-							 session.loginSession(jObject.getString("name"), username);
+							 session.loginSession(jObject.getString("name"), username, jObject.getString("date"));
 							 Toast.makeText(getApplicationContext(), "Welcome "+jObject.getString("name"), 
                		                     Toast.LENGTH_LONG).show();							 
 		                     loadMainActivity();
