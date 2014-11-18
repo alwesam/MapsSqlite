@@ -66,7 +66,7 @@ public class MainActivity extends Activity
 	
 	MarkerDataSource data;	
 	ProgressDialog prgDialog;
-	private static final String webServer = "146.148.91.48"; //my google CE ip address
+	private static final String webServer = "108.59.82.39"; //my google CE ip address
 	//private static final String webServer = "192.168.0.11"; //localhost
 	private ArrayAdapter<String> mDrawerAdapter;
 
@@ -146,7 +146,7 @@ public class MainActivity extends Activity
 	            	//close database first before launching a new activity (which also will acces the same db)!
 	            	data.close();	            	
 	            	String coordinates = String.valueOf(latlng.latitude)+" "+String.valueOf(latlng.longitude);					
-					Intent newLocation = new Intent(getBaseContext(), NewLocation.class)
+					Intent newLocation = new Intent(getBaseContext(), NewLocationActivity.class)
 	            	                               .putExtra(Intent.EXTRA_TEXT, coordinates);
                     startActivity(newLocation);
 	            }

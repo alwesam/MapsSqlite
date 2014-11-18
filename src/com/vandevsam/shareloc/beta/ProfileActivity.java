@@ -23,7 +23,7 @@ public class ProfileActivity extends Activity {
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.profile);
+        setContentView(R.layout.activity_profile);
         
         session = new SessionManager(getApplicationContext());
         

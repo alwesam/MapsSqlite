@@ -28,7 +28,7 @@ public class SearchActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.search);
+		setContentView(R.layout.activity_search);
 		
 		data = new MarkerDataSource(context);
         try {

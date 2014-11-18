@@ -23,7 +23,8 @@ public class RegisterActivity extends Activity {
 	//SessionManager session;
 	ProgressDialog prgDialog;
 	private EditText nameField, usernameField, passwordField, passwordField2;
-	private static final String webServer = "146.148.91.48"; //my google CE ip address
+	private static final String webServer = "108.59.82.39"; //my google CE ip address
+	//private static final String webServer = "146.148.91.48"; //my google CE ip address
 	//private static final String webServer = "192.168.0.11"; //localhost	
 	private TextView textView;
 	
@@ -45,12 +46,10 @@ public class RegisterActivity extends Activity {
         prgDialog.setMessage("Creating account, please wait...");
         prgDialog.setCancelable(false);
         
+        
         textView = (TextView) findViewById(R.id.textView);
-        String htmlText = "<p> Disclaimer: The developer is still working on" +
-        		"developing the security of the information given to this app." +
-        		"As a precaution, please don't provide sensitive information or a" +
-        		"password you're using to access sensitive information such as your email" +
-        		"or online bank account.</p>";
+        String htmlText = "<p></p><br><br><p align=\"center\">" +
+        		"<a href=\"http://108.59.82.39/blog\">VanDevSam</a> &copy; 2014.</p>";
         textView.setText(Html.fromHtml(htmlText));
         
 		

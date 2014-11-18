@@ -20,7 +20,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
-public class NewLocation extends Activity {
+public class NewLocationActivity extends Activity {
 
 	private Context context = this;	
 	private String coordinates;
@@ -33,7 +33,7 @@ public class NewLocation extends Activity {
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_new_location);
+        setContentView(R.layout.activity_newlocation);
         
         userComment = (EditText) findViewById(R.id.Comment); 
         editAddress = (EditText) findViewById(R.id.Location);

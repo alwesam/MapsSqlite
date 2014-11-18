@@ -11,8 +11,10 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class AuthenticateActivity extends Activity {
@@ -20,8 +22,9 @@ public class AuthenticateActivity extends Activity {
 	SessionManager session;
 	ProgressDialog prgDialog;
 	private EditText usernameField, passwordField;
-	private static final String webServer = "146.148.91.48"; //my google CE ip address
+	private static final String webServer = "108.59.82.39"; //my google CE ip address
 	//private static final String webServer = "192.168.0.11"; //localhost
+	private TextView textView;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +43,11 @@ public class AuthenticateActivity extends Activity {
 		prgDialog = new ProgressDialog(this);
         prgDialog.setMessage("Authenticating, please wait...");
         prgDialog.setCancelable(false);
+        
+        textView = (TextView) findViewById(R.id.textView);
+        String htmlText = "<p></p><br><br><p align=\"center\">" +
+        		"<a href=\"http://108.59.82.39/blog\">VanDevSam</a> &copy; 2014.</p>";
+        textView.setText(Html.fromHtml(htmlText));
 	}	
 	
 	/**
@@ -61,9 +69,7 @@ public class AuthenticateActivity extends Activity {
 	               @Override
 	               public void onSuccess(String response) {
 	                   // Hide ProgressBar
-	            	   prgDialog.hide();	
-	            	   Toast.makeText(getApplicationContext(), response, 
-                    		   Toast.LENGTH_LONG).show();
+	            	   prgDialog.hide();		            	   
 	            	   try {
 						JSONObject jObject = new JSONObject(response);						
 						 if (jObject.getBoolean("status")) {
