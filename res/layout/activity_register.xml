@@ -26,7 +26,7 @@
         android:layout_height="50dp"
         android:layout_below="@+id/enterUser"
         android:id="@+id/enterPass"
-        android:hint="Password"
+        android:hint="Enter Password"
         android:password="true" />
     
     <EditText

@@ -19,6 +19,17 @@
     <string name="group_c">"Group C"</string>
     <string name="group_d">"Group D"</string>
     
+    <string name="pref_location_label">Location</string>
+    <string name="pref_location_key" translatable="false">location</string>
+    <string name="pref_location_default" translatable="false">Vancouver</string>
+    
+    <string name="pref_gps_key">GPS Enabled?</string>
+    <string name="pref_gps_label">Zoom to GPS Location?</string>
+    <string name="pref_gps_default" translatable="false">Enabled</string>
+    
+    <string-array name="pref_gps_entries"><item>Enabled</item> <item>Disabled</item></string-array>
+    <string-array name="pref_gps_values"><item>enabled</item> <item>disabled</item></string-array>
+    
     <string-array name="sidepane_array">
         <item>Search</item>
         <item>Profile</item>

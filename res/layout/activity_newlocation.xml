@@ -49,13 +49,7 @@
         android:ems="20" android:hint="@string/hint"> 
         <requestFocus />
     </EditText>
-    
-   <Spinner
-    android:id="@+id/groups_spinner"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content" 
-    android:layout_below="@+id/Comment"/>
-    
+           
     <Button
         android:id="@+id/btnadd"
         android:layout_width="wrap_content"

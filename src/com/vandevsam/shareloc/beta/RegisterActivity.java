@@ -24,7 +24,6 @@ public class RegisterActivity extends Activity {
 	ProgressDialog prgDialog;
 	private EditText nameField, usernameField, passwordField, passwordField2;
 	private static final String webServer = "108.59.82.39"; //my google CE ip address
-	//private static final String webServer = "146.148.91.48"; //my google CE ip address
 	//private static final String webServer = "192.168.0.11"; //localhost	
 	private TextView textView;
 	
@@ -44,14 +43,12 @@ public class RegisterActivity extends Activity {
 		
 		prgDialog = new ProgressDialog(this);
         prgDialog.setMessage("Creating account, please wait...");
-        prgDialog.setCancelable(false);
-        
+        prgDialog.setCancelable(false);        
         
         textView = (TextView) findViewById(R.id.textView);
         String htmlText = "<p></p><br><br><p align=\"center\">" +
         		"<a href=\"http://108.59.82.39/blog\">VanDevSam</a> &copy; 2014.</p>";
-        textView.setText(Html.fromHtml(htmlText));
-        
+        textView.setText(Html.fromHtml(htmlText));        
 		
 	}	
 	
@@ -82,9 +79,7 @@ public class RegisterActivity extends Activity {
 	               public void onSuccess(String response) {
 	                   // Hide ProgressBar
 	            	   prgDialog.hide();
-	            	   //TODO fix and finish
-	            	   //Toast.makeText(getApplicationContext(), response, 
-                    	//	   Toast.LENGTH_LONG).show();
+	            	   
 	            	   try {
 						JSONObject jObject = new JSONObject(response);						
 						 if (jObject.getBoolean("status")) {

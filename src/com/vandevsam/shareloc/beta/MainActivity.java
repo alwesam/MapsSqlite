@@ -1,6 +1,8 @@
 package com.vandevsam.shareloc.beta;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,17 +20,23 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.MemoryInfo;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
@@ -39,17 +47,19 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity 
-                          implements LocationListener,
-                          NoticeDialogFragment.NoticeDialogListener
-                          {
+public class MainActivity extends Activity implements LocationListener,
+                                NoticeDialogFragment.NoticeDialogListener {
 
 	Context context = this;
 	private GoogleMap map;	
 	private static final int zoom = 13;
+	
+	//TODO just in case
+	private static final String Vancouver = "49.25 -123.1";
 		
 	SessionManager session;
-	//move to utilities class?
+	
+	//TODO move to utilities class?
 	private LatLng loc;			
 	public LatLng getLoc() {
 		return loc;
@@ -66,8 +76,8 @@ public class MainActivity extends Activity
 	
 	MarkerDataSource data;	
 	ProgressDialog prgDialog;
-	private static final String webServer = "108.59.82.39"; //my google CE ip address
-	//private static final String webServer = "192.168.0.11"; //localhost
+	private static final String webServer = "108.59.82.39"; //my google CE static ip address
+	//private static final String webServer = "192.168.0.11"; //localhost for debugging and local testing
 	private ArrayAdapter<String> mDrawerAdapter;
 
 	@Override
@@ -102,6 +112,14 @@ public class MainActivity extends Activity
         		 selectItem(mDrawerAdapter.getItem(position),position);
              }
 		});    
+        
+        //location preferences
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String city = prefs.getString(getString(R.string.pref_location_key),
+        		   getString(R.string.pref_location_default));  
+        String gps = prefs.getString(getString(R.string.pref_gps_key),
+        		   getString(R.string.pref_gps_default));
+        
         /**
 		 * Map initialization
 		 */	             
@@ -119,14 +137,23 @@ public class MainActivity extends Activity
         Location location = locationManager.getLastKnownLocation(provider);
         locationManager.requestLocationUpdates(provider, 20000, 0, this);
         // Find location from gps
-        if(location!=null){
+        if(location!=null && gps.equalsIgnoreCase("enabled")){
             onLocationChanged(location);
         }	else {
-        	//TODO: clean up code
-    	    LatLng latLng = new LatLng(49.28964841702669, -122.7909402921796);	 
-            map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
+        	//TODO: fix and clean up code        	
+        	  try {
+        		  //Zoom to selected location in settings
+				zoomToLocation(geoCode(city));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				Toast.makeText(getApplicationContext(), 
+		    			  "Failed to load geocoder, zooming in to Vancouver", 
+		    			  Toast.LENGTH_LONG).show();
+				zoomToLocation(Vancouver);				
+			}
         }
+        
 		//create new database to store markers
         /**
          * SQLITE database open
@@ -143,12 +170,13 @@ public class MainActivity extends Activity
 	    map.setOnMapClickListener(new OnMapClickListener() {	    	    
 	            @Override
 	            public void onMapClick(LatLng latlng) { 	            	
-	            	//close database first before launching a new activity (which also will acces the same db)!
+	            	//close database first before launching a new activity (which also will access the same DB)!
+	            	//TODO check if needed since new activity will create an object that will access same DB
 	            	data.close();	            	
 	            	String coordinates = String.valueOf(latlng.latitude)+" "+String.valueOf(latlng.longitude);					
 					Intent newLocation = new Intent(getBaseContext(), NewLocationActivity.class)
 	            	                               .putExtra(Intent.EXTRA_TEXT, coordinates);
-                    startActivity(newLocation);
+                    startActivityForResult(newLocation, 91);                    
 	            }
 	    });	 
 	    
@@ -157,18 +185,31 @@ public class MainActivity extends Activity
 			@Override
 			public void onInfoWindowClick(Marker marker) {	
 				//save coordinates of location marker to be deleted
+				//TODO find a better way to pass the coordinates, instead of setLoc
 				setLoc(new LatLng(marker.getPosition().latitude,marker.getPosition().longitude));				
 				showNoticeDialog();
 			}
 	    }); 
 	    
 	  //Initialize Progress Dialog properties
-        prgDialog = new ProgressDialog(this);
+        prgDialog = new ProgressDialog(context);
         prgDialog.setMessage("Synching SQLite Data with Remote MySQL DB. Please wait...");
         prgDialog.setCancelable(false);
  		    
 	}
 	//end onCreate method
+		
+	private String geoCode(String city) throws IOException{
+		
+		Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+		List<Address> addresses = geocoder.getFromLocationName(city, 1);
+		Address address = addresses.get(0);
+		String coordinates = String.valueOf(address.getLatitude())+
+				             " "+
+		                     String.valueOf(address.getLongitude());
+		return coordinates;
+		
+	}
 	
 	/** Swaps fragments in the map view */
 	private void selectItem(String item, int position) {
@@ -178,13 +219,13 @@ public class MainActivity extends Activity
         switch (enumval) {
         case SEARCH: //search
         	//data.close();
-        	startActivityForResult(new Intent(this, SearchActivity.class), 90);
+        	startActivityForResult(new Intent(context, SearchActivity.class), 90);
             break;
         case PROFILE:  //profile
-        	startActivity(new Intent(this, ProfileActivity.class));
+        	startActivity(new Intent(context, ProfileActivity.class));
             break; 
         case SETTINGS://settings activity
-        	startActivity(new Intent(this, SettingsActivity.class));
+        	startActivity(new Intent(context, SettingsActivity.class));
             break;
         case LOGOUT: //Log out        
         	session.logoutSession();
@@ -196,11 +237,11 @@ public class MainActivity extends Activity
             break; 
         case LOGIN: //login
         	map.clear();
-        	startActivity(new Intent(this, AuthenticateActivity.class));
+        	startActivity(new Intent(context, AuthenticateActivity.class));
         	finish();
             break; 
         case REGISTER: //register 
-        	//TODO find out diff between this and getapplicationcontext()
+        	//TODO fix code
         	startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
         	finish();
             break;
@@ -302,10 +343,7 @@ public class MainActivity extends Activity
 		Marker marker = listAMarker(slatlng);
 		LatLng latLng = marker.getPosition();	 
         map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        map.animateCamera(CameraUpdateFactory.zoomTo(zoom+2));
-        Toast.makeText(getApplicationContext(), 
-  			  "Found marker!", 
-  			  Toast.LENGTH_LONG).show();
+        map.animateCamera(CameraUpdateFactory.zoomTo(zoom+2));        
 		marker.showInfoWindow();
 		
 	}
@@ -326,18 +364,28 @@ public class MainActivity extends Activity
 	        }
 	       break;
 	      } 
+	      case 91 : {	    	
+		        if (resultCode == RESULT_OK) {
+		    	  String result = data.getStringExtra("coord");
+		    	  String[] splited = result.split(";");
+		    	  if (splited[1].equalsIgnoreCase("true"))
+		    	      findMarker(splited[0]);
+		    	  else
+		    		  zoomToLocation(splited[0]);
+		        }
+		       break;
+		      } 
 	    }
       }  else {
     	  Toast.makeText(getApplicationContext(), 
-    			  "Data Null", 
+    			  "Data NULL", 
     			  Toast.LENGTH_LONG).show();
       }    	  
      
-	}
+	}		
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
@@ -379,13 +427,21 @@ public class MainActivity extends Activity
     }
 	
    @Override
-    public void onLocationChanged(Location location) {
+   public void onLocationChanged(Location location) {
         double mLatitude = location.getLatitude();
         double mLongitude = location.getLongitude();
         LatLng latLng = new LatLng(mLatitude, mLongitude);	 
         map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
     }	
+   
+   private void zoomToLocation(String location) {		 
+	    String[] coordinates = location.split("\\s+");   	  
+        LatLng latLng = new LatLng(Double.parseDouble(coordinates[0]),
+       		       Double.parseDouble(coordinates[1]));	    	 
+	    map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+	    map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
+	}	
    
    //syncing sqlite to mysql
    public void syncSQLiteMySQLDB(){
@@ -394,23 +450,33 @@ public class MainActivity extends Activity
                RequestParams params = new RequestParams();     
                prgDialog.show();
                params.put("locationsJSON", data.composeJSONfromSQLite());
-               client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/insertmarker.php",params ,new AsyncHttpResponseHandler() {
+               client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/insertmarker.php",
+            		        params ,new AsyncHttpResponseHandler() {
                    @Override
-                   public void onSuccess(String response) {        
-                       System.out.println(response);
+                   public void onSuccess(String response) {;
                        prgDialog.hide();
                        try {
-                           JSONArray arr = new JSONArray(response);                            
-                           System.out.println(arr.length());
+                    	   String status="";
+                           JSONArray arr = new JSONArray(response);
                            for(int i=0; i<arr.length();i++){
-                               JSONObject obj = (JSONObject)arr.get(i);                               
-                               System.out.println(obj.get("id"));                               
-                               System.out.println(obj.get("status"));
-                               data.updateSyncStatus(obj.get("id").toString(),obj.get("status").toString());
+                               JSONObject obj = (JSONObject)arr.get(i);
+                               data.updateSyncStatus(obj.get("id").toString(),obj.get("status").toString());                                                
+                               status = obj.get("status").toString();
+                           }                           
+                           if(0<arr.length()){
+                        	   if(status.equalsIgnoreCase("yes")){
+                            	   Toast.makeText(getApplicationContext(), 
+                            			   "All markers were synced to remote server successfully!", 
+                                		   Toast.LENGTH_LONG).show();
+                               } else
+                            	   Toast.makeText(getApplicationContext(), 
+                            			   "One or more markers were not synced to remote server", 
+                                		   Toast.LENGTH_LONG).show();                         	   
                            }
-                           Toast.makeText(getApplicationContext(), "DB Sync completed!", Toast.LENGTH_LONG).show();
+                           
                        } catch (JSONException e) {
-                           Toast.makeText(getApplicationContext(), "Error Occured [Server's JSON response might be invalid]!", Toast.LENGTH_LONG).show();
+                           Toast.makeText(getApplicationContext(), "Server's JSON response might be invalid!", 
+                        		   Toast.LENGTH_LONG).show();
                            e.printStackTrace();
                        }
                    }
@@ -419,11 +485,14 @@ public class MainActivity extends Activity
                        String content) {
                        prgDialog.hide();
                        if(statusCode == 404){
-                           Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
+                           Toast.makeText(getApplicationContext(), "Requested resource not found", 
+                        		   Toast.LENGTH_LONG).show();
                        }else if(statusCode == 500){
-                           Toast.makeText(getApplicationContext(), "Something went wrong at server end", Toast.LENGTH_LONG).show();
+                           Toast.makeText(getApplicationContext(), "Something went wrong at server end", 
+                        		   Toast.LENGTH_LONG).show();
                        }else{
-                           Toast.makeText(getApplicationContext(), "Unexpected Error occcured! [Most common Error: Device might not be connected to Internet]", Toast.LENGTH_LONG).show();
+                           Toast.makeText(getApplicationContext(), "Device might not be connected to Internet]", 
+                        		   Toast.LENGTH_LONG).show();
                        }
                    }
                });  
@@ -449,25 +518,20 @@ public class MainActivity extends Activity
                    try {
                        // Extract JSON array from the response
                        JSONArray arr = new JSONArray(response);
-                       System.out.println(arr.length());
+                       //System.out.println(arr.length());
                        // If no of array elements is not zero
                        if(arr.length() != 0){
                            // Loop through each array element, get JSON object which id,title,snippet,position
                            for (int i = 0; i < arr.length(); i++) {
                                // Get JSON object
                                JSONObject obj = (JSONObject) arr.get(i);
-                               System.out.println(obj.get("title"));
-                               System.out.println(obj.get("snippet"));
-                               System.out.println(obj.get("position"));
                                // Insert User into SQLite DB
                                //double check if data already exists in database
                                if (!data.queryPosition(obj.get("position").toString()) 
                             	        && !data.queryAddress(obj.get("title").toString()))                            	   
                                     data.addMarker(new MyMarkerObj(obj.get("title").toString(),
                             		                               obj.get("snippet").toString(),
-                            		                               obj.get("position").toString()));
-                               else
-                            	   System.out.println("already there");                 
+                            		                               obj.get("position").toString()));                                             
                            }             
                            // Reload the Main Activity
                            reloadActivity();
@@ -482,9 +546,11 @@ public class MainActivity extends Activity
                    // Hide ProgressBar
                    prgDialog.hide();
                    if (statusCode == 404) {
-                       Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
+                       Toast.makeText(getApplicationContext(), "Requested resource not found", 
+                    		   Toast.LENGTH_LONG).show();
                    } else if (statusCode == 500) {
-                       Toast.makeText(getApplicationContext(), "Something went terrible at server end", Toast.LENGTH_LONG).show();
+                       Toast.makeText(getApplicationContext(), "Something went terrible at server end", 
+                    		   Toast.LENGTH_LONG).show();
                    } else {
                        Toast.makeText(getApplicationContext(), "Device might not be connected to network",
                                Toast.LENGTH_LONG).show();

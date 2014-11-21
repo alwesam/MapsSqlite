@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
     
+    <EditTextPreference
+        android:key="@string/pref_location_key"
+        android:title="@string/pref_location_label"
+        android:defaultValue="@string/pref_location_default" />
+    
+    <ListPreference
+        android:key="@string/pref_gps_key"
+        android:title="@string/pref_gps_label"
+        android:entries="@array/pref_gps_entries"
+        android:entryValues="@array/pref_gps_values"
+        android:defaultValue="@string/pref_gps_default" />
 
 </PreferenceScreen>

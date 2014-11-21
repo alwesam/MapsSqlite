@@ -12,9 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,7 +26,7 @@ public class NewLocationActivity extends Activity {
 	private TextView addressTextView;
 	private EditText userComment;
 	private EditText editAddress;
-	private Spinner spinner;
+	//private Spinner spinner;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,13 +37,13 @@ public class NewLocationActivity extends Activity {
         editAddress = (EditText) findViewById(R.id.Location);
         addressTextView = (TextView) findViewById(R.id.addressText);
         
-        spinner = (Spinner) findViewById(R.id.groups_spinner);
-        
+        /*
+        spinner = (Spinner) findViewById(R.id.groups_spinner);        
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.groups_array, android.R.layout.simple_spinner_item);
      // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);        
-        spinner.setAdapter(adapter);
+        spinner.setAdapter(adapter);*/
         
         data = new MarkerDataSource(context);
         try {
@@ -77,7 +75,7 @@ public class NewLocationActivity extends Activity {
 		data.close();
 		Toast.makeText(getApplicationContext(), "Marker added", Toast.LENGTH_LONG).show();
 		//go back home
-		this.callHomeActivity(view);
+		this.callHomeActivity(view, true);
 	}	
 	 
     /**
@@ -85,17 +83,23 @@ public class NewLocationActivity extends Activity {
      * @param view
      */
     public void cancelAddLocation(View view) {
-        this.callHomeActivity(view);
+        this.callHomeActivity(view, false);
     }
 	
 	/**
      * Navigate to Home Screen 
      * @param view
      */
-    public void callHomeActivity(View view) {
-        Intent objIntent = new Intent(getApplicationContext(),MainActivity.class);
-        startActivity(objIntent);
-    }
+    public void callHomeActivity(View view, Boolean added) {
+        //Intent objIntent = new Intent(getApplicationContext(),MainActivity.class);
+        //startActivity(objIntent);
+    	Intent resultIntent = new Intent();
+    	String returnResult = coordinates+";"+added.toString();
+		resultIntent.putExtra("coord", returnResult);
+		setResult(RESULT_OK, resultIntent);
+		finish();
+    }    
+    
 	
     //alternatively, find a jar file that does this already!!
     //or even better create a jarfile that does this for me!
