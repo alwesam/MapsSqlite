@@ -22,7 +22,7 @@ public class SearchActivity extends Activity {
 	private Context context = this;	
 	private List<String> list;
 	private ArrayAdapter<String> searchListAdapter;
-	MarkerDataSource data;
+	MarkerDataManager data;
 	String coordinates;
 
 	@Override
@@ -30,7 +30,7 @@ public class SearchActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_search);
 		
-		data = new MarkerDataSource(context);
+		data = new MarkerDataManager(context);
         try {
 			data.open();
 		} catch (Exception e){
@@ -71,37 +71,6 @@ public class SearchActivity extends Activity {
 		setResult(RESULT_OK, resultIntent);
 		finish();		
 	}
-	
-  /*	
-	private void returnList (List<String> alist){
-		
-		Toast.makeText(getApplicationContext(), 
-  			  "I'm running", 
-  			  Toast.LENGTH_LONG).show();
-		Intent resultIntent = new Intent();
-		resultIntent.putStringArrayListExtra("note2", (ArrayList<String>) alist);
-		setResult(RESULT_OK, resultIntent);
-		finish();
-	}
-	
-	/*@Override
-	public void onBackPressed() {
-	   //super.onBackPressed();
-	   Toast.makeText(getApplicationContext(), 
- 			  coordinates, 
- 			  Toast.LENGTH_LONG).show();
-	    Intent intent = new Intent();
-	    intent.putExtra("note", coordinates);
-	    setResult(RESULT_OK, intent);
-	    finish();
-	    returnResults(coordinates);
-	} 
-		
-   private ArrayList<String> fakeList(){		
-		ArrayList<String> searchList = new ArrayList<String>();		
-		searchList.add("Nothing");			
-		return searchList;		
-	}	*/
 	
 	@Override
 	protected void onNewIntent(Intent intent) {

@@ -30,8 +30,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.MemoryInfo;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -74,7 +72,7 @@ public class MainActivity extends Activity implements LocationListener,
     private CharSequence mTitle;      
     //private ArrayAdapter<String> listAdapter;
 	
-	MarkerDataSource data;	
+	MarkerDataManager data;	
 	ProgressDialog prgDialog;
 	private static final String webServer = "108.59.82.39"; //my google CE static ip address
 	//private static final String webServer = "192.168.0.11"; //localhost for debugging and local testing
@@ -158,7 +156,7 @@ public class MainActivity extends Activity implements LocationListener,
         /**
          * SQLITE database open
          */
-		data = new MarkerDataSource(context);		    
+		data = new MarkerDataManager(context);		    
 		try {
 			data.open();
 		} catch (Exception e){
@@ -170,9 +168,7 @@ public class MainActivity extends Activity implements LocationListener,
 	    map.setOnMapClickListener(new OnMapClickListener() {	    	    
 	            @Override
 	            public void onMapClick(LatLng latlng) { 	            	
-	            	//close database first before launching a new activity (which also will access the same DB)!
-	            	//TODO check if needed since new activity will create an object that will access same DB
-	            	data.close();	            	
+	            	            	
 	            	String coordinates = String.valueOf(latlng.latitude)+" "+String.valueOf(latlng.longitude);					
 					Intent newLocation = new Intent(getBaseContext(), NewLocationActivity.class)
 	            	                               .putExtra(Intent.EXTRA_TEXT, coordinates);
@@ -193,7 +189,7 @@ public class MainActivity extends Activity implements LocationListener,
 	    
 	  //Initialize Progress Dialog properties
         prgDialog = new ProgressDialog(context);
-        prgDialog.setMessage("Synching SQLite Data with Remote MySQL DB. Please wait...");
+        prgDialog.setMessage("Synching with Remote MySQL DB. Please wait...");
         prgDialog.setCancelable(false);
  		    
 	}
@@ -214,11 +210,10 @@ public class MainActivity extends Activity implements LocationListener,
 	/** Swaps fragments in the map view */
 	private void selectItem(String item, int position) {
 		 // update the main content by replacing fragments and/or activities
-		DrawerListEnum enumval = DrawerListEnum.valueOf(item.toUpperCase());
-        
+		//TODO look into warning
+		DrawerListEnum enumval = DrawerListEnum.valueOf(item.toUpperCase());        
         switch (enumval) {
         case SEARCH: //search
-        	//data.close();
         	startActivityForResult(new Intent(context, SearchActivity.class), 90);
             break;
         case PROFILE:  //profile
@@ -247,13 +242,11 @@ public class MainActivity extends Activity implements LocationListener,
             break;
         default:
             break;
-        }
-        
+        }        
 	    // Highlight the selected item, update the title, and close the drawer
 	    mDrawerList.setItemChecked(position, true);
 	    setTitle(mListTitles[position]);
-	    mDrawerLayout.closeDrawer(mDrawerList);
-	    
+	    mDrawerLayout.closeDrawer(mDrawerList);	    
 	}
 	
 	@Override
@@ -367,11 +360,11 @@ public class MainActivity extends Activity implements LocationListener,
 	      case 91 : {	    	
 		        if (resultCode == RESULT_OK) {
 		    	  String result = data.getStringExtra("coord");
-		    	  String[] splited = result.split(";");
-		    	  if (splited[1].equalsIgnoreCase("true"))
-		    	      findMarker(splited[0]);
+		    	  boolean added = data.getExtras().getBoolean("added");		    	  
+		    	  if (added)
+		    	      findMarker(result);
 		    	  else
-		    		  zoomToLocation(splited[0]);
+		    		  zoomToLocation(result);
 		        }
 		       break;
 		      } 
@@ -395,8 +388,6 @@ public class MainActivity extends Activity implements LocationListener,
         int id = item.getItemId();
         //When Sync action button is clicked
         if (id == R.id.action_search){
-           //data.close();
-           //startActivity(new Intent(this, SearchActivity.class));
            startActivityForResult(new Intent(this, SearchActivity.class), 90);
            return true;
         }
@@ -405,7 +396,6 @@ public class MainActivity extends Activity implements LocationListener,
         	return true;
         }
         if (id == R.id.action_settings) {
-        	data.close();
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
@@ -414,7 +404,8 @@ public class MainActivity extends Activity implements LocationListener,
         	if (session.checkLogin())
                syncSQLiteMySQLDB(); 
         	else
-        		Toast.makeText(getApplicationContext(), "You have to login to upload markers", 
+        		Toast.makeText(getApplicationContext(), 
+        				"You have to logged in to upload markers to server", 
         				Toast.LENGTH_LONG).show();
             return true;
         } 
@@ -456,23 +447,23 @@ public class MainActivity extends Activity implements LocationListener,
                    public void onSuccess(String response) {;
                        prgDialog.hide();
                        try {
-                    	   String status="";
+                    	   int count = 0;
                            JSONArray arr = new JSONArray(response);
                            for(int i=0; i<arr.length();i++){
                                JSONObject obj = (JSONObject)arr.get(i);
                                data.updateSyncStatus(obj.get("id").toString(),obj.get("status").toString());                                                
-                               status = obj.get("status").toString();
-                           }                           
-                           if(0<arr.length()){
-                        	   if(status.equalsIgnoreCase("yes")){
-                            	   Toast.makeText(getApplicationContext(), 
-                            			   "All markers were synced to remote server successfully!", 
-                                		   Toast.LENGTH_LONG).show();
-                               } else
-                            	   Toast.makeText(getApplicationContext(), 
-                            			   "One or more markers were not synced to remote server", 
-                                		   Toast.LENGTH_LONG).show();                         	   
-                           }
+                               if(obj.get("status").toString().equalsIgnoreCase("no"))
+                            	   count++;
+                           }          
+                           
+                           if(count>0)                        	  
+                        	    Toast.makeText(getApplicationContext(), 
+                            		   count+" markers were not uploaded to remote server", 
+                                	   Toast.LENGTH_LONG).show();
+                           else                            	 
+                                Toast.makeText(getApplicationContext(), 
+                        		       "All markers were uploaded to remote server!", 
+                            	        Toast.LENGTH_LONG).show();
                            
                        } catch (JSONException e) {
                            Toast.makeText(getApplicationContext(), "Server's JSON response might be invalid!", 
@@ -518,7 +509,6 @@ public class MainActivity extends Activity implements LocationListener,
                    try {
                        // Extract JSON array from the response
                        JSONArray arr = new JSONArray(response);
-                       //System.out.println(arr.length());
                        // If no of array elements is not zero
                        if(arr.length() != 0){
                            // Loop through each array element, get JSON object which id,title,snippet,position
@@ -528,10 +518,14 @@ public class MainActivity extends Activity implements LocationListener,
                                // Insert User into SQLite DB
                                //double check if data already exists in database
                                if (!data.queryPosition(obj.get("position").toString()) 
-                            	        && !data.queryAddress(obj.get("title").toString()))                            	   
+                            	        && !data.queryAddress(obj.get("title").toString()))  {                              	   
                                     data.addMarker(new MyMarkerObj(obj.get("title").toString(),
                             		                               obj.get("snippet").toString(),
-                            		                               obj.get("position").toString()));                                             
+                            		                               obj.get("position").toString()));  
+                                    Toast.makeText(getApplicationContext(), 
+                                    	   "Markers successfully obtained from remote server ", 
+                                 		   Toast.LENGTH_LONG).show();                                    
+                               }
                            }             
                            // Reload the Main Activity
                            reloadActivity();
@@ -564,14 +558,7 @@ public class MainActivity extends Activity implements LocationListener,
        Intent objIntent = new Intent(getApplicationContext(), MainActivity.class);
        startActivity(objIntent);
    }     
-   
-   //TODO check if this is needed
-   @Override
-	protected void onStart() {
-	    super.onStart();
-	    data.open();
-	}
-   
+     
 	
 	@Override
 	public void onProviderDisabled(String arg0) {

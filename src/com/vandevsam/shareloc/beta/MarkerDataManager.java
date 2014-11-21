@@ -15,13 +15,13 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-public class MarkerDataSource {
+public class MarkerDataManager {
 
 	MySQLHelper dbhelper;
 	SQLiteDatabase db;	
 	String[] cols = { MySQLHelper.TITLE, MySQLHelper.SNIPPET, MySQLHelper.POSITION };	
 	
-	public MarkerDataSource(Context c){
+	public MarkerDataManager(Context c){
 		
 		dbhelper = new MySQLHelper(c);		
 	}

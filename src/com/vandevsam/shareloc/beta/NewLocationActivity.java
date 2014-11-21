@@ -22,7 +22,7 @@ public class NewLocationActivity extends Activity {
 
 	private Context context = this;	
 	private String coordinates;
-	MarkerDataSource data;
+	MarkerDataManager data;
 	private TextView addressTextView;
 	private EditText userComment;
 	private EditText editAddress;
@@ -45,7 +45,7 @@ public class NewLocationActivity extends Activity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);        
         spinner.setAdapter(adapter);*/
         
-        data = new MarkerDataSource(context);
+        data = new MarkerDataManager(context);
         try {
 			data.open();
 		} catch (Exception e){
@@ -94,8 +94,8 @@ public class NewLocationActivity extends Activity {
         //Intent objIntent = new Intent(getApplicationContext(),MainActivity.class);
         //startActivity(objIntent);
     	Intent resultIntent = new Intent();
-    	String returnResult = coordinates+";"+added.toString();
-		resultIntent.putExtra("coord", returnResult);
+		resultIntent.putExtra("coord", coordinates);
+		resultIntent.putExtra("added", added);
 		setResult(RESULT_OK, resultIntent);
 		finish();
     }    
