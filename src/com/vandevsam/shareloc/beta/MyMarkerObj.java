@@ -5,8 +5,17 @@ public class MyMarkerObj {
 	private String title;
 	private String snippet;
 	private String position;
+	private String status;
 	
 	public MyMarkerObj(){
+	}
+	
+	public MyMarkerObj (long id, String title, String snippet, String position, String status){
+		this.setId(id);
+		this.setTitle(title);
+		this.setSnippet(snippet);
+		this.setPosition(position);	
+		this.setStatus(status);	
 	}
 	
 	public MyMarkerObj (long id, String title, String snippet, String position){
@@ -14,6 +23,13 @@ public class MyMarkerObj {
 		this.setTitle(title);
 		this.setSnippet(snippet);
 		this.setPosition(position);		
+	}
+	
+	public MyMarkerObj (String title, String snippet, String position, String status){
+		this.setTitle(title);
+		this.setSnippet(snippet);
+		this.setPosition(position);	
+		this.setStatus(status);
 	}
 	
 	public MyMarkerObj (String title, String snippet, String position){
@@ -57,6 +73,14 @@ public class MyMarkerObj {
 
 	public void setPosition(String position) {
 		this.position = position;
-	}		
+	}	
+	
+	public String getStatus() {
+		return status;
+	}
+	
+	public void setStatus(String status) {
+		this.status = status;
+	}
 
 }

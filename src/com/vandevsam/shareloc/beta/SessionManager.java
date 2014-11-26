@@ -14,7 +14,7 @@ public class SessionManager {
     private static final String PREFER_NAME = "AuthenticateShareLoc";
     private static final String SESSION_LOGIN = "IsLoggedIn";
     public static final String KEY_NAME = "name";
-    public static final String KEY_EMAIL = "username";
+    public static final String KEY_USERNAME = "username";
     public static final String KEY_DATE = "date";
      
     // Constructor
@@ -29,7 +29,7 @@ public class SessionManager {
         // Storing login value as TRUE
         editor.putBoolean(SESSION_LOGIN, true);
         editor.putString(KEY_NAME, name);
-        editor.putString(KEY_EMAIL, username);
+        editor.putString(KEY_USERNAME, username);
         editor.putString(KEY_DATE, date);
         editor.commit();
     }

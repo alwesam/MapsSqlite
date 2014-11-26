@@ -13,6 +13,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -300,33 +301,44 @@ public class MainActivity extends Activity implements LocationListener,
     @Override
     public void onDialogNegativeClick(DialogFragment dialog) {    
     	dialog.dismiss();    	
-    }	
+    }
 	
 	//list markers on the map
 	private void listMarker(){		
+		float mapIcon = BitmapDescriptorFactory.HUE_ROSE;
 		map.clear();
 		List <MyMarkerObj> n = data.getAllMarkers();			
 		for (int i=0; i < n.size(); i++){
 			String[] slatlng = n.get(i).getPosition().split(" ");
-			LatLng latlng = new LatLng (Double.valueOf(slatlng[0]), Double.valueOf(slatlng[1]));
+			LatLng latlng = new LatLng (Double.valueOf(slatlng[0]), Double.valueOf(slatlng[1]));			
+			if(n.get(i).getStatus().equalsIgnoreCase("no"))
+				mapIcon = BitmapDescriptorFactory.HUE_ROSE;
+			else
+				mapIcon = BitmapDescriptorFactory.HUE_GREEN;
 			map.addMarker(new MarkerOptions()			   
 			   .title(n.get(i).getTitle())
 			   .snippet(n.get(i).getSnippet())
 			   .position(latlng)
+			   .icon(BitmapDescriptorFactory.defaultMarker(mapIcon))
 			   .draggable(true));			
 		}	
-	}
-	
+	}	
 	
 	private Marker listAMarker(String pos){
 		map.clear();
+		float mapIcon = BitmapDescriptorFactory.HUE_ROSE;
 		MyMarkerObj n = data.getSelectMarker(pos);		
 	    String[] slatlng = n.getPosition().split(" ");
 		LatLng latlng = new LatLng (Double.valueOf(slatlng[0]), Double.valueOf(slatlng[1]));
+		if((n.getStatus()).equalsIgnoreCase("no")) //not synced, goes green
+			mapIcon = BitmapDescriptorFactory.HUE_ROSE; //not synced
+		else
+			mapIcon = BitmapDescriptorFactory.HUE_GREEN; //synced
 		Marker marker = map.addMarker(new MarkerOptions()			   
 		               .title(n.getTitle())
 		        	   .snippet(n.getSnippet())
 			           .position(latlng)
+			           .icon(BitmapDescriptorFactory.defaultMarker(mapIcon))
 			           .draggable(true));		
 		return marker;
 	}	
@@ -454,8 +466,7 @@ public class MainActivity extends Activity implements LocationListener,
                                data.updateSyncStatus(obj.get("id").toString(),obj.get("status").toString());                                                
                                if(obj.get("status").toString().equalsIgnoreCase("no"))
                             	   count++;
-                           }          
-                           
+                           }                                     
                            if(count>0)                        	  
                         	    Toast.makeText(getApplicationContext(), 
                             		   count+" markers were not uploaded to remote server", 
@@ -518,10 +529,12 @@ public class MainActivity extends Activity implements LocationListener,
                                // Insert User into SQLite DB
                                //double check if data already exists in database
                                if (!data.queryPosition(obj.get("position").toString()) 
-                            	        && !data.queryAddress(obj.get("title").toString()))  {                              	   
+                            	        && !data.queryAddress(obj.get("title").toString()))  {  
+                            	   //since info is received from server, by default it's synced to server
                                     data.addMarker(new MyMarkerObj(obj.get("title").toString(),
                             		                               obj.get("snippet").toString(),
-                            		                               obj.get("position").toString()));  
+                            		                               obj.get("position").toString(),
+                            		                               "yes"));  
                                     Toast.makeText(getApplicationContext(), 
                                     	   "Markers successfully obtained from remote server ", 
                                  		   Toast.LENGTH_LONG).show();                                    
@@ -543,7 +556,7 @@ public class MainActivity extends Activity implements LocationListener,
                        Toast.makeText(getApplicationContext(), "Requested resource not found", 
                     		   Toast.LENGTH_LONG).show();
                    } else if (statusCode == 500) {
-                       Toast.makeText(getApplicationContext(), "Something went terrible at server end", 
+                       Toast.makeText(getApplicationContext(), "Something went wrong at server end", 
                     		   Toast.LENGTH_LONG).show();
                    } else {
                        Toast.makeText(getApplicationContext(), "Device might not be connected to network",
@@ -558,7 +571,6 @@ public class MainActivity extends Activity implements LocationListener,
        Intent objIntent = new Intent(getApplicationContext(), MainActivity.class);
        startActivity(objIntent);
    }     
-     
 	
 	@Override
 	public void onProviderDisabled(String arg0) {

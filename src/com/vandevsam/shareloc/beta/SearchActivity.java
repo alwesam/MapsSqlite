@@ -37,6 +37,7 @@ public class SearchActivity extends Activity {
 			Log.i("hello", "hello");
 		} 	
         
+        //get all listing
         list = doMySearch("ALL");
         
 	    searchIntent(getIntent());

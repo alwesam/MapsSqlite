@@ -19,10 +19,9 @@ public class MarkerDataManager {
 
 	MySQLHelper dbhelper;
 	SQLiteDatabase db;	
-	String[] cols = { MySQLHelper.TITLE, MySQLHelper.SNIPPET, MySQLHelper.POSITION };	
+	String[] cols = { MySQLHelper.TITLE, MySQLHelper.SNIPPET, MySQLHelper.POSITION, MySQLHelper.STATUS};	
 	
-	public MarkerDataManager(Context c){
-		
+	public MarkerDataManager(Context c){		
 		dbhelper = new MySQLHelper(c);		
 	}
 	
@@ -39,45 +38,34 @@ public class MarkerDataManager {
 		v.put(MySQLHelper.TITLE, n.getTitle());
 		v.put(MySQLHelper.SNIPPET, n.getSnippet());
 		v.put(MySQLHelper.POSITION, n.getPosition());
-		v.put(MySQLHelper.STATUS, "no");
-		//v.put(MySQLHelper.DEL_STATUS, "no");
+		v.put(MySQLHelper.STATUS, n.getStatus());
 		db.insert(MySQLHelper.TABLE_NAME, null, v);		
 	}
 	
-	public void deleteMarker(MyMarkerObj n) {
-	    	    
+	public void deleteMarker(MyMarkerObj n) {	    	    
 	    db.delete(MySQLHelper.TABLE_NAME, MySQLHelper.POSITION
 	        + " = '" + n.getPosition() + "'", null);
 	  }	
 	
-	public List<MyMarkerObj> getAllMarkers(){
-		
+	public List<MyMarkerObj> getAllMarkers(){		
 		List<MyMarkerObj> markers = new ArrayList<MyMarkerObj>();		
 		Cursor cursor = db.query(MySQLHelper.TABLE_NAME, cols, null, null, null, null, null);		
-		cursor.moveToFirst();
-		
+		cursor.moveToFirst();		
 		while (!cursor.isAfterLast()){
 			MyMarkerObj m = cursorToMarker(cursor);
 			markers.add(m);
 			cursor.moveToNext();
-		}
-		
+		}		
 		return markers;
 	}	
 
      public MyMarkerObj getSelectMarker(String pos){
-		
-    	 MyMarkerObj marker = new MyMarkerObj();		
-    	 String selectQuery = "SELECT  * FROM locations where position = '"+pos+"'";
-     	 Cursor cursor = db.rawQuery(selectQuery, null);
-     	 cursor.moveToFirst();
-    		    //markers = cursorToMarker(cursor);
-     	 //TODO quick n dirty fix
-     	marker.setTitle(cursor.getString(1));
-		marker.setSnippet(cursor.getString(2));
-		marker.setPosition(cursor.getString(3));
-		 
-		 return marker;
+     	Cursor cursor = db.query(MySQLHelper.TABLE_NAME, 
+     			                  cols, 
+     			                 "position = '"+pos+"'", 
+     			                  null, null, null, null);
+     	cursor.moveToFirst();
+		return cursorToMarker(cursor);
 	 }
 
 	private MyMarkerObj cursorToMarker(Cursor cursor) {
@@ -85,16 +73,19 @@ public class MarkerDataManager {
 		m.setTitle(cursor.getString(0));
 		m.setSnippet(cursor.getString(1));
 		m.setPosition(cursor.getString(2));
+		m.setStatus(cursor.getString(3));
 		return m;
 	}
 	
 	/**
-     * Compose JSON out of SQLite records
-     * @return
+     * Compose JSON out of SQLite records that are not
+     * synced with remote db
+     * @return JSON String
      */
     public String composeJSONfromSQLite(){
         ArrayList<HashMap<String, String>> wordList;
         wordList = new ArrayList<HashMap<String, String>>();
+        //only upload markers which haven't been synced to remote db yet
         String selectQuery = "SELECT  * FROM locations where updateStatus = '"+"no"+"'";
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
@@ -113,18 +104,6 @@ public class MarkerDataManager {
     }
     
     /**
-     * Get SQLite records that are yet to be Synced
-     * @return
-     */
-    public int dbSyncCount(){
-        int count = 0;
-        String selectQuery = "SELECT  * FROM locations where udpateStatus = '"+"no"+"'";        
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        count = cursor.getCount();        
-        return count;
-    }
-    
-    /**
      * Update Sync status against each User ID
      * @param id
      * @param status
@@ -133,18 +112,7 @@ public class MarkerDataManager {
         String updateQuery = "Update locations set updateStatus = '"
                                 + status +"' where id="+"'"+ id +"'";
         Log.d("query",updateQuery);        
-        db.execSQL(updateQuery);
-        
-    }
-    
-    //TODO update comments
-    public void updateComments(String id, String comment){
-    	
-    	String updateQuery = "Update locations set snippet = '"
-                + comment +"' where id="+"'"+ id +"'";
-        Log.d("query",updateQuery);        
-        db.execSQL(updateQuery);
-        
+        db.execSQL(updateQuery);        
     }
     
     /**
@@ -177,28 +145,24 @@ public class MarkerDataManager {
         return cursor.getString(3);     	
     }
     
-    public ArrayList<String> getAddresses (String query) { 
-    	
+    public ArrayList<String> getAddresses (String query) {     	
     	ArrayList<String> addresses = new ArrayList<String>();
     	//TODO temp solution
     	Cursor cursor;
     	if (query == "ALL")    		
-    		cursor = db.rawQuery("SELECT * FROM locations", null);    	    
+    		cursor = db.rawQuery("SELECT * FROM locations", null);     
     	else 
-	        cursor = db.rawQuery("SELECT * FROM locations WHERE snippet LIKE '%"+query+"%'", null);    	
-    	
+	        cursor = db.rawQuery("SELECT * FROM locations WHERE snippet LIKE '%"+query+"%'", null); 
 		if (cursor.moveToFirst()) {
             do {            	            	
-            	addresses.add(cursor.getString(2));            	
-            	
+            	addresses.add(cursor.getString(2));
             } while (cursor.moveToNext());
         } else
         {
         	addresses.add("No Address Found");
     		return addresses;
-        }
-		
+        }		
 		return addresses;
-    }   
+     }   
 
 }

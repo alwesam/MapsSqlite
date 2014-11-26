@@ -70,7 +70,8 @@ public class NewLocationActivity extends Activity {
 		//TODO add conditionals to ensure legal data is entered into database
 		data.addMarker(new MyMarkerObj(userComment.getText().toString(), //enter comments
 				                       editAddress.getText().toString(), //edit or enter address
-				                       coordinates) 
+				                       coordinates,
+				                       "no") //it's not yet synced to remote db
 		               );
 		data.close();
 		Toast.makeText(getApplicationContext(), "Marker added", Toast.LENGTH_LONG).show();
