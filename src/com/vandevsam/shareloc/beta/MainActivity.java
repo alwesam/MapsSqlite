@@ -82,7 +82,7 @@ public class MainActivity extends Activity implements LocationListener,
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);		
+		setContentView(R.layout.activity_main);	
 		
 		/**
 		 * Here I'm initialzing drawer pane list variables and setting the
@@ -165,6 +165,14 @@ public class MainActivity extends Activity implements LocationListener,
 		}			
 		//show available markers
 		listMarker();
+				
+		//receiving intent workaround solution TODO temp fix
+		try {		 
+		   onActivityResult(90, RESULT_OK, this.getIntent());	
+		} catch (Exception e){
+			Log.i("Error!", "No intent passed back yet");
+		}
+		
 		//add markers			
 	    map.setOnMapClickListener(new OnMapClickListener() {	    	    
 	            @Override
@@ -216,6 +224,7 @@ public class MainActivity extends Activity implements LocationListener,
         switch (enumval) {
         case SEARCH: //search
         	startActivityForResult(new Intent(context, SearchActivity.class), 90);
+        	//startActivity(new Intent(context, SearchActivity.class));
             break;
         case PROFILE:  //profile
         	startActivity(new Intent(context, ProfileActivity.class));
@@ -400,7 +409,7 @@ public class MainActivity extends Activity implements LocationListener,
         int id = item.getItemId();
         //When Sync action button is clicked
         if (id == R.id.action_search){
-           startActivityForResult(new Intent(this, SearchActivity.class), 90);
+            startActivityForResult(new Intent(this, SearchActivity.class), 90);        	
            return true;
         }
         if (id == R.id.refresh){

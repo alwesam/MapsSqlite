@@ -23,13 +23,15 @@ public class SearchActivity extends Activity {
 	private List<String> list;
 	private ArrayAdapter<String> searchListAdapter;
 	MarkerDataManager data;
-	String coordinates;
+	//these variables are static because they're intended for the classes
+	//not the object
+	private String coordinates;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_search);
-		
+					
 		data = new MarkerDataManager(context);
         try {
 			data.open();
@@ -37,7 +39,6 @@ public class SearchActivity extends Activity {
 			Log.i("hello", "hello");
 		} 	
         
-        //get all listing
         list = doMySearch("ALL");
         
 	    searchIntent(getIntent());
@@ -60,17 +61,20 @@ public class SearchActivity extends Activity {
            @Override
            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 	         coordinates = data.getPosition(searchListAdapter.getItem(position));
-             returnResults(coordinates);	       
+	         returnResults(coordinates); //return to map activity
            }			
          });	
 	}	
 	
 	private void returnResults (String slatlng){
 		
-		Intent resultIntent = new Intent();
-		resultIntent.putExtra("note", slatlng);
-		setResult(RESULT_OK, resultIntent);
-		finish();		
+		//Intent resultIntent = new Intent();
+		Intent resultIntent = new Intent(this, MainActivity.class);
+		resultIntent.putExtra("note", slatlng);		
+		//setResult(RESULT_OK, resultIntent);		
+		//finish();	
+		startActivity(resultIntent);
+		
 	}
 	
 	@Override
@@ -86,9 +90,6 @@ public class SearchActivity extends Activity {
 	         String query = intent.getStringExtra(SearchManager.QUERY);	         
 	         list = doMySearch(query);
 	    }
-	   /* else {	         
-	         
-	    } */
 	}
    
 	private ArrayList<String> doMySearch (String search){	
