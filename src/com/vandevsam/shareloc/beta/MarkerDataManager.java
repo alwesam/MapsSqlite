@@ -39,17 +39,17 @@ public class MarkerDataManager {
 		v.put(MySQLHelper.SNIPPET, n.getSnippet());
 		v.put(MySQLHelper.POSITION, n.getPosition());
 		v.put(MySQLHelper.STATUS, n.getStatus());
-		db.insert(MySQLHelper.TABLE_NAME, null, v);		
+		db.insert(MySQLHelper.MARKER_TABLE, null, v);		
 	}
 	
 	public void deleteMarker(MyMarkerObj n) {	    	    
-	    db.delete(MySQLHelper.TABLE_NAME, MySQLHelper.POSITION
+	    db.delete(MySQLHelper.MARKER_TABLE, MySQLHelper.POSITION
 	        + " = '" + n.getPosition() + "'", null);
 	  }	
 	
 	public List<MyMarkerObj> getAllMarkers(){		
 		List<MyMarkerObj> markers = new ArrayList<MyMarkerObj>();		
-		Cursor cursor = db.query(MySQLHelper.TABLE_NAME, cols, null, null, null, null, null);		
+		Cursor cursor = db.query(MySQLHelper.MARKER_TABLE, cols, null, null, null, null, null);		
 		cursor.moveToFirst();		
 		while (!cursor.isAfterLast()){
 			MyMarkerObj m = cursorToMarker(cursor);
@@ -60,7 +60,7 @@ public class MarkerDataManager {
 	}	
 
      public MyMarkerObj getSelectMarker(String pos){
-     	Cursor cursor = db.query(MySQLHelper.TABLE_NAME, 
+     	Cursor cursor = db.query(MySQLHelper.MARKER_TABLE, 
      			                  cols, 
      			                 "position = '"+pos+"'", 
      			                  null, null, null, null);

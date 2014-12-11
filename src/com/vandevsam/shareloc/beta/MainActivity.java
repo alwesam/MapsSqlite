@@ -11,8 +11,8 @@ import org.json.JSONObject;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -30,12 +30,12 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
@@ -46,7 +46,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements LocationListener,
+public class MainActivity extends FragmentActivity implements LocationListener,
                                 NoticeDialogFragment.NoticeDialogListener {
 
 	Context context = this;
@@ -123,7 +123,11 @@ public class MainActivity extends Activity implements LocationListener,
 		 * Map initialization
 		 */	             
         //related to main framgment: map
-		map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();		
+		//map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();	
+		
+		SupportMapFragment fm = (SupportMapFragment)   getSupportFragmentManager().findFragmentById(R.id.map);
+		map = fm.getMap();		
+		
 		 // Enabling MyLocation in Google Map
         map.setMyLocationEnabled(true);
         // Getting LocationManager object from System Service LOCATION_SERVICE
@@ -191,8 +195,9 @@ public class MainActivity extends Activity implements LocationListener,
 			public void onInfoWindowClick(Marker marker) {	
 				//save coordinates of location marker to be deleted
 				//TODO find a better way to pass the coordinates, instead of setLoc
-				setLoc(new LatLng(marker.getPosition().latitude,marker.getPosition().longitude));				
-				showNoticeDialog();
+				setLoc(new LatLng(marker.getPosition().latitude,marker.getPosition().longitude));	
+				//TODO uncomment after fixing
+				//showNoticeDialog();
 			}
 	    }); 
 	    
@@ -220,11 +225,14 @@ public class MainActivity extends Activity implements LocationListener,
 	private void selectItem(String item, int position) {
 		 // update the main content by replacing fragments and/or activities
 		//TODO look into warning
-		DrawerListEnum enumval = DrawerListEnum.valueOf(item.toUpperCase());        
+		DrawerListEnum enumval = DrawerListEnum.valueOf(item.toUpperCase().replace(" ", "_"));        
         switch (enumval) {
         case SEARCH: //search
         	startActivityForResult(new Intent(context, SearchActivity.class), 90);
         	//startActivity(new Intent(context, SearchActivity.class));
+            break;
+        case CREATE_GROUP: //create a group
+        	startActivity(new Intent(context, CreateGroupActivity.class));        	
             break;
         case PROFILE:  //profile
         	startActivity(new Intent(context, ProfileActivity.class));
@@ -262,7 +270,8 @@ public class MainActivity extends Activity implements LocationListener,
 	@Override
 	public void setTitle(CharSequence title) {
 	    mTitle = title;
-	    getActionBar().setTitle(mTitle);
+	    //TODO fix
+	    //getActionBar().setTitle(mTitle);
 	}
 	
 	//TODO review
@@ -292,7 +301,8 @@ public class MainActivity extends Activity implements LocationListener,
 	public void showNoticeDialog() {
         // Create an instance of the dialog fragment and show it
         DialogFragment dialog = new NoticeDialogFragment(context);
-        dialog.show(getFragmentManager(), "NoticeDialogFragment");
+        //TODO fix
+        //dialog.show(getSupportFragmentManager(), "NoticeDialogFragment");
     }
     
     @Override
@@ -301,15 +311,17 @@ public class MainActivity extends Activity implements LocationListener,
     	//retreive location marker coordinates
     	String slatlng = String.valueOf(getLoc().latitude)+" "+String.valueOf(getLoc().longitude);    	
     	//delete record
-    	data.deleteMarker( new MyMarkerObj(slatlng));      	
-    	dialog.dismiss();  
+    	data.deleteMarker( new MyMarkerObj(slatlng));  
+    	//TODO fix
+    	//dialog.dismiss();  
     	Toast.makeText(getApplicationContext(), "Marker deleted", Toast.LENGTH_LONG).show();
     	listMarker();
     }
 
     @Override
-    public void onDialogNegativeClick(DialogFragment dialog) {    
-    	dialog.dismiss();    	
+    public void onDialogNegativeClick(DialogFragment dialog) {  
+    	//TODO fix
+    	//dialog.dismiss();    	
     }
 	
 	//list markers on the map
