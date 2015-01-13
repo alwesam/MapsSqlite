@@ -30,6 +30,7 @@
     <string-array name="sidepane_array">
         <item>Search</item>
         <item>Profile</item>
+        <item>Search Groups</item>
         <item>Create Group</item>
         <item>Settings</item>        
         <item>Logout</item>
@@ -38,6 +39,7 @@
     
     <string-array name="sidepane_array_guest">
         <item>Search</item>
+        <item>Search Groups</item>
         <item>Login</item>
         <item>Register</item>
         <item>Contact</item>

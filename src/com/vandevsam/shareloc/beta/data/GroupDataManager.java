@@ -1,4 +1,4 @@
-package com.vandevsam.shareloc.beta;
+package com.vandevsam.shareloc.beta.data;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,5 +51,15 @@ public class GroupDataManager {
 		}		
 		return groups;
 	}	
+	
+	public boolean queryGroup(String group){
+		//TODO change
+		String selectQuery = "SELECT  * FROM groups where group_name = '"+group+"'";
+    	Cursor cursor = db.rawQuery(selectQuery, null);    	
+    	if (cursor.getCount()<=0)
+    	   return false; //doesn't exist
+    	else
+    	   return true; //exists
+	}
 
 }

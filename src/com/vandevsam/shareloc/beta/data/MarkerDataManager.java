@@ -1,4 +1,4 @@
-package com.vandevsam.shareloc.beta;
+package com.vandevsam.shareloc.beta.data;
 
 
 import java.util.ArrayList;
@@ -38,7 +38,9 @@ public class MarkerDataManager {
 		v.put(MySQLHelper.TITLE, n.getTitle());
 		v.put(MySQLHelper.SNIPPET, n.getSnippet());
 		v.put(MySQLHelper.POSITION, n.getPosition());
-		v.put(MySQLHelper.STATUS, n.getStatus());
+		//v.put(MySQLHelper.STATUS, n.getStatus());
+		//TODO temp fix
+		v.put(MySQLHelper.STATUS, "no");
 		db.insert(MySQLHelper.MARKER_TABLE, null, v);		
 	}
 	

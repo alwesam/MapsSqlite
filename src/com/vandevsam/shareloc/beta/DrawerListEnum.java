@@ -2,7 +2,7 @@ package com.vandevsam.shareloc.beta;
 
 public enum DrawerListEnum {	
 	SEARCH,
-	SEARCH_GROUP,
+	SEARCH_GROUPS,
 	CREATE_GROUP,
 	LOGIN,
 	LOGOUT,

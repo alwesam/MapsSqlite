@@ -1,4 +1,4 @@
-package com.vandevsam.shareloc.beta;
+package com.vandevsam.shareloc.beta.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -50,7 +50,7 @@ public class MySQLHelper extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 	
-		 Log.w(MySQLHelper.class.getName(),
+	     Log.w(MySQLHelper.class.getName(),
 			        "Upgrading database from version " + oldVersion + " to "
 			            + newVersion + ", which will destroy all old data");
 		db.execSQL("DROP TABLE IF EXISTS" + MARKER_TABLE);

@@ -89,6 +89,30 @@
         </activity>
         
         <activity
+            android:name="com.vandevsam.shareloc.beta.SearchGroupsActivity"
+            android:label="Find a Group"
+            android:parentActivityName="com.vandevsam.shareloc.beta.MainActivity"> 
+            <intent-filter>
+               <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data
+              android:name="android.app.searchable"
+              android:resource="@xml/searchable" /> 
+              <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.vandevsam.shareloc.beta.MainActivity" />   
+        </activity>
+        
+        <activity
+            android:name="com.vandevsam.shareloc.beta.GroupDetailActivity"
+            android:label="Group Details" 
+            android:parentActivityName="com.vandevsam.shareloc.beta.SearchGroupsActivity">          
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.vandevsam.shareloc.beta.SearchGroupsActivity" />
+        </activity>
+        
+        <activity
             android:name="com.vandevsam.shareloc.beta.NewLocationActivity"
             android:label="Enter New Location" 
             android:parentActivityName="com.vandevsam.shareloc.beta.MainActivity">          

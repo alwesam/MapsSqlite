@@ -2,12 +2,7 @@ package com.vandevsam.shareloc.beta;
 
 import java.util.HashMap;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
+import com.vandevsam.shareloc.beta.data.GroupDataManager;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -29,14 +24,12 @@ public class CreateGroupActivity extends Activity {
 	private EditText groupDescription;
 	//SessionManager session;
 	ProgressDialog prgDialog;	
-	private static final String webServer = "108.59.82.39"; //my google CE ip address
-	
-	private boolean created;
 	
 	SessionManager session;
 	HashMap<String, String> user;
 	String creator;
 	String group;
+	String description;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,28 +62,30 @@ public class CreateGroupActivity extends Activity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         spinner.setAdapter(adapter);   
-        
-      //Initialize Progress Dialog properties
-        prgDialog = new ProgressDialog(context);
-        prgDialog.setMessage("Synching with Remote MySQL DB. Please wait...");
-        prgDialog.setCancelable(false);
-                
+                  
 	}	
 	
 	public void addNewGroup(View view){		
 		group = groupName.getText().toString();
+		description = groupDescription.getText().toString();
 		data.createGroup(group);
 		data.close();
-		submitInfo();		
-		/*if (created) {
-			JoinGroup newMember = new JoinGroup();
+		//crate Group in remote db
+		ServerUtilFunctions gr = new ServerUtilFunctions(this, "Creating  a group....");
+		gr.createGroup(group, description);
+		//submitInfo();	
+		//TODO fix
+		if (true) {
+			//JoinGroup newMember = new JoinGroup(this);
 			//group's creator will be its first memeber
-			newMember.joinGroup(creator,group);
-			if(newMember.getJoined())
+			//newMember.joinGroup(creator,group);				
+			gr.joinGroup(creator, group);			
+			
+			//if(newMember.getJoined())
 			   Toast.makeText(getApplicationContext(), 
 				 "Successfully joined "+creator+" as first member of "+group, 
                	 Toast.LENGTH_LONG).show();				
-		}*/
+		}
 		//go back home
 		this.callHomeActivity(view);
 	}	
@@ -103,63 +98,5 @@ public class CreateGroupActivity extends Activity {
         Intent objIntent = new Intent(getApplicationContext(),MainActivity.class);
         startActivity(objIntent);
     } 
-    
-    //also add user
-    
-    
-  //add a method to connect with login db
-  	public void submitInfo(){					 
-  		   
-  		   String name =  groupName.getText().toString();  	  
-  		   String description =  groupDescription.getText().toString();  
-  		   //boolean created;
-  	    // Create AsycHttpClient object
-  	       AsyncHttpClient client = new AsyncHttpClient();	       
-  	       // Http Request Params Object
-  	       RequestParams params = new RequestParams();
-  	       // Show ProgressBar
-  	       prgDialog.show();
-  	       params.put("name", name);
-  	       params.put("description", description);
-  	       //TODO fix up later
-  	       params.put("type", "open");
-  	       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/phplogin/create_group.php", 
-  	    		       params, 
-  	    		       new AsyncHttpResponseHandler() {
-  	               @Override
-  	               public void onSuccess(String response) {
-  	                   // Hide ProgressBar
-  	            	   prgDialog.hide();  	            	   
-  	            	   try {
-  						JSONObject jObject = new JSONObject(response);						
-  						 if (jObject.getBoolean("status")) {
-  							 Toast.makeText(getApplicationContext(), "Group successfully created!", 
-  		                    		   Toast.LENGTH_LONG).show();
-  							 //joinGroup();
-  							 created = true;
-  		                   } 
-  					    } catch (JSONException e) {					
-  						   e.printStackTrace();
-  					    }            
-  	               }
-  	               // When error occured
-  	               @Override
-  	               public void onFailure(int statusCode, Throwable error, String content) {	                   
-  	                   // Hide ProgressBar
-  	                   prgDialog.hide();
-  	                   if (statusCode == 404) {
-  	                       Toast.makeText(getApplicationContext(), "Group name invalid", 
-  	                    		   Toast.LENGTH_LONG).show();
-  	                   } else if (statusCode == 500) {
-  	                       Toast.makeText(getApplicationContext(), "Something went terrible at server end", 
-  	                    		   Toast.LENGTH_LONG).show();
-  	                   } else {
-  	                       Toast.makeText(getApplicationContext(), "Device might not be connected to network",
-  	                               Toast.LENGTH_LONG).show();
-  	                   }
-  	               }
-  	       });	
-  	     
-  	}
-	
+  	
 }

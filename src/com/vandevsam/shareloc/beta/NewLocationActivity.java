@@ -17,6 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.vandevsam.shareloc.beta.data.MarkerDataManager;
+import com.vandevsam.shareloc.beta.data.MyMarkerObj;
 
 public class NewLocationActivity extends Activity {
 

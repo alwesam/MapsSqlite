@@ -3,12 +3,14 @@ package com.vandevsam.shareloc.beta;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vandevsam.shareloc.beta.data.MarkerDataManager;
+import com.vandevsam.shareloc.beta.data.GroupDataManager;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -19,22 +21,19 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 
-public class SearchActivity extends Activity {
+public class SearchGroupsActivity extends Activity {
 	
 	private Context context = this;	
 	private List<String> list;
 	private ArrayAdapter<String> searchListAdapter;
-	MarkerDataManager data;
-	//these variables are static because they're intended for the classes
-	//not the object
-	private String coordinates;
+	GroupDataManager data;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_search);
 					
-		data = new MarkerDataManager(context);
+		data = new GroupDataManager(context);
         try {
 			data.open();
 		} catch (Exception e){
@@ -61,23 +60,16 @@ public class SearchActivity extends Activity {
        //now when I click on a result!
          listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
            @Override
-           public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-	         coordinates = data.getPosition(searchListAdapter.getItem(position));
-	         returnResults(coordinates); //return to map activity
+           public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {	   
+        	  String group = searchListAdapter.getItem(position);
+	         //call another activity
+        	  Intent detailActivity = new Intent(getBaseContext(), GroupDetailActivity.class)
+                                        .putExtra(Intent.EXTRA_TEXT, group);
+        	  startActivity(detailActivity);
            }			
          });	
 	}	
 	
-	private void returnResults (String slatlng){
-		
-		//Intent resultIntent = new Intent();
-		Intent resultIntent = new Intent(this, MainActivity.class);
-		resultIntent.putExtra("note", slatlng);		
-		//setResult(RESULT_OK, resultIntent);		
-		//finish();	
-		startActivity(resultIntent);
-		
-	}
 	
 	@Override
 	protected void onNewIntent(Intent intent) {
@@ -94,13 +86,16 @@ public class SearchActivity extends Activity {
 	    }
 	}
    
-	private ArrayList<String> doMySearch (String search){	
-		    //searchListAdapter.clear();
+	private ArrayList<String> doMySearch (String search){			    
+           //move this to OnCreate on MainActivity!
+           //ServerUtilFunctions list = new ServerUtilFunctions(this);
+           //list.listAllGroup();		
 		    ArrayList<String> searchList = new ArrayList<String>();
-	        searchList = data.getAddresses(search);
+	        searchList = (ArrayList<String>) data.getAllGroups();
 	        return searchList;		
 	}
 	
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    // Inflate the options menu from XML
@@ -115,4 +110,5 @@ public class SearchActivity extends Activity {
 	    return true;
 	}
 		
+
 }

@@ -4,10 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
@@ -17,9 +13,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
+import com.vandevsam.shareloc.beta.data.MarkerDataManager;
+import com.vandevsam.shareloc.beta.data.MyMarkerObj;
 
 import android.location.Address;
 import android.location.Criteria;
@@ -31,7 +26,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.DialogFragment;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -70,25 +64,20 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	private String[] mListTitles;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;	
-    private CharSequence mTitle;      
-    //private ArrayAdapter<String> listAdapter;
-	
-	MarkerDataManager data;	
-	ProgressDialog prgDialog;
-	private static final String webServer = "108.59.82.39"; //my google CE static ip address
-	//private static final String webServer = "192.168.0.11"; //localhost for debugging and local testing
+    private CharSequence mTitle;
+    
+	MarkerDataManager data;
 	private ArrayAdapter<String> mDrawerAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);	
-		
+		setContentView(R.layout.activity_main);			
 		/**
 		 * Here I'm initialzing drawer pane list variables and setting the
 		 * onItemclicklistnere method
 		 */		
-		session = new SessionManager(getApplicationContext());		
+		session = new SessionManager(getApplicationContext());
 		
         if (session.checkLogin())
 		   mListTitles = getResources().getStringArray(R.array.sidepane_array);
@@ -156,7 +145,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 				zoomToLocation(Vancouver);				
 			}
         }
-        
+              
 		//create new database to store markers
         /**
          * SQLITE database open
@@ -200,12 +189,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 				//showNoticeDialog();
 			}
 	    }); 
-	    
-	  //Initialize Progress Dialog properties
-        prgDialog = new ProgressDialog(context);
-        prgDialog.setMessage("Synching with Remote MySQL DB. Please wait...");
-        prgDialog.setCancelable(false);
- 		    
+	 		    
 	}
 	//end onCreate method
 		
@@ -230,6 +214,12 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         case SEARCH: //search
         	startActivityForResult(new Intent(context, SearchActivity.class), 90);
         	//startActivity(new Intent(context, SearchActivity.class));
+            break;
+        case SEARCH_GROUPS: //create a group
+        	//TODO fix
+        	ServerUtilFunctions list = new ServerUtilFunctions(this);
+            list.listAllGroup();
+        	startActivity(new Intent(context, SearchGroupsActivity.class));        	
             break;
         case CREATE_GROUP: //create a group
         	startActivity(new Intent(context, CreateGroupActivity.class));        	
@@ -374,17 +364,16 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		
 	}
 	
-	/**
-	 * call back from SearchActivity
-	 */		
+	//call back from SearchActivity
+	
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-	  //super.onActivityResult(requestCode, resultCode, data);
-     if (data != null){
+	public void onActivityResult(int requestCode, int resultCode, Intent response) {
+	  //super.onActivityResult(requestCode, resultCode, response);
+     if (response != null){
 	    switch(requestCode) {
 	      case 90 : {	    	
 	        if (resultCode == RESULT_OK) {
-	    	  String coordinates = data.getStringExtra("note");
+	    	  String coordinates = response.getStringExtra("note");
 	    	  findMarker(coordinates);
 	    	  //listMarker();
 	        }
@@ -392,8 +381,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	      } 
 	      case 91 : {	    	
 		        if (resultCode == RESULT_OK) {
-		    	  String result = data.getStringExtra("coord");
-		    	  boolean added = data.getExtras().getBoolean("added");		    	  
+		    	  String result = response.getStringExtra("coord");
+		    	  boolean added = response.getExtras().getBoolean("added");		    	  
 		    	  if (added)
 		    	      findMarker(result);
 		    	  else
@@ -433,17 +422,20 @@ public class MainActivity extends FragmentActivity implements LocationListener,
             return true;
         }
         if (id == R.id.sync_to_DB) {
-            //Sync SQLite DB data to remote MySQL DB
-        	if (session.checkLogin())
-               syncSQLiteMySQLDB(); 
+            //Sync SQLite DB markers to remote MySQL DB
+        	if (session.checkLogin()){
+               ServerUtilFunctions up = new ServerUtilFunctions(this, "Uploading Markers...");
+               up.syncSQLiteMySQLDB();
+        	}
         	else
         		Toast.makeText(getApplicationContext(), 
         				"You have to logged in to upload markers to server", 
         				Toast.LENGTH_LONG).show();
             return true;
         } 
-        if (id == R.id.sync_from_DB) {            
-            syncMySQLDBSQLite();
+        if (id == R.id.sync_from_DB) {
+            ServerUtilFunctions down = new ServerUtilFunctions(this, "Downloading Markers...");
+            down.syncMySQLDBSQLite();
             return true;
         }        
         
@@ -466,127 +458,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	    map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 	    map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
 	}	
-   
-   //syncing sqlite to mysql
-   public void syncSQLiteMySQLDB(){
-       //Create AsycHttpClient object
-               AsyncHttpClient client = new AsyncHttpClient();
-               RequestParams params = new RequestParams();     
-               prgDialog.show();
-               params.put("locationsJSON", data.composeJSONfromSQLite());
-               client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/insertmarker.php",
-            		        params ,new AsyncHttpResponseHandler() {
-                   @Override
-                   public void onSuccess(String response) {;
-                       prgDialog.hide();
-                       try {
-                    	   int count = 0;
-                           JSONArray arr = new JSONArray(response);
-                           for(int i=0; i<arr.length();i++){
-                               JSONObject obj = (JSONObject)arr.get(i);
-                               data.updateSyncStatus(obj.get("id").toString(),obj.get("status").toString());                                                
-                               if(obj.get("status").toString().equalsIgnoreCase("no"))
-                            	   count++;
-                           }                                     
-                           if(count>0)                        	  
-                        	    Toast.makeText(getApplicationContext(), 
-                            		   count+" markers were not uploaded to remote server", 
-                                	   Toast.LENGTH_LONG).show();
-                           else                            	 
-                                Toast.makeText(getApplicationContext(), 
-                        		       "All markers were uploaded to remote server!", 
-                            	        Toast.LENGTH_LONG).show();
-                           
-                       } catch (JSONException e) {
-                           Toast.makeText(getApplicationContext(), "Server's JSON response might be invalid!", 
-                        		   Toast.LENGTH_LONG).show();
-                           e.printStackTrace();
-                       }
-                   }
-                   @Override
-                   public void onFailure(int statusCode, Throwable error,
-                       String content) {
-                       prgDialog.hide();
-                       if(statusCode == 404){
-                           Toast.makeText(getApplicationContext(), "Requested resource not found", 
-                        		   Toast.LENGTH_LONG).show();
-                       }else if(statusCode == 500){
-                           Toast.makeText(getApplicationContext(), "Something went wrong at server end", 
-                        		   Toast.LENGTH_LONG).show();
-                       }else{
-                           Toast.makeText(getApplicationContext(), "Device might not be connected to Internet]", 
-                        		   Toast.LENGTH_LONG).show();
-                       }
-                   }
-               });  
-   }
-   //end sync sqlite to mysql method
- 
-   // Method to Sync MySQL to SQLite DB
-   public void syncMySQLDBSQLite() {
-       // Create AsycHttpClient object
-       AsyncHttpClient client = new AsyncHttpClient();
-       // Http Request Params Object
-       RequestParams params = new RequestParams();
-       // Show ProgressBar
-       prgDialog.show();
-       // Make Http call to getusers.php
-       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/getlocations.php", params, new AsyncHttpResponseHandler() {
-               @Override
-               public void onSuccess(String response) {
-                   // Hide ProgressBar
-                   prgDialog.hide();
-                   // Update SQLite DB with response sent by getusers.php
-                   //updateSQLite(response);
-                   try {
-                       // Extract JSON array from the response
-                       JSONArray arr = new JSONArray(response);
-                       // If no of array elements is not zero
-                       if(arr.length() != 0){
-                           // Loop through each array element, get JSON object which id,title,snippet,position
-                           for (int i = 0; i < arr.length(); i++) {
-                               // Get JSON object
-                               JSONObject obj = (JSONObject) arr.get(i);
-                               // Insert User into SQLite DB
-                               //double check if data already exists in database
-                               if (!data.queryPosition(obj.get("position").toString()) 
-                            	        && !data.queryAddress(obj.get("title").toString()))  {  
-                            	   //since info is received from server, by default it's synced to server
-                                    data.addMarker(new MyMarkerObj(obj.get("title").toString(),
-                            		                               obj.get("snippet").toString(),
-                            		                               obj.get("position").toString(),
-                            		                               "yes"));  
-                                    Toast.makeText(getApplicationContext(), 
-                                    	   "Markers successfully obtained from remote server ", 
-                                 		   Toast.LENGTH_LONG).show();                                    
-                               }
-                           }             
-                           // Reload the Main Activity
-                           reloadActivity();
-                       }
-                   } catch (JSONException e) {
-                       e.printStackTrace();
-                   }
-               }
-               // When error occured
-               @Override
-               public void onFailure(int statusCode, Throwable error, String content) {                   
-                   // Hide ProgressBar
-                   prgDialog.hide();
-                   if (statusCode == 404) {
-                       Toast.makeText(getApplicationContext(), "Requested resource not found", 
-                    		   Toast.LENGTH_LONG).show();
-                   } else if (statusCode == 500) {
-                       Toast.makeText(getApplicationContext(), "Something went wrong at server end", 
-                    		   Toast.LENGTH_LONG).show();
-                   } else {
-                       Toast.makeText(getApplicationContext(), "Device might not be connected to network",
-                               Toast.LENGTH_LONG).show();
-                   }
-               }
-       });
-   }
-
+  
    // Reload MainActivity
    public void reloadActivity() {
        Intent objIntent = new Intent(getApplicationContext(), MainActivity.class);
@@ -606,7 +478,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	@Override
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
 				
-	}
-	
+	}	
 	
 }

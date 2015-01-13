@@ -1,4 +1,4 @@
-package com.vandevsam.shareloc.beta;
+package com.vandevsam.shareloc.beta.data;
 
 public class MyMarkerObj {
 	private long id;

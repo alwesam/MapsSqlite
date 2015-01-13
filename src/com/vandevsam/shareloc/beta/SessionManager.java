@@ -16,7 +16,7 @@ public class SessionManager {
     public static final String KEY_NAME = "name";
     public static final String KEY_USERNAME = "username";
     public static final String KEY_DATE = "date";
-     
+         
     // Constructor
     public SessionManager(Context context){
         mContext = context;
@@ -40,18 +40,15 @@ public class SessionManager {
     public HashMap<String, String> getUserDetails(){
          
         //Use hashmap to store user credentials
-        HashMap<String, String> user = new HashMap<String, String>();
-         
+        HashMap<String, String> user = new HashMap<String, String>();         
         // user name
-        user.put(KEY_NAME, pref.getString(KEY_NAME, null));
-         
+        user.put(KEY_NAME, pref.getString(KEY_NAME, null));         
         // user email id
-        user.put(KEY_DATE, pref.getString(KEY_DATE, null));
-         
+        user.put(KEY_DATE, pref.getString(KEY_DATE, null));         
         // return user
         return user;
     }
-    
+     
     public boolean checkLogin(){
         // Check login status
     	return pref.getBoolean(SESSION_LOGIN, false);
