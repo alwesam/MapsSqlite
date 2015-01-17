@@ -9,6 +9,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.vandevsam.shareloc.beta.data.GroupDataManager;
 import com.vandevsam.shareloc.beta.data.MarkerDataManager;
+import com.vandevsam.shareloc.beta.data.MyGroupObj;
 import com.vandevsam.shareloc.beta.data.MyMarkerObj;
 
 import android.app.ProgressDialog;
@@ -105,7 +106,12 @@ public class ServerUtilFunctions {
 	                               // Get JSON object
 	                               JSONObject obj = (JSONObject) arr.get(i);
 	                               if (!group_data.queryGroup(obj.get("group").toString()))  
-	                                    group_data.createGroup(obj.get("group").toString());		                           
+	                                    group_data.createGroup(new MyGroupObj(
+	                                    		                 obj.get("group").toString(),
+	                                    		                 "hi", //TODO fix
+	                                    		                 "open", //TODO fix
+	                                    		                 "yes" //join status!
+	                                    		                 ));		                           
 	                           }             		                         
 	                       }
 	                       
@@ -134,9 +140,9 @@ public class ServerUtilFunctions {
 	                               Toast.LENGTH_LONG).show();
 	                   }
 	               }
-	       });	
-		
+	       });			
 	}
+	
 	//TODO combine this with the above
 	public void listAllGroup(){	  		   
 		   group_data = new GroupDataManager(mContext);
@@ -160,7 +166,12 @@ public class ServerUtilFunctions {
 	                               // Get JSON object
 	                               JSONObject obj = (JSONObject) arr.get(i);
 	                               if (!group_data.queryGroup(obj.get("group").toString()))  
-	                                    group_data.createGroup(obj.get("group").toString());		                           
+	                            	   group_data.createGroup(new MyGroupObj(
+                      		                           obj.get("group").toString(),
+                      		                           "hi", //TODO fix
+                      		                           "open",
+                      		                           "no" //join status
+                      		                            ));			                           
 	                           }             		                         
 	                       }
 	                       
@@ -255,6 +266,7 @@ public class ServerUtilFunctions {
 	                   public void onSuccess(String response) {;
 	                       prgDialog.hide();
 	                       try {
+	                    	   //TODO review this logic, doesn't come across as right
 	                    	   int count = 0;
 	                           JSONArray arr = new JSONArray(response);
 	                           for(int i=0; i<arr.length();i++){
@@ -262,20 +274,16 @@ public class ServerUtilFunctions {
 	                               marker_data.updateSyncStatus(obj.get("id").toString(),obj.get("status").toString());                                                
 	                               if(obj.get("status").toString().equalsIgnoreCase("no"))
 	                            	   count++;
-	                           }                  
-	                           Toast.makeText(mContext, 
-                            		   count+"  "+response, 
-                                	   Toast.LENGTH_LONG).show();
+	                           }	 
 	                           
-	                           
-	                           /*if(count>0)                        	  
+	                           if(count>0)                        	  
 	                        	    Toast.makeText(mContext, 
 	                            		   count+" markers were not uploaded to remote server", 
 	                                	   Toast.LENGTH_LONG).show();
 	                           else                            	 
 	                                Toast.makeText(mContext, 
 	                        		       "All markers were uploaded to remote server!", 
-	                            	        Toast.LENGTH_LONG).show(); */
+	                            	        Toast.LENGTH_LONG).show(); 
 	                           
 	                       } catch (JSONException e) {
 	                           Toast.makeText(mContext, "Server's JSON response might be invalid!", 

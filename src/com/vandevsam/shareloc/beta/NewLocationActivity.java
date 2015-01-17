@@ -1,6 +1,7 @@
 package com.vandevsam.shareloc.beta;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import android.app.Activity;
@@ -12,11 +13,15 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.vandevsam.shareloc.beta.data.GroupDataManager;
 import com.vandevsam.shareloc.beta.data.MarkerDataManager;
 import com.vandevsam.shareloc.beta.data.MyMarkerObj;
 
@@ -25,27 +30,44 @@ public class NewLocationActivity extends Activity {
 	private Context context = this;	
 	private String coordinates;
 	MarkerDataManager data;
+	GroupDataManager gr_data;
 	private TextView addressTextView;
 	private EditText userComment;
 	private EditText editAddress;
-	//private Spinner spinner;
+	private List<String> searchList;
+	private ArrayAdapter<String> adapter;
+	private Spinner spinner;
+	
+	private String group_sel;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_newlocation);
         
+        gr_data = new GroupDataManager(context);    
+        try {
+			gr_data.open();
+		} catch (Exception e){
+			Log.i("Cannot open db", "hello");
+		} 	
+        
+        
+        searchList = new ArrayList<String>();
+        searchList = gr_data.getAllGroups(); 
+        spinner = (Spinner) findViewById(R.id.Spinner01);
+        adapter = new ArrayAdapter<String>(this,
+                              android.R.layout.simple_spinner_item, 
+                              searchList);
+        //TODO find out the purpose of this?
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter); 
+        //TODO implement class
+        //spinner.setOnItemSelectedListener(new CustomOnItemSelectedListener());
+                
         userComment = (EditText) findViewById(R.id.Comment); 
         editAddress = (EditText) findViewById(R.id.Location);
         addressTextView = (TextView) findViewById(R.id.addressText);
-        
-        /*
-        spinner = (Spinner) findViewById(R.id.groups_spinner);        
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.groups_array, android.R.layout.simple_spinner_item);
-     // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);        
-        spinner.setAdapter(adapter);*/
         
         data = new MarkerDataManager(context);
         try {
@@ -60,7 +82,7 @@ public class NewLocationActivity extends Activity {
         //decoding address and calling async function to get result
         GetAddressTask getAddress = new GetAddressTask(context);	        	    
 	    getAddress.execute(coordinates);
-       
+
     }		
 	
 	public void updateAddress (String address){
@@ -68,11 +90,16 @@ public class NewLocationActivity extends Activity {
 		editAddress.setText(address);
 	}
 		
-	public void addNewLocation(View view){		
+	public void addNewLocation(View view){	
+		
+		spinner = (Spinner) findViewById(R.id.Spinner01);		
+		group_sel = String.valueOf(spinner.getSelectedItem());
+		
 		//TODO add conditionals to ensure legal data is entered into database
 		data.addMarker(new MyMarkerObj(userComment.getText().toString(), //enter comments
 				                       editAddress.getText().toString(), //edit or enter address
-				                       coordinates,
+				                       coordinates, //position
+				                       group_sel, //group name
 				                       "no") //it's not yet synced to remote db
 		               );
 		data.close();

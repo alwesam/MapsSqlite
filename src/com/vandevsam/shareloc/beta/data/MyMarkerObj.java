@@ -5,6 +5,9 @@ public class MyMarkerObj {
 	private String title;
 	private String snippet;
 	private String position;
+	
+	private String group;
+	
 	private String status;
 	
 	public MyMarkerObj(){
@@ -24,6 +27,16 @@ public class MyMarkerObj {
 		this.setSnippet(snippet);
 		this.setPosition(position);		
 	}
+	
+	//*****ADD a new field in markers table: group
+	public MyMarkerObj (String title, String snippet, String position, String group, String status){
+		this.setTitle(title);
+		this.setSnippet(snippet);
+		this.setPosition(position);	
+		this.setGroup(group);
+		this.setStatus(status);
+	}
+	//*****************
 	
 	public MyMarkerObj (String title, String snippet, String position, String status){
 		this.setTitle(title);
@@ -74,6 +87,16 @@ public class MyMarkerObj {
 	public void setPosition(String position) {
 		this.position = position;
 	}	
+	
+	//**********
+	public String getGroup() {
+		return group;
+	}
+	
+	public void setGroup(String group) {
+		this.group = group;
+	}
+	//**************
 	
 	public String getStatus() {
 		return status;

@@ -6,7 +6,7 @@
     <string name="action_search">Search</string>
     <string name="action_sync_from_mysql">Download Markers</string>
     <string name="action_sync_to_mysql">Upload Markers</string>
-    <string name="action_refresh">Refresh</string>
+    <string name="action_refresh">Show All Markers</string>
     <string name="hello_world">Hello world!</string>
     <string name="addlocation">"Selected address:"</string>
     <string name="address">""</string>   
@@ -18,7 +18,7 @@
     
     <string name="pref_location_label">Location</string>
     <string name="pref_location_key" translatable="false">location</string>
-    <string name="pref_location_default" translatable="false">Vancouver</string>
+    <string name="pref_location_default" translatable="false">Vancouver BC</string>
     
     <string name="pref_gps_key">GPS Enabled?</string>
     <string name="pref_gps_label">Zoom to GPS Location?</string>

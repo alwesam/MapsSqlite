@@ -13,7 +13,7 @@ public class GroupDataManager {
 	
 	MySQLHelper dbhelper;
 	SQLiteDatabase db;		
-	String[] cols = { MySQLHelper.GROUP_NAME, MySQLHelper.GROUP_TYPE};
+	String[] cols = { MySQLHelper.GROUP_NAME, MySQLHelper.GROUP_DESC, MySQLHelper.GROUP_TYPE, MySQLHelper.GROUP_STATUS};
 	
 	public GroupDataManager(Context c){		
 		dbhelper = new MySQLHelper(c);		
@@ -27,14 +27,16 @@ public class GroupDataManager {
 		db.close();
 	}
 	
-	public void createGroup(String groupName) {
+	public void createGroup(MyGroupObj n) {
 		ContentValues v = new ContentValues();		
-		v.put(MySQLHelper.GROUP_NAME, groupName);
-		//TODO for now, it's only open
-		v.put(MySQLHelper.GROUP_TYPE, "open");
-		db.insert(MySQLHelper.GROUP_TABLE, null, v);		
+		v.put(MySQLHelper.GROUP_NAME, n.getName());
+		v.put(MySQLHelper.GROUP_DESC, n.getDescription());
+		v.put(MySQLHelper.GROUP_TYPE, n.getType());
+		v.put(MySQLHelper.GROUP_STATUS, n.getStatus()); //join status
+		db.insert(MySQLHelper.GROUP_TABLE, null, v);			
 	}
-	
+		
+
 	public void deleteGroup(String groupName) {	    	    
 	    db.delete(MySQLHelper.GROUP_TABLE, MySQLHelper.GROUP_NAME
 	        + " = '" + groupName + "'", null);
@@ -52,6 +54,19 @@ public class GroupDataManager {
 		return groups;
 	}	
 	
+	public List<String> getDetails(String group){		
+		List<String> details = new ArrayList<String>();		
+		String selectQuery = "SELECT  * FROM groups where group_name = '"+group+"'";
+    	Cursor cursor = db.rawQuery(selectQuery, null);  		
+				
+		if (cursor.moveToFirst()){
+			details.add(cursor.getString(1)); //name	
+			details.add(cursor.getString(2)); //description
+			details.add(cursor.getString(3)); //type
+		}		
+		return details;
+	}
+		
 	public boolean queryGroup(String group){
 		//TODO change
 		String selectQuery = "SELECT  * FROM groups where group_name = '"+group+"'";
@@ -60,6 +75,18 @@ public class GroupDataManager {
     	   return false; //doesn't exist
     	else
     	   return true; //exists
+	}
+	
+	public boolean queryStatus(String group){
+		//TODO change
+		String selectQuery = "SELECT  * FROM groups where group_name = '"+group+"'";
+    	Cursor cursor = db.rawQuery(selectQuery, null);  
+    	//TODO make it dependent on searching the string instead of the the position
+    	cursor.moveToFirst();	
+    	if (cursor.getString(4).equalsIgnoreCase("yes"))
+    	   return true; //you're a member
+    	else
+    	   return false; //you're not a member
 	}
 
 }

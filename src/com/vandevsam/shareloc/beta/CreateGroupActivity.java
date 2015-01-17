@@ -3,6 +3,7 @@ package com.vandevsam.shareloc.beta;
 import java.util.HashMap;
 
 import com.vandevsam.shareloc.beta.data.GroupDataManager;
+import com.vandevsam.shareloc.beta.data.MyGroupObj;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -14,7 +15,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 public class CreateGroupActivity extends Activity {
 
@@ -68,25 +68,32 @@ public class CreateGroupActivity extends Activity {
 	public void addNewGroup(View view){		
 		group = groupName.getText().toString();
 		description = groupDescription.getText().toString();
-		data.createGroup(group);
+		//create the group in local sqlite db
+		data.createGroup(new MyGroupObj(group,
+				                        description,
+				                        "open",
+				                        "yes"
+				                         ));
+		
 		data.close();
-		//crate Group in remote db
+		
+		//TODO remove later...
+		/*
+		//then sync it to remote db Group in remote db
 		ServerUtilFunctions gr = new ServerUtilFunctions(this, "Creating  a group....");
-		gr.createGroup(group, description);
-		//submitInfo();	
+		gr.createGroup(group, description);			
 		//TODO fix
 		if (true) {
-			//JoinGroup newMember = new JoinGroup(this);
-			//group's creator will be its first memeber
-			//newMember.joinGroup(creator,group);				
+							
 			gr.joinGroup(creator, group);			
-			
-			//if(newMember.getJoined())
-			   Toast.makeText(getApplicationContext(), 
-				 "Successfully joined "+creator+" as first member of "+group, 
-               	 Toast.LENGTH_LONG).show();				
-		}
+		
+		    Toast.makeText(getApplicationContext(), 
+			 "Successfully joined "+creator+" as first member of "+group, 
+              Toast.LENGTH_LONG).show();	
+		    
+		}*/
 		//go back home
+		
 		this.callHomeActivity(view);
 	}	
 	 

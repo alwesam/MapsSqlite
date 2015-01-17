@@ -1,6 +1,7 @@
 package com.vandevsam.shareloc.beta;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -23,13 +24,19 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.annotation.TargetApi;
 import android.app.DialogFragment;
+//import android.app.FragmentManager;
+//import android.app.FragmentManager;
+//import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
@@ -40,6 +47,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class MainActivity extends FragmentActivity implements LocationListener,
                                 NoticeDialogFragment.NoticeDialogListener {
 
@@ -80,7 +88,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		session = new SessionManager(getApplicationContext());
 		
         if (session.checkLogin())
-		   mListTitles = getResources().getStringArray(R.array.sidepane_array);
+		   mListTitles = getResources().getStringArray(R.array.sidepane_array);		 
         else
            mListTitles = getResources().getStringArray(R.array.sidepane_array_guest);			
 		
@@ -137,7 +145,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         		  //Zoom to selected location in settings
 				zoomToLocation(geoCode(city));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				Toast.makeText(getApplicationContext(), 
 		    			  "Failed to load geocoder, zooming in to Vancouver", 
@@ -157,7 +164,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 			Log.i("Error!", "Cannot open SQLite DB");
 		}			
 		//show available markers
-		listMarker();
+		//listMarker();
 				
 		//receiving intent workaround solution TODO temp fix
 		try {		 
@@ -207,24 +214,19 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	
 	/** Swaps fragments in the map view */
 	private void selectItem(String item, int position) {
-		 // update the main content by replacing fragments and/or activities
-		//TODO look into warning
 		DrawerListEnum enumval = DrawerListEnum.valueOf(item.toUpperCase().replace(" ", "_"));        
         switch (enumval) {
         case SEARCH: //search
         	startActivityForResult(new Intent(context, SearchActivity.class), 90);
         	//startActivity(new Intent(context, SearchActivity.class));
             break;
-        case SEARCH_GROUPS: //create a group
-        	//TODO fix
-        	ServerUtilFunctions list = new ServerUtilFunctions(this);
-            list.listAllGroup();
+        case SEARCH_GROUPS: //create a group        
         	startActivity(new Intent(context, SearchGroupsActivity.class));        	
             break;
         case CREATE_GROUP: //create a group
         	startActivity(new Intent(context, CreateGroupActivity.class));        	
             break;
-        case PROFILE:  //profile
+        case PROFILE:  //profile        	
         	startActivity(new Intent(context, ProfileActivity.class));
             break; 
         case SETTINGS://settings activity
@@ -276,7 +278,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	      emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);	      
 	      emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
 	      emailIntent.putExtra(Intent.EXTRA_TEXT, "Feedback");
-
 	      try {
 	         startActivity(Intent.createChooser(emailIntent, "Send mail..."));
 	         finish();
@@ -292,7 +293,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         // Create an instance of the dialog fragment and show it
         DialogFragment dialog = new NoticeDialogFragment(context);
         //TODO fix
-        //dialog.show(getSupportFragmentManager(), "NoticeDialogFragment");
+        FragmentManager fm =  getSupportFragmentManager();
+        //dialog.show(fm, "NoticeDialogFragment");
     }
     
     @Override
@@ -301,18 +303,27 @@ public class MainActivity extends FragmentActivity implements LocationListener,
     	//retreive location marker coordinates
     	String slatlng = String.valueOf(getLoc().latitude)+" "+String.valueOf(getLoc().longitude);    	
     	//delete record
-    	data.deleteMarker( new MyMarkerObj(slatlng));  
-    	//TODO fix
-    	//dialog.dismiss();  
+    	data.deleteMarker( new MyMarkerObj(slatlng));
+    	dialog.dismiss();  
     	Toast.makeText(getApplicationContext(), "Marker deleted", Toast.LENGTH_LONG).show();
     	listMarker();
     }
 
     @Override
-    public void onDialogNegativeClick(DialogFragment dialog) {  
-    	//TODO fix
-    	//dialog.dismiss();    	
+    public void onDialogNegativeClick(DialogFragment dialog) { 
+    	dialog.dismiss();    	
     }
+    
+    /**
+    @Override
+	public void onDialogPositiveClick(DialogFragment dialog) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onDialogNegativeClick(DialogFragment dialog) {
+		// TODO Auto-generated method stub		
+	}	**/
 	
 	//list markers on the map
 	private void listMarker(){		
@@ -341,7 +352,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		MyMarkerObj n = data.getSelectMarker(pos);		
 	    String[] slatlng = n.getPosition().split(" ");
 		LatLng latlng = new LatLng (Double.valueOf(slatlng[0]), Double.valueOf(slatlng[1]));
-		if((n.getStatus()).equalsIgnoreCase("no")) //not synced, goes green
+		if((n.getStatus()).equalsIgnoreCase("no")) //not synced, goes rose
 			mapIcon = BitmapDescriptorFactory.HUE_ROSE; //not synced
 		else
 			mapIcon = BitmapDescriptorFactory.HUE_GREEN; //synced
@@ -360,12 +371,10 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		LatLng latLng = marker.getPosition();	 
         map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         map.animateCamera(CameraUpdateFactory.zoomTo(zoom+2));        
-		marker.showInfoWindow();
-		
+		marker.showInfoWindow();		
 	}
 	
-	//call back from SearchActivity
-	
+	//call back from SearchActivity	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent response) {
 	  //super.onActivityResult(requestCode, resultCode, response);
@@ -395,8 +404,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
     	  Toast.makeText(getApplicationContext(), 
     			  "Data NULL", 
     			  Toast.LENGTH_LONG).show();
-      }    	  
-     
+      }    	       
 	}		
 
 	@Override
@@ -414,7 +422,8 @@ public class MainActivity extends FragmentActivity implements LocationListener,
            return true;
         }
         if (id == R.id.refresh){
-        	reloadActivity();
+        	//reloadActivity();
+        	listMarker();
         	return true;
         }
         if (id == R.id.action_settings) {

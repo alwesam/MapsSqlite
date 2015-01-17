@@ -62,9 +62,16 @@ public class SearchGroupsActivity extends Activity {
            @Override
            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {	   
         	  String group = searchListAdapter.getItem(position);
-	         //call another activity
-        	  Intent detailActivity = new Intent(getBaseContext(), GroupDetailActivity.class)
-                                        .putExtra(Intent.EXTRA_TEXT, group);
+        	         	  
+        	  Intent detailActivity;
+        	          	         	  
+        	  if (data.queryStatus(group))
+	               detailActivity = new Intent(getBaseContext(), MyGroupDetailActivity.class)
+                                        .putExtra("key", group);
+        	  else
+        		   detailActivity = new Intent(getBaseContext(), GroupDetailActivity.class)
+                                          .putExtra("key", group);
+        		  
         	  startActivity(detailActivity);
            }			
          });	

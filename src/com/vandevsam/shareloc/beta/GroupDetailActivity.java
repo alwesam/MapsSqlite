@@ -19,16 +19,17 @@ public class GroupDetailActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_groupdetail);
-		groupTextView = (TextView) findViewById(R.id.addressText);
+		groupTextView = (TextView) findViewById(R.id.GroupName);
 		//TODO fix
-		/*Intent intent = this.getIntent();   
-		groupName = intent.getStringExtra(Intent.EXTRA_TEXT);
-        groupTextView.setText("Selected group: "+groupName);*/
-	
+		Intent intent = getIntent();   
+		groupName = intent.getStringExtra("key");
+		groupTextView.setText("Group: "+groupName);	
 	}	
 	
 	public void joinGroup(View view){	
+		
 		//JoinGroup joined = new JoinGroup(this);
+		
 		ServerUtilFunctions joined = new ServerUtilFunctions(this);
 		//TODO fix, this is a placeholder
 		joined.joinGroup("wesam","vancouver");		

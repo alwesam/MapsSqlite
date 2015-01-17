@@ -19,7 +19,8 @@ public class MarkerDataManager {
 
 	MySQLHelper dbhelper;
 	SQLiteDatabase db;	
-	String[] cols = { MySQLHelper.TITLE, MySQLHelper.SNIPPET, MySQLHelper.POSITION, MySQLHelper.STATUS};	
+	String[] cols = { MySQLHelper.TITLE, MySQLHelper.SNIPPET, MySQLHelper.POSITION, MySQLHelper.GROUPS, MySQLHelper.STATUS};	
+	// 0 (title), 1 (address), 2 (coordinates), 3 (group), 4 (status)
 	
 	public MarkerDataManager(Context c){		
 		dbhelper = new MySQLHelper(c);		
@@ -38,12 +39,12 @@ public class MarkerDataManager {
 		v.put(MySQLHelper.TITLE, n.getTitle());
 		v.put(MySQLHelper.SNIPPET, n.getSnippet());
 		v.put(MySQLHelper.POSITION, n.getPosition());
-		//v.put(MySQLHelper.STATUS, n.getStatus());
-		//TODO temp fix
-		v.put(MySQLHelper.STATUS, "no");
-		db.insert(MySQLHelper.MARKER_TABLE, null, v);		
+		v.put(MySQLHelper.GROUPS, n.getGroup());
+		v.put(MySQLHelper.STATUS, n.getStatus());		
+		db.insert(MySQLHelper.MARKER_TABLE, null, v);
 	}
-	
+		
+		
 	public void deleteMarker(MyMarkerObj n) {	    	    
 	    db.delete(MySQLHelper.MARKER_TABLE, MySQLHelper.POSITION
 	        + " = '" + n.getPosition() + "'", null);
@@ -75,7 +76,8 @@ public class MarkerDataManager {
 		m.setTitle(cursor.getString(0));
 		m.setSnippet(cursor.getString(1));
 		m.setPosition(cursor.getString(2));
-		m.setStatus(cursor.getString(3));
+		m.setGroup(cursor.getString(3)); //add a new mark
+		m.setStatus(cursor.getString(4));
 		return m;
 	}
 	
@@ -93,10 +95,13 @@ public class MarkerDataManager {
         if (cursor.moveToFirst()) {
             do {
                 HashMap<String, String> map = new HashMap<String, String>();
+                //TODO deal with this exception
                 map.put(MySQLHelper.COLUMN_ID, cursor.getString(0));
                 map.put(MySQLHelper.TITLE, cursor.getString(1));
                 map.put(MySQLHelper.SNIPPET, cursor.getString(2));
                 map.put(MySQLHelper.POSITION, cursor.getString(3));
+                map.put(MySQLHelper.GROUPS, cursor.getString(4));
+                //map.put(MySQLHelper.STATUS, cursor.getString(5));
                 wordList.add(map);
             } while (cursor.moveToNext());
         }
@@ -144,7 +149,7 @@ public class MarkerDataManager {
     	String selectQuery = "SELECT  * FROM locations where snippet = '"+address+"'";
     	Cursor cursor = db.rawQuery(selectQuery, null);
     	cursor.moveToFirst();
-        return cursor.getString(3);     	
+        return cursor.getString(3);     //position is 3	
     }
     
     public ArrayList<String> getAddresses (String query) {     	
@@ -157,7 +162,7 @@ public class MarkerDataManager {
 	        cursor = db.rawQuery("SELECT * FROM locations WHERE snippet LIKE '%"+query+"%'", null); 
 		if (cursor.moveToFirst()) {
             do {            	            	
-            	addresses.add(cursor.getString(2));
+            	addresses.add(cursor.getString(2)); //address is 2
             } while (cursor.moveToNext());
         } else
         {

@@ -1,26 +1,26 @@
 package com.vandevsam.shareloc.beta;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.EditText;
 
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 @SuppressLint("ValidFragment")
 public class NoticeDialogFragment extends DialogFragment {	
 		
-	private final EditText input;
-	
-    /* The activity that creates an instance of this dialog fragment must
-     * implement this interface in order to receive event callbacks.
-     * Each method passes the DialogFragment in case the host needs to query it. */
+	private EditText input;
+
     public interface NoticeDialogListener {
         public void onDialogPositiveClick(DialogFragment dialog);
-        public void onDialogNegativeClick(DialogFragment dialog);				
+		public void onDialogNegativeClick(DialogFragment dialog);				
     }
     
     public NoticeDialogFragment(Context context) {
@@ -28,8 +28,7 @@ public class NoticeDialogFragment extends DialogFragment {
 	}
     
     // Use this instance of the interface to deliver action events
-    NoticeDialogListener mListener;    
-    
+    NoticeDialogListener mListener;        
 
 	// Override the Fragment.onAttach() method to instantiate the NoticeDialogListener
     @Override
@@ -46,7 +45,7 @@ public class NoticeDialogFragment extends DialogFragment {
         }
     }
     
-    @Override
+	@Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Build the dialog and set up the button click handlers
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());        
@@ -67,5 +66,6 @@ public class NoticeDialogFragment extends DialogFragment {
                });
         return builder.create();
     }
+
     
 }

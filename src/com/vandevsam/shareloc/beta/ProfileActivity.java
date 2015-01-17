@@ -30,15 +30,15 @@ public class ProfileActivity extends Activity {
         
         session = new SessionManager(getApplicationContext());        
         
-     // get user data from session
+       // get user data from session
         user = session.getUserDetails();
         name = user.get(SessionManager.KEY_NAME);
         date = user.get(SessionManager.KEY_DATE);
         
-      //add groups to local db
+        //add groups to local db
         //TODO fix this mess
-        ServerUtilFunctions list = new ServerUtilFunctions(this);
-        list.listGroup(name);
+        //ServerUtilFunctions list = new ServerUtilFunctions(this);
+        //list.listGroup(name);
         //ListGroups list = new ListGroups(this); 
         //list.listGroup(name); //return a list of groups        
                 
