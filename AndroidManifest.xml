@@ -157,6 +157,8 @@
                 android:value="com.vandevsam.shareloc.beta.MainActivity" />
         </activity>
         
+        <activity android:name=".SetGroupPreference"/>
+        
        
     </application>
 

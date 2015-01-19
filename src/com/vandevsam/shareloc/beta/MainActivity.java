@@ -1,6 +1,7 @@
 package com.vandevsam.shareloc.beta;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -374,17 +375,59 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		marker.showInfoWindow();		
 	}
 	
+	
+	/**private void checkPref(){		
+        SharedPreferences myPref  
+        = PreferenceManager.getDefaultSharedPreferences(this); 
+        String _pref =  
+                "Option 1: " +  myPref.getBoolean("pref_opt1", true) + "\n"
+                + "Option 4: " +  myPref.getBoolean("pref_opt4", false); 
+        Toast.makeText(getApplicationContext(), 
+  			 _pref, 
+  			  Toast.LENGTH_LONG).show();
+    }**/
+	
+		
+	private void checkPref(){
+	
+		SaveGroupPreference pref = new SaveGroupPreference(this); 
+		List<String> groups = pref.getPrefGroup();
+		List<Boolean> groups_check = pref.getPrefCheck();
+		
+		for (int i=0; i<groups.size(); i++) {
+			Toast.makeText(getApplicationContext(), 
+		  			 groups.get(i), Toast.LENGTH_LONG).show();
+		
+			String a;
+			if(groups_check.get(i))
+				a = "True";
+			else 
+				a = "False";
+			
+			
+			Toast.makeText(getApplicationContext(), 
+					a, Toast.LENGTH_LONG).show();
+			
+		}
+		        
+	}
+	
 	//call back from SearchActivity	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent response) {
 	  //super.onActivityResult(requestCode, resultCode, response);
      if (response != null){
 	    switch(requestCode) {
+	      case 0 : {	    	
+	        if (resultCode == RESULT_OK) {
+	    	  checkPref();
+	        }
+	       break;
+	      } 
 	      case 90 : {	    	
 	        if (resultCode == RESULT_OK) {
 	    	  String coordinates = response.getStringExtra("note");
 	    	  findMarker(coordinates);
-	    	  //listMarker();
 	        }
 	       break;
 	      } 
@@ -420,7 +463,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         if (id == R.id.action_search){
             startActivityForResult(new Intent(this, SearchActivity.class), 90);        	
            return true;
-        }
+        }       
         if (id == R.id.refresh){
         	//reloadActivity();
         	listMarker();
@@ -446,7 +489,11 @@ public class MainActivity extends FragmentActivity implements LocationListener,
             ServerUtilFunctions down = new ServerUtilFunctions(this, "Downloading Markers...");
             down.syncMySQLDBSQLite();
             return true;
-        }        
+        }  
+        if (id == R.id.group_pref){
+           startActivityForResult(new Intent(this, SetGroupPreference.class), 0);        	
+           return true;
+        }
         
         return super.onOptionsItemSelected(item);
     }

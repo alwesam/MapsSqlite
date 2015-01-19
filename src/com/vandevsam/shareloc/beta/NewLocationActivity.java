@@ -50,8 +50,7 @@ public class NewLocationActivity extends Activity {
 			gr_data.open();
 		} catch (Exception e){
 			Log.i("Cannot open db", "hello");
-		} 	
-        
+		} 	       
         
         searchList = new ArrayList<String>();
         searchList = gr_data.getAllGroups(); 
