@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 public class CreateGroupActivity extends Activity {
 
@@ -69,11 +70,19 @@ public class CreateGroupActivity extends Activity {
 		group = groupName.getText().toString();
 		description = groupDescription.getText().toString();
 		//create the group in local sqlite db
-		data.createGroup(new MyGroupObj(group,
+		if (!data.queryGroup(group)){
+		   data.createGroup(new MyGroupObj(group,
 				                        description,
 				                        "open",
 				                        "yes"
 				                         ));
+		} else {
+			Toast.makeText(getApplicationContext(), 
+					 "Group of this name already exists", 
+		              Toast.LENGTH_LONG).show();
+			return;
+		}
+	
 		
 		data.close();
 		

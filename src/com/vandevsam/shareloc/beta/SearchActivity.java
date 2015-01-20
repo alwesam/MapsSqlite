@@ -5,10 +5,12 @@ import java.util.List;
 
 import com.vandevsam.shareloc.beta.data.MarkerDataManager;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -19,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class SearchActivity extends Activity {
 	
 	private Context context = this;	
@@ -63,7 +66,8 @@ public class SearchActivity extends Activity {
            @Override
            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 	         coordinates = data.getPosition(searchListAdapter.getItem(position));
-	         returnResults(coordinates); //return to map activity
+	         if(data.queryPosition(coordinates))
+	            returnResults(coordinates); //return to map activity
            }			
          });	
 	}	

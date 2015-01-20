@@ -2,7 +2,6 @@ package com.vandevsam.shareloc.beta;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -29,15 +28,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.annotation.TargetApi;
-import android.app.DialogFragment;
-//import android.app.FragmentManager;
-//import android.app.FragmentManager;
-//import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
@@ -49,8 +43,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class MainActivity extends FragmentActivity implements LocationListener,
-                                NoticeDialogFragment.NoticeDialogListener {
+public class MainActivity extends FragmentActivity implements LocationListener{
+                               // ,NoticeDialogFragment.NoticeDialogListener {
 
 	Context context = this;
 	private GoogleMap map;	
@@ -60,16 +54,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	private static final String Vancouver = "49.25 -123.1";
 		
 	SessionManager session;
-	
-	//TODO move to utilities class?
-	private LatLng loc;			
-	public LatLng getLoc() {
-		return loc;
-	}
-	public void setLoc(LatLng loc) {
-		this.loc = loc;
-	}	
-	
+		
 	private String[] mListTitles;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;	
@@ -190,11 +175,15 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	    map.setOnInfoWindowClickListener(new OnInfoWindowClickListener(){
 			@Override
 			public void onInfoWindowClick(Marker marker) {	
-				//save coordinates of location marker to be deleted
-				//TODO find a better way to pass the coordinates, instead of setLoc
-				setLoc(new LatLng(marker.getPosition().latitude,marker.getPosition().longitude));	
-				//TODO uncomment after fixing
-				//showNoticeDialog();
+				
+				map.clear();
+							
+				String coordinates = String.valueOf(marker.getPosition().latitude+
+						" "+marker.getPosition().longitude);				
+				Intent markerDetails = new Intent(getBaseContext(), MarkerDetailsActivity.class)
+                                    .putExtra(Intent.EXTRA_TEXT, coordinates);
+                startActivity(markerDetails);  
+				
 			}
 	    }); 
 	 		    
@@ -290,7 +279,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	   }
 	
 	//dialog methods
-	public void showNoticeDialog() {
+	/**public void showNoticeDialog() {
         // Create an instance of the dialog fragment and show it
         DialogFragment dialog = new NoticeDialogFragment(context);
         //TODO fix
@@ -307,27 +296,16 @@ public class MainActivity extends FragmentActivity implements LocationListener,
     	data.deleteMarker( new MyMarkerObj(slatlng));
     	dialog.dismiss();  
     	Toast.makeText(getApplicationContext(), "Marker deleted", Toast.LENGTH_LONG).show();
-    	listMarker();
+    	//listMarker();
     }
 
     @Override
     public void onDialogNegativeClick(DialogFragment dialog) { 
     	dialog.dismiss();    	
-    }
-    
-    /**
-    @Override
-	public void onDialogPositiveClick(DialogFragment dialog) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void onDialogNegativeClick(DialogFragment dialog) {
-		// TODO Auto-generated method stub		
-	}	**/
+    }    **/
 	
 	//list markers on the map
-	private void listMarker(){		
+	/**private void listMarker(){		
 		float mapIcon = BitmapDescriptorFactory.HUE_ROSE;
 		map.clear();
 		List <MyMarkerObj> n = data.getAllMarkers();			
@@ -345,7 +323,50 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 			   .icon(BitmapDescriptorFactory.defaultMarker(mapIcon))
 			   .draggable(true));			
 		}	
-	}	
+	}	***/
+	
+	private void listSelMarker(){
+		
+		SaveGroupPreference pref = new SaveGroupPreference(this); 
+		List<String> groups = pref.getPrefGroup();
+		List<Boolean> groups_check = pref.getPrefCheck();
+		
+		List<String> selGroups = new ArrayList<String>();	
+		
+		int safety_count = 0;
+				
+		for (int i=0; i<groups.size(); i++) {			
+			if(groups_check.get(i)){
+				selGroups.add(groups.get(i));
+			    safety_count++;
+			}
+		}	
+		
+		map.clear();
+		
+		if (safety_count==0){
+			Toast.makeText(getApplicationContext(), 
+					"No Markers", Toast.LENGTH_LONG).show();
+			return;}
+				
+		float mapIcon = BitmapDescriptorFactory.HUE_ROSE;
+		
+		List <MyMarkerObj> n = data.getSelMarkers(selGroups);			
+		for (int i=0; i < n.size(); i++){
+			String[] slatlng = n.get(i).getPosition().split(" ");
+			LatLng latlng = new LatLng (Double.valueOf(slatlng[0]), Double.valueOf(slatlng[1]));			
+			if(n.get(i).getStatus().equalsIgnoreCase("no"))
+				mapIcon = BitmapDescriptorFactory.HUE_ROSE;
+			else
+				mapIcon = BitmapDescriptorFactory.HUE_GREEN;
+			map.addMarker(new MarkerOptions()			   
+			   .title(n.get(i).getTitle())
+			   .snippet(n.get(i).getSnippet())
+			   .position(latlng)
+			   .icon(BitmapDescriptorFactory.defaultMarker(mapIcon))
+			   .draggable(true));			
+		}			
+	}
 	
 	private Marker listAMarker(String pos){
 		map.clear();
@@ -375,43 +396,6 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 		marker.showInfoWindow();		
 	}
 	
-	
-	/**private void checkPref(){		
-        SharedPreferences myPref  
-        = PreferenceManager.getDefaultSharedPreferences(this); 
-        String _pref =  
-                "Option 1: " +  myPref.getBoolean("pref_opt1", true) + "\n"
-                + "Option 4: " +  myPref.getBoolean("pref_opt4", false); 
-        Toast.makeText(getApplicationContext(), 
-  			 _pref, 
-  			  Toast.LENGTH_LONG).show();
-    }**/
-	
-		
-	private void checkPref(){
-	
-		SaveGroupPreference pref = new SaveGroupPreference(this); 
-		List<String> groups = pref.getPrefGroup();
-		List<Boolean> groups_check = pref.getPrefCheck();
-		
-		for (int i=0; i<groups.size(); i++) {
-			Toast.makeText(getApplicationContext(), 
-		  			 groups.get(i), Toast.LENGTH_LONG).show();
-		
-			String a;
-			if(groups_check.get(i))
-				a = "True";
-			else 
-				a = "False";
-			
-			
-			Toast.makeText(getApplicationContext(), 
-					a, Toast.LENGTH_LONG).show();
-			
-		}
-		        
-	}
-	
 	//call back from SearchActivity	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent response) {
@@ -420,7 +404,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
 	    switch(requestCode) {
 	      case 0 : {	    	
 	        if (resultCode == RESULT_OK) {
-	    	  checkPref();
+	    	  //nothing
 	        }
 	       break;
 	      } 
@@ -466,7 +450,7 @@ public class MainActivity extends FragmentActivity implements LocationListener,
         }       
         if (id == R.id.refresh){
         	//reloadActivity();
-        	listMarker();
+        	listSelMarker();
         	return true;
         }
         if (id == R.id.action_settings) {

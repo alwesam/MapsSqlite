@@ -39,7 +39,7 @@ public class GroupDataManager {
 
 	public void deleteGroup(String groupName) {	    	    
 	    db.delete(MySQLHelper.GROUP_TABLE, MySQLHelper.GROUP_NAME
-	        + " = '" + groupName + "'", null);
+	        + " = '" + groupName + "'", null);	
 	  }	
 	
 	public List<String> getAllGroups(){		
