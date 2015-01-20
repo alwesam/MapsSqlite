@@ -112,6 +112,15 @@
                 android:value="com.vandevsam.shareloc.beta.SearchGroupsActivity" />
         </activity>
         
+        <activity
+            android:name="com.vandevsam.shareloc.beta.MarkerDetailsActivity"
+            android:label="Marker Details" 
+            android:parentActivityName="com.vandevsam.shareloc.beta.MainActivity">          
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.vandevsam.shareloc.beta.MainActivity" />
+        </activity>
+        
          <activity
             android:name="com.vandevsam.shareloc.beta.MyGroupDetailActivity"
             android:label="My Group Details" 
