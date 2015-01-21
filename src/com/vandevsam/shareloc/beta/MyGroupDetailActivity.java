@@ -86,7 +86,11 @@ public class MyGroupDetailActivity extends Activity {
      * @param view
      */
     public void callHomeActivity(View view) {        
-		finish();
+		
+    	Intent resultIntent = new Intent();		
+		setResult(RESULT_OK, resultIntent);
+    	finish();
+        
     }   
 	
 

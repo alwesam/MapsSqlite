@@ -1,6 +1,8 @@
 package com.vandevsam.shareloc.beta;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import com.vandevsam.shareloc.beta.data.GroupDataManager;
 import com.vandevsam.shareloc.beta.data.MyGroupObj;
@@ -20,10 +22,8 @@ import android.widget.Toast;
 public class CreateGroupActivity extends Activity {
 
 	Context context = this;
-	GroupDataManager data;
 	private EditText groupName;
 	private EditText groupDescription;
-	//SessionManager session;
 	ProgressDialog prgDialog;	
 	
 	SessionManager session;
@@ -41,15 +41,7 @@ public class CreateGroupActivity extends Activity {
         // get user data from session
         user = session.getUserDetails();
         //this guy, the creator will be added to the group
-        creator = user.get(SessionManager.KEY_NAME);
-        
-        data = new GroupDataManager(context);
-        
-        try {
-           data.open();
-        } catch (Exception e){
-			Log.i("hello", "hello");
-		} 
+        creator = user.get(SessionManager.KEY_NAME);              
         
         groupName = (EditText) findViewById(R.id.GroupName); 
         groupDescription = (EditText) findViewById(R.id.GroupDesc);        
@@ -67,8 +59,24 @@ public class CreateGroupActivity extends Activity {
 	}	
 	
 	public void addNewGroup(View view){		
+		
 		group = groupName.getText().toString();
 		description = groupDescription.getText().toString();
+		
+		if (group.equals("null") || group.equals("") ){
+			Toast.makeText(getApplicationContext(), 
+					 "Enter a group name", 
+		              Toast.LENGTH_LONG).show();
+			return;
+		}
+		
+		GroupDataManager data = new GroupDataManager(context);
+        
+        try {
+           data.open();
+        } catch (Exception e){
+			Log.i("hello", "hello");
+		} 
 		//create the group in local sqlite db
 		if (!data.queryGroup(group)){
 		   data.createGroup(new MyGroupObj(group,
@@ -81,10 +89,16 @@ public class CreateGroupActivity extends Activity {
 					 "Group of this name already exists", 
 		              Toast.LENGTH_LONG).show();
 			return;
-		}
-	
-		
+		}			
 		data.close();
+		
+		//Make a check next to it for preferences
+		SaveGroupPreference pref = new SaveGroupPreference(this);  
+		List<String> name = new ArrayList<String>();    	
+    	List<Boolean> check = new ArrayList<Boolean>();
+    	name.add(group);
+    	check.add(true);  	   	    	
+    	pref.checkPref(name,check);
 		
 		//TODO remove later...
 		/*

@@ -91,7 +91,8 @@
         <activity
             android:name="com.vandevsam.shareloc.beta.SearchGroupsActivity"
             android:label="Find a Group"
-            android:parentActivityName="com.vandevsam.shareloc.beta.MainActivity"> 
+            android:parentActivityName="com.vandevsam.shareloc.beta.MainActivity"
+            > 
             <intent-filter>
                <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -124,7 +125,8 @@
          <activity
             android:name="com.vandevsam.shareloc.beta.MyGroupDetailActivity"
             android:label="My Group Details" 
-            android:parentActivityName="com.vandevsam.shareloc.beta.SearchGroupsActivity">          
+            android:parentActivityName="com.vandevsam.shareloc.beta.SearchGroupsActivity"
+            >          
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vandevsam.shareloc.beta.SearchGroupsActivity" />

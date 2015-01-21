@@ -133,7 +133,8 @@ public class MainActivity extends FragmentActivity implements LocationListener{
 			} catch (IOException e) {
 				e.printStackTrace();
 				Toast.makeText(getApplicationContext(), 
-		    			  "Failed to load geocoder, zooming in to Vancouver", 
+		    			  "Cannot zoom to selected address in Settings, \n" +
+		    			  "check network connection or restart device", 
 		    			  Toast.LENGTH_LONG).show();
 				zoomToLocation(Vancouver);				
 			}
@@ -253,7 +254,7 @@ public class MainActivity extends FragmentActivity implements LocationListener{
 	public void setTitle(CharSequence title) {
 	    mTitle = title;
 	    //TODO fix
-	    //getActionBar().setTitle(mTitle);
+	    getActionBar().setTitle(mTitle);
 	}
 	
 	//TODO review

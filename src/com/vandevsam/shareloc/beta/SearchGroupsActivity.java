@@ -62,7 +62,7 @@ public class SearchGroupsActivity extends Activity {
            @Override
            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {	   
         	  String group = searchListAdapter.getItem(position);
-        	         	  
+        	          	          	         	  
         	  Intent detailActivity;
         	          	         	  
         	  if (data.queryStatus(group))
@@ -70,9 +70,8 @@ public class SearchGroupsActivity extends Activity {
                                         .putExtra("key", group);
         	  else
         		   detailActivity = new Intent(getBaseContext(), GroupDetailActivity.class)
-                                          .putExtra("key", group);
-        		  
-        	  startActivity(detailActivity);
+                                          .putExtra("key", group);        		  
+        	  startActivityForResult(detailActivity,0);
            }			
          });	
 	}	
@@ -116,6 +115,23 @@ public class SearchGroupsActivity extends Activity {
 	    searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
 	    return true;
 	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent response) {
+	  //super.onActivityResult(requestCode, resultCode, response);
+       if (response != null){
+	     switch(requestCode) {
+	       case 0 : {	    	
+	         if (resultCode == RESULT_OK) {
+	    	  //list = doMySearch("ALL");
+	    	  Intent objIntent = new Intent(getApplicationContext(), SearchGroupsActivity.class);
+	          startActivity(objIntent);
+	         }
+	         break;
+	       }  	    
+	    }	    
+      } 
+	}	
 		
 
 }

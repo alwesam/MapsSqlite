@@ -13,7 +13,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -29,52 +28,27 @@ public class NewLocationActivity extends Activity {
 
 	private Context context = this;	
 	private String coordinates;
-	MarkerDataManager data;
-	GroupDataManager gr_data;
+	//MarkerDataManager data;
+	//GroupDataManager gr_data;
 	private TextView addressTextView;
 	private EditText userComment;
 	private EditText editAddress;
-	private List<String> searchList;
-	private ArrayAdapter<String> adapter;
+	//private List<String> searchList;
+	//private ArrayAdapter<String> adapter;
 	private Spinner spinner;
 	
-	private String group_sel;
+	//private String group_sel;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_newlocation);
+        setContentView(R.layout.activity_newlocation);   
         
-        gr_data = new GroupDataManager(context);    
-        try {
-			gr_data.open();
-		} catch (Exception e){
-			Log.i("Cannot open db", "hello");
-		} 	       
-        
-        searchList = new ArrayList<String>();
-        searchList = gr_data.getAllGroups(); 
-        spinner = (Spinner) findViewById(R.id.Spinner01);
-        adapter = new ArrayAdapter<String>(this,
-                              android.R.layout.simple_spinner_item, 
-                              searchList);
-        //TODO find out the purpose of this?
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter); 
-        //TODO implement class
-        //spinner.setOnItemSelectedListener(new CustomOnItemSelectedListener());
+        fixSpinner();
                 
         userComment = (EditText) findViewById(R.id.Comment); 
         editAddress = (EditText) findViewById(R.id.Location);
-        addressTextView = (TextView) findViewById(R.id.addressText);
-        
-        data = new MarkerDataManager(context);
-        try {
-			data.open();
-		} catch (Exception e){
-			Log.i("hello", "hello");
-		}        
-        
+        addressTextView = (TextView) findViewById(R.id.addressText); 
         Intent intent = this.getIntent();
         coordinates = intent.getStringExtra(Intent.EXTRA_TEXT);
         
@@ -84,7 +58,27 @@ public class NewLocationActivity extends Activity {
 
     }		
 	
-	public void updateAddress (String address){
+	private void fixSpinner (){
+		GroupDataManager gr_data = new GroupDataManager(context);    
+        try {
+			gr_data.open();
+		} catch (Exception e){
+			Log.i("Cannot open db", "Error");
+		} 	               
+        List<String> searchList = new ArrayList<String>();
+        searchList = gr_data.getAllGroups(); 
+        spinner = (Spinner) findViewById(R.id.Spinner01);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                              android.R.layout.simple_spinner_item, 
+                              searchList);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter); 
+        //TODO implement class
+        //spinner.setOnItemSelectedListener(new CustomOnItemSelectedListener());
+		
+	}
+	
+	private void updateAddress (String address){
 		addressTextView.setText("Selected address: "+address);
 		editAddress.setText(address);
 	}
@@ -92,17 +86,42 @@ public class NewLocationActivity extends Activity {
 	public void addNewLocation(View view){	
 		
 		spinner = (Spinner) findViewById(R.id.Spinner01);		
-		group_sel = String.valueOf(spinner.getSelectedItem());
+		String group_sel = String.valueOf(spinner.getSelectedItem());
+		String comment = userComment.getText().toString();
+				
+		if (comment.equals("null") || comment.equals("") ){
+			comment = "  ";
+		}		
+			
+		//comment: this is something peculiar in java where "null" will be assigned 
+		//to a String that hasn't been initialized yet
+		//For any non-null reference value x, x.equals(null) should return false.
+		//therefore mystring.equals(null) will always return false regardless
+		//myString.isEmpty() works only with API 9 and above
+		if (group_sel.equals("null") || group_sel.equals("")){
+			Toast.makeText(getApplicationContext(), 
+					"Create or join a group to choose from", 
+					Toast.LENGTH_LONG).show();
+			return;
+		}
 		
+		MarkerDataManager data = new MarkerDataManager(context);
+        try {
+			data.open();
+		} catch (Exception e){
+			Log.i("Cannot open db", "Error");
+		}  		
 		//TODO add conditionals to ensure legal data is entered into database
-		data.addMarker(new MyMarkerObj(userComment.getText().toString(), //enter comments
+		data.addMarker(new MyMarkerObj(comment, //enter comments
 				                       editAddress.getText().toString(), //edit or enter address
 				                       coordinates, //position
 				                       group_sel, //group name
 				                       "no") //it's not yet synced to remote db
 		               );
 		data.close();
-		Toast.makeText(getApplicationContext(), "Marker added", Toast.LENGTH_LONG).show();
+		Toast.makeText(getApplicationContext(), 
+				"Marker added", 
+				Toast.LENGTH_LONG).show();
 		//go back home
 		this.callHomeActivity(view, true);
 	}	
@@ -119,7 +138,7 @@ public class NewLocationActivity extends Activity {
      * Navigate to Home Screen 
      * @param view
      */
-    public void callHomeActivity(View view, Boolean added) {
+    private void callHomeActivity(View view, Boolean added) {
         //Intent objIntent = new Intent(getApplicationContext(),MainActivity.class);
         //startActivity(objIntent);
     	Intent resultIntent = new Intent();
@@ -167,17 +186,15 @@ public class NewLocationActivity extends Activity {
 	            LatLng loc = new LatLng(Double.parseDouble(splited[0]),Double.parseDouble(splited[1]));
 	            // Create a list to contain the result address
 	            List<Address> addresses = null;
-	            try {
-	                /*
-	                 * Return 1 address.
-	                 */
+	            try {	              
 	                addresses = geocoder.getFromLocation(loc.latitude,
 	                        loc.longitude, 1);
 	            } catch (IOException e1) {
-	            Log.e("LocationSampleActivity",
+	               Log.e("LocationSampleActivity",
 	                    "IO Exception in getFromLocation()");
-	            e1.printStackTrace();
-	            return ("IO Exception trying to get address");
+	               e1.printStackTrace();	               
+	            //return ("IO Exception trying to get address");
+	            return null;
 	            } catch (IllegalArgumentException e2) {
 	            // Error message to post in the log
 	            String errorString = "Illegal arguments " +
@@ -214,7 +231,12 @@ public class NewLocationActivity extends Activity {
 	        }
 	    
 	        protected void onPostExecute(String result) {
-	        	updateAddress(result);
+	        	if (result == null)
+	        	  Toast.makeText(getApplicationContext(), 
+	            		   "IO Exception, check network connection or restart device", 
+	            		   Toast.LENGTH_LONG).show();
+	        	else
+	        	  updateAddress(result);
 	        }	    
 	    }
 	
