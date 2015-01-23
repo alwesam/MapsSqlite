@@ -186,10 +186,21 @@ public class MainActivity extends FragmentActivity implements LocationListener{
                 startActivity(markerDetails);  
 				
 			}
-	    }); 
+	    });     
+	    	
+	    checkoutGroups();
+	    
+	    //show selected markers
+	    listSelMarker();
 	 		    
 	}
 	//end onCreate method
+	
+	private void checkoutGroups (){		
+		//list all groups in the remote db and populate the sqlite db
+        ServerUtilFunctions list = new ServerUtilFunctions(this);
+        list.listAllGroup();      
+	}
 		
 	private String geoCode(String city) throws IOException{
 		
@@ -461,7 +472,7 @@ public class MainActivity extends FragmentActivity implements LocationListener{
         if (id == R.id.sync_to_DB) {
             //Sync SQLite DB markers to remote MySQL DB
         	if (session.checkLogin()){
-               ServerUtilFunctions up = new ServerUtilFunctions(this, "Uploading Markers...");
+               ServerUtilFunctions up = new ServerUtilFunctions(this, "");
                up.syncSQLiteMySQLDB();
         	}
         	else
@@ -471,8 +482,8 @@ public class MainActivity extends FragmentActivity implements LocationListener{
             return true;
         } 
         if (id == R.id.sync_from_DB) {
-            ServerUtilFunctions down = new ServerUtilFunctions(this, "Downloading Markers...");
-            down.syncMySQLDBSQLite();
+            ServerUtilFunctions down = new ServerUtilFunctions(this, "Connecting to remote server...");
+            down.syncMySQLDBSQLite("ALL");
             return true;
         }  
         if (id == R.id.group_pref){

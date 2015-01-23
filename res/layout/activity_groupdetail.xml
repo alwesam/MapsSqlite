@@ -30,8 +30,7 @@
               
     <TextView android:id="@+id/GroupDesc"
               android:layout_width="wrap_content"
-              android:layout_height="wrap_content"            
-              android:text="This is life"
+              android:layout_height="wrap_content"
               android:ems="20"> 
         <requestFocus />
         </TextView>
@@ -40,7 +39,6 @@
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_below="@+id/GroupDesc"
-              android:text="Open"
               android:ems="20"> 
         <requestFocus />
         </TextView>
@@ -54,17 +52,8 @@
         android:layout_below="@+id/GroupType"
         android:layout_marginTop="32dp"
         android:text="Join"     
-        android:onClick="joinGroup" />
-    
-      <Button
-        android:id="@+id/btnCancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/GroupType"
-        android:layout_toRightOf="@+id/btnjoin"
-        android:layout_marginTop="32dp"
-        android:text="@string/cancel"     
-        android:onClick="cancelJoinGroup" />
+        android:onClick="joinGroup" />   
+      
 
       </RelativeLayout>
       

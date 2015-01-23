@@ -3,6 +3,7 @@ package com.vandevsam.shareloc.beta;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.vandevsam.shareloc.beta.data.GroupDataManager;
 import com.vandevsam.shareloc.beta.data.MarkerDataManager;
 
 import android.annotation.TargetApi;
@@ -10,6 +11,7 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.database.SQLException;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class SearchActivity extends Activity {
@@ -101,7 +104,31 @@ public class SearchActivity extends Activity {
 	private ArrayList<String> doMySearch (String search){	
 		    //searchListAdapter.clear();
 		    ArrayList<String> searchList = new ArrayList<String>();
-	        searchList = data.getAddresses(search);
+		    GroupDataManager groups = new GroupDataManager(this);		    
+		    try {
+				groups.open();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				Toast.makeText(getApplicationContext(), 
+		    			  "Cannot open groups database", 
+		    			  Toast.LENGTH_LONG).show();
+			}
+		    //groups.close();
+		    //searchList = data.getAddresses(search);
+		    //TODO temp fix
+		    
+		    try {
+				searchList = data.getSelAddresses(groups.getJoinedGroups());					
+				groups.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+				Toast.makeText(getApplicationContext(), 
+		    			  "List is empty", 
+		    			  Toast.LENGTH_LONG).show();
+				groups.close();
+			}
+	         		   
 	        return searchList;		
 	}
 	

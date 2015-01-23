@@ -68,14 +68,19 @@ public class MarkerDataManager {
 		return markers;
 	}	
 	
+    private String buildQuery(List<String> col_string){
+    	
+    	String[] sel = new String[col_string.size()];		
+		for (int i=0; i<col_string.size(); i++)
+			sel[i] = "SELECT * FROM locations where groups = '"+col_string.get(i)+"'";			
+		SQLiteQueryBuilder stringBuild = new SQLiteQueryBuilder();
+		    	
+    	return stringBuild.buildUnionQuery(sel,null,null);
+    }
+	
 	public List<MyMarkerObj> getSelMarkers(List<String> selGroups){	
 		
-		String[] sel = new String[selGroups.size()];		
-		for (int i=0; i<selGroups.size(); i++)
-			sel[i] = "SELECT * FROM locations where groups = '"+selGroups.get(i)+"'";	
-		
-		SQLiteQueryBuilder stringBuild = new SQLiteQueryBuilder();
-		String selectQuery = stringBuild.buildUnionQuery(sel,null,null);
+		String selectQuery = buildQuery(selGroups); 
         
 		List<MyMarkerObj> markers = new ArrayList<MyMarkerObj>();
 		Cursor cursor = db.rawQuery(selectQuery, null);		
@@ -205,16 +210,30 @@ public class MarkerDataManager {
     		cursor = db.rawQuery("SELECT * FROM locations", null);     
     	else 
 	        cursor = db.rawQuery("SELECT * FROM locations WHERE snippet LIKE '%"+query+"%'", null); 
+    	
 		if (cursor.moveToFirst()) {
             do {            	            	
             	addresses.add(cursor.getString(cursor.getColumnIndex(MySQLHelper.SNIPPET)));
             } while (cursor.moveToNext());
-        } else
-        {
-        	//addresses.add("No Address Found");
-    		return addresses;
-        	//return null;
-        }		
+        }
+		
+		return addresses;
+     }      
+    
+    public ArrayList<String> getSelAddresses (List<String> selGroups) {     	
+    	
+		String selectQuery = buildQuery(selGroups);   	    	
+    	
+    	ArrayList<String> addresses = new ArrayList<String>();
+    	//TODO temp solution
+    	Cursor cursor = db.rawQuery(selectQuery, null);
+    	
+		if (cursor.moveToFirst()) {
+            do {            	            	
+            	addresses.add(cursor.getString(cursor.getColumnIndex(MySQLHelper.SNIPPET)));
+            } while (cursor.moveToNext());
+        }
+		
 		return addresses;
      }   
 

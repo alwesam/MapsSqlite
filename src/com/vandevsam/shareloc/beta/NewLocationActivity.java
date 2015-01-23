@@ -66,7 +66,7 @@ public class NewLocationActivity extends Activity {
 			Log.i("Cannot open db", "Error");
 		} 	               
         List<String> searchList = new ArrayList<String>();
-        searchList = gr_data.getAllGroups(); 
+        searchList = gr_data.getJoinedGroups(); 
         spinner = (Spinner) findViewById(R.id.Spinner01);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                               android.R.layout.simple_spinner_item, 

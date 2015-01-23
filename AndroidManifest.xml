@@ -6,7 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="8"
-        android:targetSdkVersion="16" />
+        android:targetSdkVersion="19" />
     
     <!-- Allows to receive map -->
     <uses-permission android:name="com.vandevsam.shareloc.beta.permission.MAPS_RECEIVE" />
@@ -168,7 +168,12 @@
                 android:value="com.vandevsam.shareloc.beta.MainActivity" />
         </activity>
         
-        <activity android:name=".SetGroupPreference"/>
+        <activity android:name=".SetGroupPreference"
+            android:parentActivityName=".MainActivity">
+        <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.vandevsam.shareloc.beta.MainActivity" />
+        </activity>
         
        
     </application>

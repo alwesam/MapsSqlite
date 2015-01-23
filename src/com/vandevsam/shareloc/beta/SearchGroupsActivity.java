@@ -70,7 +70,8 @@ public class SearchGroupsActivity extends Activity {
                                         .putExtra("key", group);
         	  else
         		   detailActivity = new Intent(getBaseContext(), GroupDetailActivity.class)
-                                          .putExtra("key", group);        		  
+                                          .putExtra("key", group);   
+        	  
         	  startActivityForResult(detailActivity,0);
            }			
          });	
@@ -93,9 +94,7 @@ public class SearchGroupsActivity extends Activity {
 	}
    
 	private ArrayList<String> doMySearch (String search){			    
-           //move this to OnCreate on MainActivity!
-           //ServerUtilFunctions list = new ServerUtilFunctions(this);
-           //list.listAllGroup();		
+          	
 		    ArrayList<String> searchList = new ArrayList<String>();
 	        searchList = (ArrayList<String>) data.getAllGroups();
 	        return searchList;		

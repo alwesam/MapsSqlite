@@ -3,7 +3,7 @@
         android:id="@+id/group_list"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:columnWidth="90dp"
+        android:columnWidth="120dp"
         android:numColumns="auto_fit"
         android:verticalSpacing="10dp"
         android:horizontalSpacing="10dp"

@@ -100,21 +100,15 @@ public class CreateGroupActivity extends Activity {
     	check.add(true);  	   	    	
     	pref.checkPref(name,check);
 		
-		//TODO remove later...
-		/*
 		//then sync it to remote db Group in remote db
-		ServerUtilFunctions gr = new ServerUtilFunctions(this, "Creating  a group....");
+		ServerUtilFunctions gr = new ServerUtilFunctions(this, "Creating the group....");
 		gr.createGroup(group, description);			
 		//TODO fix
-		if (true) {
-							
-			gr.joinGroup(creator, group);			
-		
-		    Toast.makeText(getApplicationContext(), 
-			 "Successfully joined "+creator+" as first member of "+group, 
-              Toast.LENGTH_LONG).show();	
-		    
-		}*/
+			
+		//ServerUtilFunctions jn = new ServerUtilFunctions(this, "Joining the group....");
+		//note: doesn't work if used a different object, must use same reference??
+		gr.joinGroup(creator, group);			
+			
 		//go back home
 		
 		this.callHomeActivity(view);

@@ -8,11 +8,13 @@ import com.vandevsam.shareloc.beta.data.GroupDataManager;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Resources.NotFoundException;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.Toast;
  
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class SetGroupPreference extends Activity {
@@ -34,7 +36,7 @@ public class SetGroupPreference extends Activity {
 			Log.i("Cannot open db", "hello");
 		}	                
         List<String> searchList = new ArrayList<String>();
-        searchList = gr_data.getAllGroups(); 
+        searchList = gr_data.getJoinedGroups(); 
         
         ArrayAdapter<String> grAdapter = new ArrayAdapter<String>(this,
             android.R.layout.simple_list_item_multiple_choice, searchList);
@@ -42,14 +44,28 @@ public class SetGroupPreference extends Activity {
         gridView = (GridView) findViewById(R.id.group_list); 
         gridView.setAdapter(grAdapter);
         grCount = grAdapter.getCount();  
-        
-        SaveGroupPreference pref = new SaveGroupPreference(this); 
-        List<Boolean> group_check = pref.getPrefCheck();
-                   
-       //all checked true by default
-        for (int i = 0; i < grCount; i++) {
-            gridView.setItemChecked(i, group_check.get(i));                       
-        }  
+     
+        //TODO fix later
+     /**   
+        try {
+			SaveGroupPreference pref = new SaveGroupPreference(this); 
+			List<Boolean> group_check = pref.getPrefCheck();
+			
+			Toast.makeText(getBaseContext(), 
+					group_check.size(), 
+				   Toast.LENGTH_LONG).show(); 
+			           
+      //all checked true by default
+			for (int i = 0; i < grCount; i++) {
+			    gridView.setItemChecked(i, group_check.get(i));                       
+			}
+		} catch (NotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			Toast.makeText(getBaseContext(), 
+					"Empty List", 
+				   Toast.LENGTH_LONG).show(); 
+		}   **/
         
     }
     
@@ -68,6 +84,10 @@ public class SetGroupPreference extends Activity {
     	
     }
     
+    public void setPref(){
+    	
+    }
+    
     @Override
     public void onBackPressed() {	
     	
@@ -78,5 +98,5 @@ public class SetGroupPreference extends Activity {
 		setResult(RESULT_OK, resultIntent);		
 		finish();		
 	}
- 
+   
 }

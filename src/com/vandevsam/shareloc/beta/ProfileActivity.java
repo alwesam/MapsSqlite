@@ -64,15 +64,16 @@ public class ProfileActivity extends Activity {
         data.open();		
         List<String> groups = data.getAllGroups();		
 		String result="";
-		/*int i=0;
-		while(groups.iterator()!=null){
-            result += groups.get(i++)+",";                 
-		}*/
+	
 		for (int i=0; i<groups.size(); i++){
+			//Make sure group is joined!!
+		 if (data.queryStatus(groups.get(i))){
 		   if(i<groups.size()-1)
 			 result += groups.get(i)+", ";
 		   else
-			 result += groups.get(i);
+			 result += groups.get(i);		   
+		 }
+		 
 		}
 		return result;
 	}

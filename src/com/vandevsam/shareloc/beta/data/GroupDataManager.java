@@ -8,6 +8,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 public class GroupDataManager {
 	
@@ -54,6 +55,19 @@ public class GroupDataManager {
 		return groups;
 	}	
 	
+	public List<String> getJoinedGroups(){
+		List<String> groups = new ArrayList<String>();	
+		String selectQuery = "SELECT  * FROM groups where group_status = '"+"yes"+"' ";
+		Cursor cursor = db.rawQuery(selectQuery, null);		
+		cursor.moveToFirst();		
+		while (!cursor.isAfterLast()){
+			String g = cursor.getString(cursor.getColumnIndex(MySQLHelper.GROUP_NAME));
+			groups.add(g);
+			cursor.moveToNext();
+		}		
+		return groups;
+	}
+	
 	public List<String> getDetails(String group){		
 		List<String> details = new ArrayList<String>();		
 		String selectQuery = "SELECT  * FROM groups where group_name = '"+group+"'";
@@ -76,6 +90,13 @@ public class GroupDataManager {
     	else
     	   return true; //exists
 	}
+	
+	public void updateStatus(String group, String status){    
+        String updateQuery = "Update groups set group_status = '"
+                                + status +"' where group_name="+"'"+ group +"'";
+        Log.d("query",updateQuery);        
+        db.execSQL(updateQuery);        
+    }
 	
 	public boolean queryStatus(String group){
 		//TODO change

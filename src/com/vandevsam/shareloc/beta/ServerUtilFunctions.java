@@ -20,7 +20,6 @@ public class ServerUtilFunctions {
 	
 	Context mContext;
 	private static final String webServer = "108.59.82.39"; //my google CE ip address
-	//private static final String webServer = "192.168.0.11"; //localhost for debugging and local testing
 	
 	GroupDataManager group_data;	
 	MarkerDataManager marker_data;	
@@ -39,7 +38,8 @@ public class ServerUtilFunctions {
 	}
 	
 	//join a group
-	public void joinGroup(String member, String group){
+	//TODO temp fix
+	public void joinGroup(String member, final String group){
   		
 		   AsyncHttpClient client = new AsyncHttpClient();	       
 	       // Http Request Params Object
@@ -55,7 +55,7 @@ public class ServerUtilFunctions {
 	            	   try {
 						JSONObject jObject = new JSONObject(response);						
 						 if (jObject.getBoolean("status")) {
-							 Toast.makeText(mContext, "Successfully joined group!", 
+							 Toast.makeText(mContext, "Successfully joined "+group+"!", 
 		                    		   Toast.LENGTH_LONG).show();							  
 		                   } 
 					    } catch (JSONException e) {					
@@ -67,7 +67,7 @@ public class ServerUtilFunctions {
 	               @Override
 	               public void onFailure(int statusCode, Throwable error, String content) {                   
 	                   // Hide ProgressBar
-	                   prgDialog.hide();
+	                   //prgDialog.hide();
 	                   if (statusCode == 404) {
 	                       Toast.makeText(mContext, "Requested resource not found", 
 	                    		   Toast.LENGTH_LONG).show();
@@ -168,10 +168,11 @@ public class ServerUtilFunctions {
 	                               if (!group_data.queryGroup(obj.get("group").toString()))  
 	                            	   group_data.createGroup(new MyGroupObj(
                       		                           obj.get("group").toString(),
-                      		                           "hi", //TODO fix
-                      		                           "open",
-                      		                           "no" //join status
-                      		                            ));			                           
+                      		                           obj.get("description").toString(), 
+                      		                           obj.get("type").toString(),
+                      		                           "no" //join status //TODO fix
+                      		                            ));		
+	                             	                               
 	                           }             		                         
 	                       }
 	                       
@@ -310,7 +311,7 @@ public class ServerUtilFunctions {
 	   }
 	   
 	   // download markers from remote MySQL to local SQLite DB
-	   public void syncMySQLDBSQLite() {
+	   public void syncMySQLDBSQLite(String group) {
 	       // Create AsycHttpClient object
 		   marker_data = new MarkerDataManager(mContext);
            marker_data.open();
@@ -320,17 +321,18 @@ public class ServerUtilFunctions {
 	       // Show ProgressBar
 	       prgDialog.show();
 	       // Make Http call to getusers.php
-	       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/getlocations.php", params, new AsyncHttpResponseHandler() {
+	       params.put("group", group);
+	       //TODO fix!!!
+	       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/getsellocations.php", params, new AsyncHttpResponseHandler() {
 	               @Override
 	               public void onSuccess(String response) {
 	                   // Hide ProgressBar
 	                   prgDialog.hide();
-	                   // Update SQLite DB with response sent by getusers.php
-	                   //updateSQLite(response);
+	                   
 	                   try {
 	                       // Extract JSON array from the response
 	                       JSONArray arr = new JSONArray(response);
-	                       // If no of array elements is not zero
+	                       // If no of array elements is not zero	                 
 	                       if(arr.length() != 0){
 	                           // Loop through each array element, get JSON object which id,title,snippet,position
 	                           for (int i = 0; i < arr.length(); i++) {
@@ -344,6 +346,7 @@ public class ServerUtilFunctions {
 	                                    marker_data.addMarker(new MyMarkerObj(obj.get("title").toString(),
 	                            		                               obj.get("snippet").toString(),
 	                            		                               obj.get("position").toString(),
+	                            		                               obj.get("group").toString(),
 	                            		                               "yes"));  
 	                                    Toast.makeText(mContext, 
 	                                    	   "Markers successfully obtained from remote server ", 
@@ -361,7 +364,7 @@ public class ServerUtilFunctions {
 	               @Override
 	               public void onFailure(int statusCode, Throwable error, String content) {                   
 	                   // Hide ProgressBar
-	                   prgDialog.hide();
+	                   prgDialog.hide();	                  
 	                   if (statusCode == 404) {
 	                       Toast.makeText(mContext, "Requested resource not found", 
 	                    		   Toast.LENGTH_LONG).show();
