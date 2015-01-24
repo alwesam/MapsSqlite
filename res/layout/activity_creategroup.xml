@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingTop="1dp" >
+    android:background="#CCCCCC"
+    android:paddingTop="1dp" 
+    android:paddingLeft="5dp">
     
     <TextView android:id="@+id/GroupText"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
+              android:layout_marginTop="10dp"           
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:textColor="#008000"
               android:layout_alignParentLeft="true"
               android:layout_alignParentTop="true"
-              android:text="Enter a group name, description, and type" />
+              android:text="Enter group details below" />
     
    <EditText
         android:id="@+id/GroupName"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="wrap_content"        
         android:layout_below="@+id/GroupText"
+         android:layout_marginTop="15dp"   
         android:inputType="text"
         android:ems="20" 
         android:hint="Group Name">
@@ -25,7 +31,7 @@
    <EditText
         android:id="@+id/GroupDesc"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="wrap_content"        
         android:layout_below="@+id/GroupName"
         android:inputType="text"
         android:ems="20" 
@@ -35,7 +41,7 @@
    <Spinner
     android:id="@+id/group_type"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="wrap_content"    
     android:layout_below="@+id/GroupDesc" />
            
     <Button
@@ -57,4 +63,4 @@
         android:layout_marginTop="32dp"
         android:text="@string/cancel"     
         android:onClick="cancelAddGroup" />      
-</LinearLayout>
+</RelativeLayout>
