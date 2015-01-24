@@ -1,4 +1,6 @@
-package com.vandevsam.shareloc.beta;
+package com.vandevsam.sharespot.beta;
+
+import com.vandevsam.shareloc.beta.R;
 
 import android.os.Bundle;
 import android.preference.ListPreference;

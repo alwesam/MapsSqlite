@@ -1,4 +1,4 @@
-package com.vandevsam.shareloc.beta;
+package com.vandevsam.sharespot.beta;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.vandevsam.shareloc.beta.R;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -17,80 +18,70 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
-public class RegisterActivity extends Activity {
+public class AuthenticateActivity extends Activity {
 	
-	//SessionManager session;
+	SessionManager session;
 	ProgressDialog prgDialog;
-	private EditText nameField, usernameField, passwordField, passwordField2;
+	private EditText usernameField, passwordField;
 	private static final String webServer = "108.59.82.39"; //my google CE ip address
-	//private static final String webServer = "192.168.0.11"; //localhost	
+	//private static final String webServer = "192.168.0.11"; //localhost
 	private TextView textView;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_register);				
+		setContentView(R.layout.activity_authenticate);	
 		
-		nameField = (EditText)findViewById(R.id.enterName);
-		usernameField = (EditText)findViewById(R.id.enterUser);
-	    passwordField = (EditText)findViewById(R.id.enterPass);
-	    passwordField2 = (EditText)findViewById(R.id.reenterPass);
-	    
-	    //save entered data
-	    nameField.setText(nameField.getText().toString());
-	    usernameField.setText(usernameField.getText().toString());
+		session = new SessionManager(getApplicationContext());
+		
+		//if already logged in, skip to map main activity
+		if(session.checkLogin())
+			loadMainActivity();
+		
+		usernameField = (EditText)findViewById(R.id.username);
+	    passwordField = (EditText)findViewById(R.id.password);
 		
 		prgDialog = new ProgressDialog(this);
-        prgDialog.setMessage("Creating account, please wait...");
-        prgDialog.setCancelable(false);        
+        prgDialog.setMessage("Authenticating, please wait...");
+        prgDialog.setCancelable(false);
         
         textView = (TextView) findViewById(R.id.textView);
         String htmlText = "<p></p><br><br><p align=\"center\">" +
         		"<a href=\"http://108.59.82.39/blog\">VanDevSam</a> &copy; 2014.</p>";
-        textView.setText(Html.fromHtml(htmlText));        
-		
+        textView.setText(Html.fromHtml(htmlText));
 	}	
 	
-	//add a method to connect with login db
-	public void submitInfo(View view){					 
-		   
-		   String name =  nameField.getText().toString();
-	       String username = usernameField.getText().toString();
-	       String password = passwordField.getText().toString();
-	       String password2 = passwordField2.getText().toString();
-	       
-	       //NOTE: remember to compare string values, use .equals(), the == compares references (objects) not values
-	       
-	    // Create AsycHttpClient object
+	/**
+	 * Enter user name & password 
+	 */
+    public void passLogin(View view) {
+	       // Create AsycHttpClient object
 	       AsyncHttpClient client = new AsyncHttpClient();	       
 	       // Http Request Params Object
 	       RequestParams params = new RequestParams();
+	       final String username = usernameField.getText().toString();
+	       String password = passwordField.getText().toString();
 	       // Show ProgressBar
 	       prgDialog.show();
-	       params.put("name", name);
 	       params.put("user", username);
 	       params.put("pass", password);
-	       params.put("repass", password2);
 	       //TODO connect via https
-	       //TODO write a register php file
-	       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/phplogin/register.php", params, new AsyncHttpResponseHandler() {
+	       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/phplogin/login.php", params, new AsyncHttpResponseHandler() {
 	               @Override
 	               public void onSuccess(String response) {
 	                   // Hide ProgressBar
-	            	   prgDialog.hide();
-	            	   
+	            	   prgDialog.hide();		            	   
 	            	   try {
 						JSONObject jObject = new JSONObject(response);						
 						 if (jObject.getBoolean("status")) {
-							 Toast.makeText(getApplicationContext(), "Account successfully created!", 
-		                    		   Toast.LENGTH_LONG).show();						 						 
-		                     loadLoginActivity();
+							 session.loginSession(jObject.getString("name"), username, jObject.getString("date"));
+							 Toast.makeText(getApplicationContext(), "Welcome "+jObject.getString("name"), 
+               		                     Toast.LENGTH_LONG).show();							 
+		                     loadMainActivity();
 		                   } 
 					    } catch (JSONException e) {					
 						   e.printStackTrace();
-					    }                	                   
-	                                
+					    }            
 	               }
 	               // When error occured
 	               @Override
@@ -108,17 +99,25 @@ public class RegisterActivity extends Activity {
 	                               Toast.LENGTH_LONG).show();
 	                   }
 	               }
-	       });	
-	     
-	}
-	
-	public void loadLoginActivity() {
-        Intent objIntent = new Intent(getApplicationContext(), AuthenticateActivity.class);                                     
+	       });	       
+   }
+    
+    public void guestLogin(View view){
+    	loadMainActivity();
+    }
+    
+    public void createAccount(View view){
+    	Intent register = new Intent(getApplicationContext(), RegisterActivity.class);
+    	startActivity(register);
+    	finish();
+    }
+
+    public void loadMainActivity() {
+        Intent objIntent = new Intent(getApplicationContext(), MainActivity.class);                                     
         objIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         objIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(objIntent);
         finish();
     }
-
 
 }

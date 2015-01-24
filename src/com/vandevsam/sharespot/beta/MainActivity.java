@@ -1,4 +1,4 @@
-package com.vandevsam.shareloc.beta;
+package com.vandevsam.sharespot.beta;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,8 +14,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.vandevsam.shareloc.beta.data.MarkerDataManager;
-import com.vandevsam.shareloc.beta.data.MyMarkerObj;
+import com.vandevsam.shareloc.beta.R;
+import com.vandevsam.sharespot.beta.data.MarkerDataManager;
+import com.vandevsam.sharespot.beta.data.MyMarkerObj;
 
 import android.location.Address;
 import android.location.Criteria;
@@ -339,30 +340,39 @@ public class MainActivity extends FragmentActivity implements LocationListener{
 	
 	private void listSelMarker(){
 		
-		SaveGroupPreference pref = new SaveGroupPreference(this); 
-		List<String> groups = pref.getPrefGroup();
-		List<Boolean> groups_check = pref.getPrefCheck();
+		List<String> selGroups;
+		int safety_count;
 		
-		List<String> selGroups = new ArrayList<String>();	
-		
-		int safety_count = 0;
-				
-		for (int i=0; i<groups.size(); i++) {			
-			if(groups_check.get(i)){
-				selGroups.add(groups.get(i));
-			    safety_count++;
+		try {
+			SaveGroupPreference pref = new SaveGroupPreference(this); 
+			List<String> groups = pref.getPrefGroup();
+			List<Boolean> groups_check = pref.getPrefCheck();
+			
+			selGroups = new ArrayList<String>();	
+			
+			safety_count = 0;
+					
+			for (int i=0; i<groups.size(); i++) {			
+				if(groups_check.get(i)){
+					selGroups.add(groups.get(i));
+				    safety_count++;
+				}
 			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
 		}	
 		
 		map.clear();
 		
 		if (safety_count==0){
-			Toast.makeText(getApplicationContext(), 
-					"No Markers", Toast.LENGTH_LONG).show();
+			//Toast.makeText(getApplicationContext(), 
+				//	"No Markers", Toast.LENGTH_LONG).show();
 			return;}
 				
 		float mapIcon = BitmapDescriptorFactory.HUE_ROSE;
-		
+		//get select markers
 		List <MyMarkerObj> n = data.getSelMarkers(selGroups);			
 		for (int i=0; i < n.size(); i++){
 			String[] slatlng = n.get(i).getPosition().split(" ");

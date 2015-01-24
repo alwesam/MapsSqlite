@@ -1,4 +1,4 @@
-package com.vandevsam.shareloc.beta;
+package com.vandevsam.sharespot.beta;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,9 +20,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.vandevsam.shareloc.beta.data.GroupDataManager;
-import com.vandevsam.shareloc.beta.data.MarkerDataManager;
-import com.vandevsam.shareloc.beta.data.MyMarkerObj;
+import com.vandevsam.shareloc.beta.R;
+import com.vandevsam.sharespot.beta.data.GroupDataManager;
+import com.vandevsam.sharespot.beta.data.MarkerDataManager;
+import com.vandevsam.sharespot.beta.data.MyMarkerObj;
 
 public class NewLocationActivity extends Activity {
 

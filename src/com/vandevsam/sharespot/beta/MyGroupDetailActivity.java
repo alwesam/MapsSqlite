@@ -1,28 +1,31 @@
-package com.vandevsam.shareloc.beta;
+package com.vandevsam.sharespot.beta;
+
 
 import java.util.List;
-
-import com.vandevsam.shareloc.beta.data.MarkerDataManager;
-import com.vandevsam.shareloc.beta.data.MyMarkerObj;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+
 import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MarkerDetailsActivity extends Activity {
+import com.vandevsam.shareloc.beta.R;
+import com.vandevsam.sharespot.beta.data.GroupDataManager;
+import com.vandevsam.sharespot.beta.data.MarkerDataManager;
+
+public class MyGroupDetailActivity extends Activity {
 	
 	Context context = this;
-	private String coordinates;
+	private String groupName;
 	private TextView textName;	
 	private TextView textDesc;
 	private TextView textType;
 	
-	MarkerDataManager marker;
+	GroupDataManager group;
 	
 	
 	@Override
@@ -30,44 +33,51 @@ public class MarkerDetailsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mygroupdetail);
         
-        Intent intent = this.getIntent();   
-		coordinates = intent.getStringExtra(Intent.EXTRA_TEXT);	
+        Intent intent = getIntent();   
+		groupName = intent.getStringExtra("key");	
         
-        marker = new MarkerDataManager(context);
+        group = new GroupDataManager(context);
         
-        marker.open();        
+        group.open();        
         //fetch details
-        List<String> details = marker.getMarkerDetails(coordinates);             
-        marker.close();
+        List<String> details = group.getDetails(groupName);             
+        group.close();
         
         //extractions
-        String desc = details.get(0);
-        String address = details.get(1);        
-        String group = details.get(3);
+        String name = details.get(0);
+        String desc = details.get(1);
+        String type = details.get(2);
         
       //get name and username
         textName = (TextView) findViewById(R.id.textName);
-        String htmlName = "<h3>Address: "+address+"</h3>";
+        String htmlName = "<h3>Group Name: "+name+"</h3>";
         textName.setText(Html.fromHtml(htmlName));
         
         textDesc = (TextView) findViewById(R.id.textDesc);
-        String htmlDate = "<h3>Description: "+desc+"</h3>";
+        String htmlDate = "<h3>Group Description: "+desc+"</h3>";
         textDesc.setText(Html.fromHtml(htmlDate));        
         
         //get groups signed in
         //special case TODO review later
         textType = (TextView) findViewById(R.id.textType);
-        String htmlGroup = "<h3>Group: "+group+"</h3>";
+        String htmlGroup = "<h3>Group Type: "+type+"</h3>";
         textType.setText(Html.fromHtml(htmlGroup));
 
 	}
 	
 	public void deleteGroup(View view) {
-		marker.open();
-		marker.deleteMarker(new MyMarkerObj(coordinates));
-		marker.close();
+		group.open();
+		group.deleteGroup(groupName);
+		group.close();
+		
+		//also delete markers in the group
+		MarkerDataManager markers = new MarkerDataManager(this);
+		markers.open();
+		markers.deleteMarkerGroup(groupName);
+		markers.close();
+		
 		Toast.makeText(getApplicationContext(), 
-				 "marker deleted", 
+				 "group deleted", 
 	              Toast.LENGTH_LONG).show();	
         this.callHomeActivity(view);
     }
@@ -77,9 +87,13 @@ public class MarkerDetailsActivity extends Activity {
      * @param view
      */
     public void callHomeActivity(View view) {        
-		finish();
+		
+    	Intent resultIntent = new Intent();		
+		setResult(RESULT_OK, resultIntent);
+    	finish();
+        
     }   
-	
 	
 
 }
+

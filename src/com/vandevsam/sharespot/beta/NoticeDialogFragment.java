@@ -1,4 +1,4 @@
-package com.vandevsam.shareloc.beta;
+package com.vandevsam.sharespot.beta;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;

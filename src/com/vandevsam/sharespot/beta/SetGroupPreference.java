@@ -1,20 +1,19 @@
-package com.vandevsam.shareloc.beta;
+package com.vandevsam.sharespot.beta;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vandevsam.shareloc.beta.data.GroupDataManager;
+import com.vandevsam.shareloc.beta.R;
+import com.vandevsam.sharespot.beta.data.GroupDataManager;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Resources.NotFoundException;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.Toast;
  
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class SetGroupPreference extends Activity {

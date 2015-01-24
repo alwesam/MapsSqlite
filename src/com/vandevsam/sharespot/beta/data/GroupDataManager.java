@@ -1,4 +1,4 @@
-package com.vandevsam.shareloc.beta.data;
+package com.vandevsam.sharespot.beta.data;
 
 import java.util.ArrayList;
 import java.util.List;

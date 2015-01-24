@@ -1,4 +1,4 @@
-package com.vandevsam.shareloc.beta.data;
+package com.vandevsam.sharespot.beta.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
