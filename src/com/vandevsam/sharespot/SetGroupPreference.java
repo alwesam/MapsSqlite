@@ -1,10 +1,9 @@
-package com.vandevsam.sharespot.beta;
+package com.vandevsam.sharespot;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vandevsam.shareloc.beta.R;
-import com.vandevsam.sharespot.beta.data.GroupDataManager;
+import com.vandevsam.sharespot.data.GroupDataManager;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

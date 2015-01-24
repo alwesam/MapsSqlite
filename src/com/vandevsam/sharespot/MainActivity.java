@@ -1,4 +1,4 @@
-package com.vandevsam.sharespot.beta;
+package com.vandevsam.sharespot;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,9 +14,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.vandevsam.shareloc.beta.R;
-import com.vandevsam.sharespot.beta.data.MarkerDataManager;
-import com.vandevsam.sharespot.beta.data.MyMarkerObj;
+import com.vandevsam.sharespot.data.MarkerDataManager;
+import com.vandevsam.sharespot.data.MyMarkerObj;
 
 import android.location.Address;
 import android.location.Criteria;

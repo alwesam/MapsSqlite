@@ -1,4 +1,4 @@
-package com.vandevsam.sharespot.beta.data;
+package com.vandevsam.sharespot.data;
 
 public class MyGroupObj {
 	private long id;

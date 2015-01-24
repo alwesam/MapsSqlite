@@ -1,4 +1,4 @@
-package com.vandevsam.sharespot.beta;
+package com.vandevsam.sharespot;
 
 public enum DrawerListEnum {	
 	SEARCH,

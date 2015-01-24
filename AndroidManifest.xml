@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.vandevsam.shareloc.beta"
+    package="com.vandevsam.sharespot"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -9,7 +9,7 @@
         android:targetSdkVersion="19" />
     
     <!-- Allows to receive map -->
-    <uses-permission android:name="com.vandevsam.shareloc.beta.permission.MAPS_RECEIVE" />
+    <uses-permission android:name="com.vandevsam.sharespot.permission.MAPS_RECEIVE" />
  
     <!-- Used by the Google Maps Android API V2 to download map tiles from Google Maps servers -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -49,7 +49,7 @@
             android:value="@string/api_value" />   
             
         <activity
-            android:name="com.vandevsam.sharespot.beta.AuthenticateActivity"
+            android:name="com.vandevsam.sharespot.AuthenticateActivity"
             android:label="@string/app_name" >
             <intent-filter>               
                 <action android:name="android.intent.action.MAIN" />
@@ -59,7 +59,7 @@
         </activity> 
                   
         <activity
-            android:name="com.vandevsam.sharespot.beta.MainActivity"
+            android:name="com.vandevsam.sharespot.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>                
                 
@@ -68,15 +68,15 @@
         </activity>      
         
         <activity
-            android:name="com.vandevsam.sharespot.beta.RegisterActivity"
+            android:name="com.vandevsam.sharespot.RegisterActivity"
             android:label="Register" >
                                 
         </activity> 
         
         <activity
-            android:name="com.vandevsam.sharespot.beta.SearchActivity"
+            android:name="com.vandevsam.sharespot.SearchActivity"
             android:label="Search a Location"
-            android:parentActivityName="com.vandevsam.sharespot.beta.MainActivity"> 
+            android:parentActivityName="com.vandevsam.sharespot.MainActivity"> 
             <intent-filter>
                <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -89,9 +89,9 @@
         </activity>
         
         <activity
-            android:name="com.vandevsam.sharespot.beta.SearchGroupsActivity"
+            android:name="com.vandevsam.sharespot.SearchGroupsActivity"
             android:label="Find a Group"
-            android:parentActivityName="com.vandevsam.sharespot.beta.MainActivity"
+            android:parentActivityName="com.vandevsam.sharespot.MainActivity"
             > 
             <intent-filter>
                <action android:name="android.intent.action.SEARCH" />
@@ -105,27 +105,27 @@
         </activity>
         
         <activity
-            android:name="com.vandevsam.sharespot.beta.GroupDetailActivity"
+            android:name="com.vandevsam.sharespot.GroupDetailActivity"
             android:label="Group Details" 
-            android:parentActivityName="com.vandevsam.sharespot.beta.SearchGroupsActivity">          
+            android:parentActivityName="com.vandevsam.sharespot.SearchGroupsActivity">          
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vandevsam.shareloc.beta.SearchGroupsActivity" />
         </activity>
         
         <activity
-            android:name="com.vandevsam.sharespot.beta.MarkerDetailsActivity"
+            android:name="com.vandevsam.sharespot.MarkerDetailsActivity"
             android:label="Marker Details" 
-            android:parentActivityName="com.vandevsam.sharespot.beta.MainActivity">          
+            android:parentActivityName="com.vandevsam.sharespot.MainActivity">          
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vandevsam.shareloc.beta.MainActivity" />
         </activity>
         
          <activity
-            android:name="com.vandevsam.sharespot.beta.MyGroupDetailActivity"
+            android:name="com.vandevsam.sharespot.MyGroupDetailActivity"
             android:label="My Group Details" 
-            android:parentActivityName="com.vandevsam.sharespot.beta.SearchGroupsActivity"
+            android:parentActivityName="com.vandevsam.sharespot.SearchGroupsActivity"
             >          
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -133,43 +133,43 @@
         </activity>
         
         <activity
-            android:name="com.vandevsam.sharespot.beta.NewLocationActivity"
+            android:name="com.vandevsam.sharespot.NewLocationActivity"
             android:label="Enter New Location" 
-            android:parentActivityName="com.vandevsam.sharespot.beta.MainActivity">          
+            android:parentActivityName="com.vandevsam.sharespot.MainActivity">          
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vandevsam.shareloc.beta.MainActivity" />
         </activity>
         
          <activity
-            android:name="com.vandevsam.sharespot.beta.CreateGroupActivity"
+            android:name="com.vandevsam.sharespot.CreateGroupActivity"
             android:label="Create New Group" 
-            android:parentActivityName="com.vandevsam.sharespot.beta.MainActivity">          
+            android:parentActivityName="com.vandevsam.sharespot.MainActivity">          
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vandevsam.shareloc.beta.MainActivity" />
         </activity>
         
         <activity
-            android:name="com.vandevsam.sharespot.beta.ProfileActivity"
+            android:name="com.vandevsam.sharespot.ProfileActivity"
             android:label="Profile" 
-            android:parentActivityName="com.vandevsam.sharespot.beta.MainActivity">          
+            android:parentActivityName="com.vandevsam.sharespot.MainActivity">          
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vandevsam.shareloc.beta.MainActivity" />
         </activity>
         
         <activity
-            android:name="com.vandevsam.sharespot.beta.SettingsActivity"
+            android:name="com.vandevsam.sharespot.SettingsActivity"
             android:label="Settings"
-            android:parentActivityName="com.vandevsam.sharespot.beta.MainActivity" >
+            android:parentActivityName="com.vandevsam.sharespot.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vandevsam.shareloc.beta.MainActivity" />
         </activity>
         
-        <activity android:name="com.vandevsam.sharespot.beta.SetGroupPreference"
-            android:parentActivityName="com.vandevsam.sharespot.beta.MainActivity">
+        <activity android:name="com.vandevsam.sharespot.SetGroupPreference"
+            android:parentActivityName="com.vandevsam.sharespot.MainActivity">
         <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.vandevsam.shareloc.beta.MainActivity" />

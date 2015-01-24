@@ -1,4 +1,4 @@
-package com.vandevsam.sharespot.beta;
+package com.vandevsam.sharespot;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -6,7 +6,6 @@ import org.json.JSONObject;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.vandevsam.shareloc.beta.R;
 
 import android.app.Activity;
 import android.app.ProgressDialog;

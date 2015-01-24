@@ -1,4 +1,4 @@
-package com.vandevsam.sharespot.beta;
+package com.vandevsam.sharespot;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -7,10 +7,10 @@ import org.json.JSONObject;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.vandevsam.sharespot.beta.data.GroupDataManager;
-import com.vandevsam.sharespot.beta.data.MarkerDataManager;
-import com.vandevsam.sharespot.beta.data.MyGroupObj;
-import com.vandevsam.sharespot.beta.data.MyMarkerObj;
+import com.vandevsam.sharespot.data.GroupDataManager;
+import com.vandevsam.sharespot.data.MarkerDataManager;
+import com.vandevsam.sharespot.data.MyGroupObj;
+import com.vandevsam.sharespot.data.MyMarkerObj;
 
 import android.app.ProgressDialog;
 import android.content.Context;
