@@ -41,7 +41,7 @@ public class CreateGroupActivity extends Activity {
         // get user data from session
         user = session.getUserDetails();
         //this guy, the creator will be added to the group
-        creator = user.get(SessionManager.KEY_NAME);              
+        creator = user.get(SessionManager.KEY_USERNAME);              
         
         groupName = (EditText) findViewById(R.id.GroupName); 
         groupDescription = (EditText) findViewById(R.id.GroupDesc);        
@@ -70,8 +70,7 @@ public class CreateGroupActivity extends Activity {
 			return;
 		}
 		
-		GroupDataManager data = new GroupDataManager(context);
-        
+		GroupDataManager data = new GroupDataManager(context);        
         try {
            data.open();
         } catch (Exception e){
@@ -92,25 +91,18 @@ public class CreateGroupActivity extends Activity {
 		}			
 		data.close();
 		
-		//Make a check next to it for preferences
-		SaveGroupPreference pref = new SaveGroupPreference(this);  
-		List<String> name = new ArrayList<String>();    	
-    	List<Boolean> check = new ArrayList<Boolean>();
-    	name.add(group);
-    	check.add(true);  	   	    	
-    	pref.checkPref(name,check);
+		//make sure it's checked!
+	    //TODO move into a method
+	    SaveGroupPreference pref = new SaveGroupPreference(this);  
+	    List<String> name = new ArrayList<String>();    	
+	    List<Boolean> check = new ArrayList<Boolean>();
+	    name.add(group);
+	    check.add(true);  	   	    	
+	    pref.checkPref(name,check); 
 		
-		//then sync it to remote db Group in remote db
 		ServerUtilFunctions gr = new ServerUtilFunctions(this, "Creating the group....");
-		gr.createGroup(group, description);			
-		//TODO fix
-			
-		//ServerUtilFunctions jn = new ServerUtilFunctions(this, "Joining the group....");
-		//note: doesn't work if used a different object, must use same reference??
-		gr.joinGroup(creator, group);			
-			
-		//go back home
-		
+		gr.createGroup(creator, group, description);			
+	
 		this.callHomeActivity(view);
 	}	
 	 

@@ -188,11 +188,9 @@ public class MainActivity extends FragmentActivity implements LocationListener{
 			}
 	    });     
 	    	
-	    checkoutGroups();
-	    
+	    checkoutGroups();	    
 	    //show selected markers
-	    listSelMarker();
-	 		    
+	    listSelMarker();	 		    
 	}
 	//end onCreate method
 	

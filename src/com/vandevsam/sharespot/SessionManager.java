@@ -42,8 +42,10 @@ public class SessionManager {
         //Use hashmap to store user credentials
         HashMap<String, String> user = new HashMap<String, String>();         
         // user name
-        user.put(KEY_NAME, pref.getString(KEY_NAME, null));         
-        // user email id
+        user.put(KEY_NAME, pref.getString(KEY_NAME, null));      
+        // username
+        user.put(KEY_USERNAME, pref.getString(KEY_USERNAME, null)); 
+        // user date
         user.put(KEY_DATE, pref.getString(KEY_DATE, null));         
         // return user
         return user;

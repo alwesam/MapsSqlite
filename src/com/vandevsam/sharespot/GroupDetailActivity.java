@@ -1,9 +1,6 @@
 package com.vandevsam.sharespot;
 
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import com.vandevsam.sharespot.data.GroupDataManager;
 
@@ -20,7 +17,7 @@ public class GroupDetailActivity extends Activity {
 	private String groupName;
 	SessionManager session;
 	HashMap<String, String> user;
-	String name;
+	String username;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +27,7 @@ public class GroupDetailActivity extends Activity {
 		//get user details
 		session = new SessionManager(getApplicationContext());
 	    user = session.getUserDetails();
-	    name = user.get(SessionManager.KEY_NAME);
+	    username = user.get(SessionManager.KEY_USERNAME);
 		
 		groupTextView = (TextView) findViewById(R.id.GroupName);
 		//TODO fix
@@ -45,25 +42,12 @@ public class GroupDetailActivity extends Activity {
 	public void joinGroup(View view){	
 		
 		//JoinGroup joined = new JoinGroup(this);		
-		ServerUtilFunctions joined = new ServerUtilFunctions(this);
-		joined.joinGroup(name,groupName);	
-		//update queryStatus
-        GroupDataManager group = new GroupDataManager(this);
-        group.open();
-		group.updateStatus(groupName,"yes");
-		group.close();
-        
-		//make sure it's checked!
-	    SaveGroupPreference pref = new SaveGroupPreference(this);  
-	    List<String> name = new ArrayList<String>();    	
-	    List<Boolean> check = new ArrayList<Boolean>();
-	    name.add(groupName);
-	    check.add(true);  	   	    	
-	    pref.checkPref(name,check); 
-	    
+		ServerUtilFunctions joinG = new ServerUtilFunctions(this);		
+		joinG.joinGroup(username,groupName);
+		    
 	    //download markers associated with this marker
-	    ServerUtilFunctions down = new ServerUtilFunctions(this, "Downloading Markers...");
-        down.syncMySQLDBSQLite(groupName);
+	    //ServerUtilFunctions down = new ServerUtilFunctions(this, "Downloading Markers...");
+        //down.syncMySQLDBSQLite(groupName);
 	
 		//go back home
 		this.callHomeActivity(view);

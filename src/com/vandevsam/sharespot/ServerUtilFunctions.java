@@ -1,5 +1,8 @@
 package com.vandevsam.sharespot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,16 +50,40 @@ public class ServerUtilFunctions {
 	       // Show ProgressBar	       
 	       params.put("user", member);	  
 	       params.put("group", group);
+	       //TODO temp fix!!
+	       	    	     	       
 	       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/phplogin/join_group.php", 
 	    		       params, 
 	    		       new AsyncHttpResponseHandler() {
 	               @Override
-	               public void onSuccess(String response) {	                    	            	   
+	               public void onSuccess(String response) {	  
+	            	   
+	            	 //  Toast.makeText(mContext, response, 
+	                   // 		  Toast.LENGTH_LONG).show();	  
+	           
 	            	   try {
 						JSONObject jObject = new JSONObject(response);						
 						 if (jObject.getBoolean("status")) {
+							 
 							 Toast.makeText(mContext, "Successfully joined "+group+"!", 
-		                    		   Toast.LENGTH_LONG).show();							  
+		                    	     	  Toast.LENGTH_LONG).show();
+							 
+							    //update join status!
+							    group_data = new GroupDataManager(mContext);
+							    group_data.open();
+							    //update join status
+							    group_data.updateStatus(group,"yes");
+							    group_data.close();							    
+							    
+							  //make sure it's checked!
+							    //TODO move into a method
+							    SaveGroupPreference pref = new SaveGroupPreference(mContext);  
+							    List<String> name = new ArrayList<String>();    	
+							    List<Boolean> check = new ArrayList<Boolean>();
+							    name.add(group);
+							    check.add(true);  	   	    	
+							    pref.checkPref(name,check); 							    
+							    
 		                   } 
 					    } catch (JSONException e) {					
 						   e.printStackTrace();
@@ -80,7 +107,7 @@ public class ServerUtilFunctions {
 	                   }
 	               }
 	       });	
-		
+	 		
 	}
 	
 	public void listGroup(String member){
@@ -205,24 +232,30 @@ public class ServerUtilFunctions {
 	}
 	
 	//create a group
-	public void createGroup(String name, String description){
+	public void createGroup(String user, String group, String description){
 	    // Create AsycHttpClient object
 	       AsyncHttpClient client = new AsyncHttpClient();	       
 	       // Http Request Params Object
 	       RequestParams params = new RequestParams();
 	       // Show ProgressBar
 	       prgDialog.show();
-	       params.put("name", name);
+	       params.put("name", user);
+	       params.put("group", group);
 	       params.put("description", description);
 	       //TODO fix up later
 	       params.put("type", "open");
+	       	       
 	       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/phplogin/create_group.php", 
 	    		       params, 
 	    		       new AsyncHttpResponseHandler() {
 	               @Override
 	               public void onSuccess(String response) {
 	                   // Hide ProgressBar
-	            	   prgDialog.hide();  	            	   
+	            	   prgDialog.hide();  	          
+	            	   
+	            	   Toast.makeText(mContext, response, 
+                    		   Toast.LENGTH_LONG).show();
+	            	   
 	            	   try {
 						JSONObject jObject = new JSONObject(response);						
 						 if (jObject.getBoolean("status")) {
