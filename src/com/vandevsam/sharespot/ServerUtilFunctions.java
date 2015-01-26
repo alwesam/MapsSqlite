@@ -171,19 +171,21 @@ public class ServerUtilFunctions {
 	}
 	
 	//TODO combine this with the above
-	public void listAllGroup(){	  		   
+	public void listAllGroup(String member){	  		   
 		   group_data = new GroupDataManager(mContext);
            group_data.open();
+           group_data.clear();
 		   AsyncHttpClient client = new AsyncHttpClient();	       
 	       // Http Request Params Object
 	       RequestParams params = new RequestParams();
 	       // Show ProgressBar	     
-	       //params.put("user", "All");
+	       params.put("user", member);
 	       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/phplogin/list_all_group.php", 
 	    		       params, 
 	    		       new AsyncHttpResponseHandler() {
 	               @Override
-	               public void onSuccess(String response) {	                    	            	   
+	               public void onSuccess(String response) {	    
+	            		            	   
 	            	   try {
 	            		   JSONArray arr = new JSONArray(response);
 	                       // If no of array elements is not zero
@@ -197,9 +199,9 @@ public class ServerUtilFunctions {
                       		                           obj.get("group").toString(),
                       		                           obj.get("description").toString(), 
                       		                           obj.get("type").toString(),
-                      		                           "no" //join status //TODO fix
+                      		                           obj.get("join_status").toString()
                       		                            ));		
-	                             	                               
+	                            	                             	                               
 	                           }             		                         
 	                       }
 	                       
@@ -344,7 +346,7 @@ public class ServerUtilFunctions {
 	   }
 	   
 	   // download markers from remote MySQL to local SQLite DB
-	   public void syncMySQLDBSQLite(String group) {
+	   public void syncMySQLDBSQLite() {
 	       // Create AsycHttpClient object
 		   marker_data = new MarkerDataManager(mContext);
            marker_data.open();
@@ -354,14 +356,18 @@ public class ServerUtilFunctions {
 	       // Show ProgressBar
 	       prgDialog.show();
 	       // Make Http call to getusers.php
-	       params.put("group", group);
-	       //TODO fix!!!
+	       //params.put("group", group);
+	       group_data = new GroupDataManager(mContext);
+	       group_data.open();
+	       params.put("groupsJSON", group_data.composegroupJSONfromSQLite());
+	       group_data.close();
+	       //TODO fix!!! fix sellocations!
 	       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/getsellocations.php", params, new AsyncHttpResponseHandler() {
 	               @Override
 	               public void onSuccess(String response) {
 	                   // Hide ProgressBar
 	                   prgDialog.hide();
-	                   
+	                  	                   
 	                   try {
 	                       // Extract JSON array from the response
 	                       JSONArray arr = new JSONArray(response);

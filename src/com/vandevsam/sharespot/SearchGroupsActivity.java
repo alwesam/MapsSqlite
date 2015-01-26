@@ -64,7 +64,7 @@ public class SearchGroupsActivity extends Activity {
         	  String group = searchListAdapter.getItem(position);
         	          	          	         	  
         	  Intent detailActivity;
-        	          	         	  
+        	   //TODO combine these activities into one   	  
         	  if (data.queryStatus(group))
 	               detailActivity = new Intent(getBaseContext(), MyGroupDetailActivity.class)
                                         .putExtra("key", group);

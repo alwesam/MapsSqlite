@@ -50,6 +50,10 @@ public class MarkerDataManager {
 	        + " = '" + n.getPosition() + "'", null);
 	 }	
 	
+	public void clear(){
+		db.delete(MySQLHelper.MARKER_TABLE, null, null);
+	}
+	
 	//TODO quick fix, visit later
 	public void deleteMarkerGroup(String group) {	    	    
 	    db.delete(MySQLHelper.MARKER_TABLE, MySQLHelper.GROUPS

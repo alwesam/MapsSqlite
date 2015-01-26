@@ -1,7 +1,11 @@
 package com.vandevsam.sharespot.data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -36,12 +40,34 @@ public class GroupDataManager {
 		v.put(MySQLHelper.GROUP_STATUS, n.getStatus()); //join status
 		db.insert(MySQLHelper.GROUP_TABLE, null, v);			
 	}
+	
+	public void clear(){
+		db.delete(MySQLHelper.GROUP_TABLE, null, null);
+	}
 		
 
 	public void deleteGroup(String groupName) {	    	    
 	    db.delete(MySQLHelper.GROUP_TABLE, MySQLHelper.GROUP_NAME
 	        + " = '" + groupName + "'", null);	
 	  }	
+	
+	public String composegroupJSONfromSQLite(){
+        ArrayList<HashMap<String, String>> wordList;
+        wordList = new ArrayList<HashMap<String, String>>();
+        String selectQuery = "SELECT  * FROM groups where group_status = '"+"yes"+"'";
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                HashMap<String, String> map = new HashMap<String, String>();               
+                map.put(MySQLHelper.GROUP_NAME, 
+                		cursor.getString(cursor.getColumnIndex(MySQLHelper.GROUP_NAME)));                
+                wordList.add(map);
+            } while (cursor.moveToNext());
+        }
+        Gson gson = new GsonBuilder().create();
+        //Use GSON to serialize Array List to JSON
+        return gson.toJson(wordList);
+    }
 	
 	public List<String> getAllGroups(){		
 		List<String> groups = new ArrayList<String>();		

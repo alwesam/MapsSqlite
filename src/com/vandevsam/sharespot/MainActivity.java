@@ -2,6 +2,7 @@ package com.vandevsam.sharespot;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -14,6 +15,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.vandevsam.sharespot.data.GroupDataManager;
 import com.vandevsam.sharespot.data.MarkerDataManager;
 import com.vandevsam.sharespot.data.MyMarkerObj;
 
@@ -61,6 +63,7 @@ public class MainActivity extends FragmentActivity implements LocationListener{
     private CharSequence mTitle;
     
 	MarkerDataManager data;
+	GroupDataManager data_gr;
 	private ArrayAdapter<String> mDrawerAdapter;
 
 	@Override
@@ -151,7 +154,12 @@ public class MainActivity extends FragmentActivity implements LocationListener{
 			Log.i("Error!", "Cannot open SQLite DB");
 		}			
 		//show available markers
-		//listMarker();
+		data_gr = new GroupDataManager(context);		    
+		try {
+			data_gr.open();
+		} catch (Exception e){
+			Log.i("Error!", "Cannot open SQLite DB");
+		}	
 				
 		//receiving intent workaround solution TODO temp fix
 		try {		 
@@ -187,8 +195,10 @@ public class MainActivity extends FragmentActivity implements LocationListener{
 				
 			}
 	    });     
-	    	
-	    checkoutGroups();	    
+	    
+	    if(session.checkLogin())
+	       checkoutGroups();		    
+	    
 	    //show selected markers
 	    listSelMarker();	 		    
 	}
@@ -196,8 +206,10 @@ public class MainActivity extends FragmentActivity implements LocationListener{
 	
 	private void checkoutGroups (){		
 		//list all groups in the remote db and populate the sqlite db
+		HashMap<String, String> user = session.getUserDetails();
+       
         ServerUtilFunctions list = new ServerUtilFunctions(this);
-        list.listAllGroup();      
+        list.listAllGroup(user.get(SessionManager.KEY_USERNAME));      
 	}
 		
 	private String geoCode(String city) throws IOException{
@@ -234,6 +246,13 @@ public class MainActivity extends FragmentActivity implements LocationListener{
             break;
         case LOGOUT: //Log out        
         	session.logoutSession();
+        	//clear map
+        	map.clear();
+        	//clear databases
+        	data.clear();
+        	data.close();
+        	data_gr.clear();
+        	data_gr.close();
         	//to reload activity
         	reloadActivity();
             break; 
@@ -242,6 +261,8 @@ public class MainActivity extends FragmentActivity implements LocationListener{
             break; 
         case LOGIN: //login
         	map.clear();
+        	data.clear();
+        	data.close();
         	startActivity(new Intent(context, AuthenticateActivity.class));
         	finish();
             break; 
@@ -423,7 +444,7 @@ public class MainActivity extends FragmentActivity implements LocationListener{
 	    switch(requestCode) {
 	      case 0 : {	    	
 	        if (resultCode == RESULT_OK) {
-	    	  //nothing
+	    	   listSelMarker();
 	        }
 	       break;
 	      } 
@@ -490,7 +511,7 @@ public class MainActivity extends FragmentActivity implements LocationListener{
         } 
         if (id == R.id.sync_from_DB) {
             ServerUtilFunctions down = new ServerUtilFunctions(this, "Connecting to remote server...");
-            down.syncMySQLDBSQLite("ALL");
+            down.syncMySQLDBSQLite();
             return true;
         }  
         if (id == R.id.group_pref){

@@ -34,12 +34,16 @@ public class SearchActivity extends Activity {
 	//these variables are static because they're intended for the classes
 	//not the object
 	private String coordinates;
+	
+	SessionManager session;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_search);
-					
+		
+        session = new SessionManager(getApplicationContext());		
+        					
 		data = new MarkerDataManager(context);
         try {
 			data.open();
@@ -103,7 +107,9 @@ public class SearchActivity extends Activity {
    
 	private ArrayList<String> doMySearch (String search){	
 		    //searchListAdapter.clear();
-		    ArrayList<String> searchList = new ArrayList<String>();
+		    ArrayList<String> searchList = new ArrayList<String>();		      
+		    
+		    //for those joined in groups .. ie.e members
 		    GroupDataManager groups = new GroupDataManager(this);		    
 		    try {
 				groups.open();
@@ -117,6 +123,10 @@ public class SearchActivity extends Activity {
 		    //groups.close();
 		    //searchList = data.getAddresses(search);
 		    //TODO temp fix
+            if (!session.checkLogin()){
+            	searchList = data.getAddresses(search);
+            	return searchList;
+		     }
 		    
 		    try {
 				searchList = data.getSelAddresses(groups.getJoinedGroups());					

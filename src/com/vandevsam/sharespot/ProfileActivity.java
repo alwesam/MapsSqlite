@@ -62,17 +62,18 @@ public class ProfileActivity extends Activity {
 	public String parseGroups() {
 		GroupDataManager data = new GroupDataManager(context);
         data.open();		
-        List<String> groups = data.getAllGroups();		
+        //List<String> groups = data.getAllGroups();	
+        List<String> groups = data.getJoinedGroups();
 		String result="";
 	
 		for (int i=0; i<groups.size(); i++){
 			//Make sure group is joined!!
-		 if (data.queryStatus(groups.get(i))){
+		 //if (data.queryStatus(groups.get(i))){
 		   if(i<groups.size()-1)
 			 result += groups.get(i)+", ";
 		   else
 			 result += groups.get(i);		   
-		 }
+		 //}
 		 
 		}
 		return result;

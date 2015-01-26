@@ -67,6 +67,11 @@ public class NewLocationActivity extends Activity {
 		} 	               
         List<String> searchList = new ArrayList<String>();
         searchList = gr_data.getJoinedGroups(); 
+        
+        if (searchList.size()==0){
+        	searchList.add("open");
+        }
+        
         spinner = (Spinner) findViewById(R.id.Spinner01);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                               android.R.layout.simple_spinner_item, 
