@@ -50,8 +50,8 @@ class DB_Functions {
      * Getting sel locations
      */
     public function getSelLocations($groups_sel) {
-        //$result = mysql_query("select * FROM locations WHERE Group='$groups_sel'");
-        $result = mysql_query("select * FROM locations");
+        $result = mysql_query("select * FROM locations WHERE Groups='$groups_sel'");
+        //$result = mysql_query("select * FROM locations");
         return $result;
     }
 }

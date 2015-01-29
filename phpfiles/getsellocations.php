@@ -20,7 +20,7 @@ $b = array();
 	
 for($i=0; $i<count($data) ; $i++)
  {    
-    $locations = $db->getSelLocations($data[$i]->group_name);    
+      $locations = $db->getSelLocations($data[$i]->group_name);    
     
     if ($locations) {
          while ($row = mysql_fetch_assoc($locations)) {
@@ -28,12 +28,10 @@ for($i=0; $i<count($data) ; $i++)
             $b["title"] = $row['Title'];
 	    $b["snippet"] = $row['Snippet'];
 	    $b["position"] = $row['Position'];
-	    $b["group"] = $row['Group'];
+	    $b["group"] = $row['Groups'];
             array_push($a,$b);
          }
-    } else {
-	   die("bad!");
-    }
+    } 
 
   }
   
