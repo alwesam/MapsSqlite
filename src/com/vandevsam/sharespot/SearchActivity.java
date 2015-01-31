@@ -3,7 +3,6 @@ package com.vandevsam.sharespot;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vandevsam.sharespot.data.GroupDataManager;
 import com.vandevsam.sharespot.data.MarkerDataManager;
 
 import android.annotation.TargetApi;
@@ -11,7 +10,6 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.database.SQLException;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,7 +20,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class SearchActivity extends Activity {
@@ -108,8 +105,9 @@ public class SearchActivity extends Activity {
 	private ArrayList<String> doMySearch (String search){	
 		    //searchListAdapter.clear();
 		    ArrayList<String> searchList = new ArrayList<String>();		      
+		    searchList = data.getAddresses(search);		    
 		    
-		    //for those joined in groups .. ie.e members
+		    /**
 		    GroupDataManager groups = new GroupDataManager(this);		    
 		    try {
 				groups.open();
@@ -120,14 +118,15 @@ public class SearchActivity extends Activity {
 		    			  "Cannot open groups database", 
 		    			  Toast.LENGTH_LONG).show();
 			}
-		    //groups.close();
-		    //searchList = data.getAddresses(search);
+		    groups.close();		    
 		    //TODO temp fix
+		    //Note: no need since user could only downloads markers of groups
+		    //he's part of
+		    /**
             if (!session.checkLogin()){
             	searchList = data.getAddresses(search);
             	return searchList;
-		     }
-		    
+		     }		    
 		    try {
 				searchList = data.getSelAddresses(groups.getJoinedGroups());					
 				groups.close();
@@ -137,7 +136,7 @@ public class SearchActivity extends Activity {
 		    			  "List is empty", 
 		    			  Toast.LENGTH_LONG).show();
 				groups.close();
-			}
+			} **/
 	         		   
 	        return searchList;		
 	}

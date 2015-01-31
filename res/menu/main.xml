@@ -8,13 +8,7 @@
         android:icon="@drawable/ic_search"
         android:orderInCategory="400"
         android:showAsAction="always"
-        />  
-        
-    <item
-        android:id="@+id/refresh"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/action_refresh"/>
+        />      
     
     <item
         android:id="@+id/sync_to_DB"
@@ -27,17 +21,25 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_sync_from_mysql"/>
+    <!-- 
+    <item
+        android:id="@+id/refresh"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_refresh"/>
+        -->
     
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_settings"/>
-    
+   <!--  
     <item
         android:id="@+id/group_pref"
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="Group Preferences"/>
+        -->
 
 </menu>

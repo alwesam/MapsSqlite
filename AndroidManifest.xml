@@ -124,7 +124,7 @@
         
          <activity
             android:name="com.vandevsam.sharespot.MyGroupDetailActivity"
-            android:label="My Group Details" 
+            android:label="Group Details" 
             android:parentActivityName="com.vandevsam.sharespot.SearchGroupsActivity"
             >          
             <meta-data

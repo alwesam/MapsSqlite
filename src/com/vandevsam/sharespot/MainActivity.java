@@ -46,8 +46,7 @@ import android.widget.Toast;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class MainActivity extends FragmentActivity implements LocationListener{
-                               // ,NoticeDialogFragment.NoticeDialogListener {
-
+                               
 	Context context = this;
 	private GoogleMap map;	
 	private static final int zoom = 13;
@@ -256,7 +255,7 @@ public class MainActivity extends FragmentActivity implements LocationListener{
         	//to reload activity
         	reloadActivity();
             break; 
-        case CONTACT: //send feedback
+        case CONTACT_DEVELOPER: //send feedback
         	sendEmail();
             break; 
         case LOGIN: //login
@@ -307,69 +306,19 @@ public class MainActivity extends FragmentActivity implements LocationListener{
 	         Toast.makeText(MainActivity.this, 
 	         "There is no messaging client installed.", Toast.LENGTH_SHORT).show();
 	      }
-	   }
-	
-	//dialog methods
-	/**public void showNoticeDialog() {
-        // Create an instance of the dialog fragment and show it
-        DialogFragment dialog = new NoticeDialogFragment(context);
-        //TODO fix
-        FragmentManager fm =  getSupportFragmentManager();
-        //dialog.show(fm, "NoticeDialogFragment");
-    }
-    
-    @Override
-    public void onDialogPositiveClick(DialogFragment dialog) {
-        // User touched the dialog's positive button
-    	//retreive location marker coordinates
-    	String slatlng = String.valueOf(getLoc().latitude)+" "+String.valueOf(getLoc().longitude);    	
-    	//delete record
-    	data.deleteMarker( new MyMarkerObj(slatlng));
-    	dialog.dismiss();  
-    	Toast.makeText(getApplicationContext(), "Marker deleted", Toast.LENGTH_LONG).show();
-    	//listMarker();
-    }
-
-    @Override
-    public void onDialogNegativeClick(DialogFragment dialog) { 
-    	dialog.dismiss();    	
-    }    **/
-	
-	//list markers on the map
-	/**private void listMarker(){		
-		float mapIcon = BitmapDescriptorFactory.HUE_ROSE;
-		map.clear();
-		List <MyMarkerObj> n = data.getAllMarkers();			
-		for (int i=0; i < n.size(); i++){
-			String[] slatlng = n.get(i).getPosition().split(" ");
-			LatLng latlng = new LatLng (Double.valueOf(slatlng[0]), Double.valueOf(slatlng[1]));			
-			if(n.get(i).getStatus().equalsIgnoreCase("no"))
-				mapIcon = BitmapDescriptorFactory.HUE_ROSE;
-			else
-				mapIcon = BitmapDescriptorFactory.HUE_GREEN;
-			map.addMarker(new MarkerOptions()			   
-			   .title(n.get(i).getTitle())
-			   .snippet(n.get(i).getSnippet())
-			   .position(latlng)
-			   .icon(BitmapDescriptorFactory.defaultMarker(mapIcon))
-			   .draggable(true));			
-		}	
-	}	***/
+	   }	
 	
 	private void listSelMarker(){
 		
+		/**
 		List<String> selGroups;
-		int safety_count;
-		
+		int safety_count;		
 		try {
 			SaveGroupPreference pref = new SaveGroupPreference(this); 
 			List<String> groups = pref.getPrefGroup();
-			List<Boolean> groups_check = pref.getPrefCheck();
-			
-			selGroups = new ArrayList<String>();	
-			
-			safety_count = 0;
-					
+			List<Boolean> groups_check = pref.getPrefCheck();			
+			selGroups = new ArrayList<String>();			
+			safety_count = 0;					
 			for (int i=0; i<groups.size(); i++) {			
 				if(groups_check.get(i)){
 					selGroups.add(groups.get(i));
@@ -381,17 +330,19 @@ public class MainActivity extends FragmentActivity implements LocationListener{
 			e.printStackTrace();
 			return;
 		}	
-		
-		map.clear();
-		
 		if (safety_count==0){
 			//Toast.makeText(getApplicationContext(), 
 				//	"No Markers", Toast.LENGTH_LONG).show();
 			return;}
+		**/
+		
+		map.clear();
 				
 		float mapIcon = BitmapDescriptorFactory.HUE_ROSE;
 		//get select markers
-		List <MyMarkerObj> n = data.getSelMarkers(selGroups);			
+		//TODO fix later
+		//List <MyMarkerObj> n = data.getSelMarkers(selGroups);	
+		List <MyMarkerObj> n = data.getAllMarkers();
 		for (int i=0; i < n.size(); i++){
 			String[] slatlng = n.get(i).getPosition().split(" ");
 			LatLng latlng = new LatLng (Double.valueOf(slatlng[0]), Double.valueOf(slatlng[1]));			
@@ -485,14 +436,15 @@ public class MainActivity extends FragmentActivity implements LocationListener{
         int id = item.getItemId();
         //When Sync action button is clicked
         if (id == R.id.action_search){
-            startActivityForResult(new Intent(this, SearchActivity.class), 90);        	
+           startActivityForResult(new Intent(this, SearchActivity.class), 90);        	
            return true;
-        }       
+        }   
+        /**
         if (id == R.id.refresh){
         	//reloadActivity();
         	listSelMarker();
         	return true;
-        }
+        }**/
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
@@ -514,10 +466,11 @@ public class MainActivity extends FragmentActivity implements LocationListener{
             down.syncMySQLDBSQLite();
             return true;
         }  
+        /** TODO reactivate later when fix group pref
         if (id == R.id.group_pref){
            startActivityForResult(new Intent(this, SetGroupPreference.class), 0);        	
            return true;
-        }
+        }**/
         
         return super.onOptionsItemSelected(item);
     }

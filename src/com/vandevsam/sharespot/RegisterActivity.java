@@ -74,7 +74,7 @@ public class RegisterActivity extends Activity {
 	       params.put("repass", password2);
 	       //TODO connect via https
 	       //TODO write a register php file
-	       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/phplogin/register.php", params, new AsyncHttpResponseHandler() {
+	       client.post("http://"+webServer+"/b/phpfiles/phplogin/register.php", params, new AsyncHttpResponseHandler() {
 	               @Override
 	               public void onSuccess(String response) {
 	                   // Hide ProgressBar
