@@ -9,5 +9,5 @@ public enum DrawerListEnum {
 	REGISTER,
 	PROFILE,
 	SETTINGS,
-	CONTACT
+	CONTACT_DEVELOPER
 }

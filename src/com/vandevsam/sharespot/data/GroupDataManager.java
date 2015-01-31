@@ -130,10 +130,23 @@ public class GroupDataManager {
     	Cursor cursor = db.rawQuery(selectQuery, null);  
     	//TODO make it dependent on searching the string instead of the the position
     	cursor.moveToFirst();	
-    	if (cursor.getString(4).equalsIgnoreCase("yes"))
+    	if (cursor.getString(cursor.getColumnIndex(MySQLHelper.GROUP_STATUS)).equalsIgnoreCase("yes"))
     	   return true; //you're a member
     	else
     	   return false; //you're not a member
+	}
+	
+	public boolean isPrivate(String group){
+		//TODO change
+		String selectQuery = "SELECT  * FROM groups where group_name = '"+group+"'";
+	   	Cursor cursor = db.rawQuery(selectQuery, null);  
+	   	//TODO make it dependent on searching the string instead of the the position
+	   	cursor.moveToFirst();	
+	   	if (cursor.getString(cursor.getColumnIndex(MySQLHelper.GROUP_TYPE)).equalsIgnoreCase("private"))
+	   	   return true; //this group is private
+	   	else
+	   	   return false; //this group is not priavate
+		
 	}
 
 }

@@ -34,7 +34,7 @@ public class SaveGroupPreference {
         editor.commit();    	
     }    
     
-    //TODO find if can put in a hash map of two arraylist//instead of two separate methods!
+    //TODO put in a hash map of two arraylist instead of two separate methods!
     public ArrayList<String> getPrefGroup(){
     	
     	//experiment

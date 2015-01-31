@@ -65,7 +65,7 @@ public class AuthenticateActivity extends Activity {
 	       params.put("user", username);
 	       params.put("pass", password);
 	       //TODO connect via https
-	       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/phplogin/login.php", params, new AsyncHttpResponseHandler() {
+	       client.post("http://"+webServer+"/b/phpfiles/phplogin/login.php", params, new AsyncHttpResponseHandler() {
 	               @Override
 	               public void onSuccess(String response) {
 	                   // Hide ProgressBar

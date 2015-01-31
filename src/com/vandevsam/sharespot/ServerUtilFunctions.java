@@ -52,7 +52,7 @@ public class ServerUtilFunctions {
 	       params.put("group", group);
 	       //TODO temp fix!!
 	       	    	     	       
-	       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/phplogin/join_group.php", 
+	       client.post("http://"+webServer+"/b/phpfiles/phplogin/join_group.php", 
 	    		       params, 
 	    		       new AsyncHttpResponseHandler() {
 	               @Override
@@ -110,6 +110,7 @@ public class ServerUtilFunctions {
 	 		
 	}
 	
+	//TODO delete this method
 	public void listGroup(String member){
 		   
 		   group_data = new GroupDataManager(mContext);
@@ -119,7 +120,7 @@ public class ServerUtilFunctions {
 	       RequestParams params = new RequestParams();
 	       // Show ProgressBar	       
 	       params.put("user", member);
-	       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/phplogin/list_group.php", 
+	       client.post("http://"+webServer+"/b/phpfiles/phplogin/list_group.php", 
 	    		       params, 
 	    		       new AsyncHttpResponseHandler() {
 	               @Override
@@ -180,7 +181,7 @@ public class ServerUtilFunctions {
 	       RequestParams params = new RequestParams();
 	       // Show ProgressBar	     
 	       params.put("user", member);
-	       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/phplogin/list_all_group.php", 
+	       client.post("http://"+webServer+"/b/phpfiles/phplogin/list_all_group.php", 
 	    		       params, 
 	    		       new AsyncHttpResponseHandler() {
 	               @Override
@@ -223,7 +224,7 @@ public class ServerUtilFunctions {
 	                       Toast.makeText(mContext, "Requested resource not found", 
 	                    		   Toast.LENGTH_LONG).show();
 	                   } else if (statusCode == 500) {
-	                       Toast.makeText(mContext, "Something went wrong at server end", 
+	                       Toast.makeText(mContext, "Error at server side, maybe php file syntax error", 
 	                    		   Toast.LENGTH_LONG).show();
 	                   } else {
 	                       Toast.makeText(mContext, "Device might not be connected to network",
@@ -234,7 +235,7 @@ public class ServerUtilFunctions {
 	}
 	
 	//create a group
-	public void createGroup(String user, String group, String description){
+	public void createGroup(String user, String group, String description, String type){
 	    // Create AsycHttpClient object
 	       AsyncHttpClient client = new AsyncHttpClient();	       
 	       // Http Request Params Object
@@ -243,21 +244,17 @@ public class ServerUtilFunctions {
 	       prgDialog.show();
 	       params.put("name", user);
 	       params.put("group", group);
-	       params.put("description", description);
-	       //TODO fix up later
-	       params.put("type", "open");
+	       params.put("description", description);	      
+	       params.put("type", type);
 	       	       
-	       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/phplogin/create_group.php", 
+	       client.post("http://"+webServer+"/b/phpfiles/phplogin/create_group.php", 
 	    		       params, 
 	    		       new AsyncHttpResponseHandler() {
 	               @Override
 	               public void onSuccess(String response) {
 	                   // Hide ProgressBar
 	            	   prgDialog.hide();  	          
-	            	   
-	            	   Toast.makeText(mContext, response, 
-                    		   Toast.LENGTH_LONG).show();
-	            	   
+	            	   	            	   
 	            	   try {
 						JSONObject jObject = new JSONObject(response);						
 						 if (jObject.getBoolean("status")) {
@@ -296,7 +293,7 @@ public class ServerUtilFunctions {
 	               RequestParams params = new RequestParams();     
 	               prgDialog.show();
 	               params.put("locationsJSON", marker_data.composeJSONfromSQLite());
-	               client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/insertmarker.php",
+	               client.post("http://"+webServer+"/b/phpfiles/insertmarker.php",
 	            		        params ,new AsyncHttpResponseHandler() {
 	                   @Override
 	                   public void onSuccess(String response) {;
@@ -362,15 +359,20 @@ public class ServerUtilFunctions {
 	       params.put("groupsJSON", group_data.composegroupJSONfromSQLite());
 	       group_data.close();
 	       //TODO fix!!! fix sellocations!
-	       client.post("http://"+webServer+"/sqlitemysqlsyncMarkers/getsellocations.php", params, new AsyncHttpResponseHandler() {
+	       client.post("http://"+webServer+"/b/phpfiles/getsellocations.php", params, new AsyncHttpResponseHandler() {
 	               @Override
 	               public void onSuccess(String response) {
 	                   // Hide ProgressBar
 	                   prgDialog.hide();
+	                   
+	                  // Toast.makeText(mContext, 
+                        //	   response, 
+                     	//	   Toast.LENGTH_LONG).show();
 	                  	                   
 	                   try {
 	                       // Extract JSON array from the response
 	                       JSONArray arr = new JSONArray(response);
+	                    	                       
 	                       // If no of array elements is not zero	                 
 	                       if(arr.length() != 0){
 	                           // Loop through each array element, get JSON object which id,title,snippet,position
@@ -386,7 +388,7 @@ public class ServerUtilFunctions {
 	                            		                               obj.get("snippet").toString(),
 	                            		                               obj.get("position").toString(),
 	                            		                               obj.get("group").toString(),
-	                            		                               "yes"));  
+	                            		                               "yes"));  //TODO fix it in the backend
 	                                    Toast.makeText(mContext, 
 	                                    	   "Markers successfully obtained from remote server ", 
 	                                 		   Toast.LENGTH_LONG).show();                                    

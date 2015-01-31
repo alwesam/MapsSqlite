@@ -34,19 +34,19 @@
         <item>Create Group</item>
         <item>Settings</item>        
         <item>Logout</item>
-        <item>Contact</item>
+        <item>Contact Developer</item>
     </string-array>
     
     <string-array name="sidepane_array_guest">
         <item>Search</item>
-        <item>Search Groups</item>
         <item>Login</item>
         <item>Register</item>
         <item>Contact</item>
     </string-array>
     
     <string-array name="group_array_type">
-        <item>Open</item>
+        <item>Public</item>
+        <item>Private</item>        
     </string-array>
     
 

@@ -60,6 +60,9 @@ public class CreateGroupActivity extends Activity {
 	
 	public void addNewGroup(View view){		
 		
+		Spinner spinner = (Spinner) findViewById(R.id.group_type);		
+		String group_type = String.valueOf(spinner.getSelectedItem());
+		
 		group = groupName.getText().toString();
 		description = groupDescription.getText().toString();
 		
@@ -80,7 +83,7 @@ public class CreateGroupActivity extends Activity {
 		if (!data.queryGroup(group)){
 		   data.createGroup(new MyGroupObj(group,
 				                        description,
-				                        "open",
+				                        group_type,
 				                        "yes"
 				                         ));
 		} else {
@@ -101,7 +104,7 @@ public class CreateGroupActivity extends Activity {
 	    pref.checkPref(name,check); 
 		
 		ServerUtilFunctions gr = new ServerUtilFunctions(this, "Creating the group....");
-		gr.createGroup(creator, group, description);			
+		gr.createGroup(creator, group, description, group_type);			
 	
 		this.callHomeActivity(view);
 	}	

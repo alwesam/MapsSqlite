@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class GroupDetailActivity extends Activity {
 	
@@ -33,18 +34,28 @@ public class GroupDetailActivity extends Activity {
 		//TODO fix
 		Intent intent = getIntent();   
 		groupName = intent.getStringExtra("key");
-		groupTextView.setText("Group: "+groupName);	
-		
+		groupTextView.setText("Group: "+groupName);			
 		//TODO join this activity with mygroupdetails as well as the layout!		
 		
 	}	
 	
 	public void joinGroup(View view){	
 		
-		//JoinGroup joined = new JoinGroup(this);		
-		ServerUtilFunctions joinG = new ServerUtilFunctions(this);		
-		joinG.joinGroup(username,groupName);
-		    
+		//TODO fix later
+		GroupDataManager type = new GroupDataManager(this);
+		type.open();
+		
+		if (!type.isPrivate(groupName)){ //returns true if private		
+		   ServerUtilFunctions joinG = new ServerUtilFunctions(this);		
+		   joinG.joinGroup(username,groupName);
+		   type.close();
+		} else {
+			Toast.makeText(this, "Cannot join... This group is private",
+                    Toast.LENGTH_LONG).show();	
+			type.close();
+			return;
+		}
+	
 	    //download markers associated with this marker
 	    //ServerUtilFunctions down = new ServerUtilFunctions(this, "Downloading Markers...");
         //down.syncMySQLDBSQLite(groupName);
