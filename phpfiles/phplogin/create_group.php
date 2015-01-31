@@ -36,7 +36,7 @@ if($creator&&$group&&$description&&$type)
              echo "Group name must be between 4 and 50 characters";             
          } else {		 
              $queryreg = mysql_query("              
-			  INSERT INTO groups VALUES('','$group','$description','$type','$date');             
+			  INSERT INTO groups VALUES('','$group','$description','$type','$creator','$date');             
              ");		
 			 
 			  //select group id
