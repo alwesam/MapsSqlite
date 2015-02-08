@@ -54,6 +54,15 @@ class DB_Functions {
         //$result = mysql_query("select * FROM locations");
         return $result;
     }
+    
+    public function removeLocation($coord,$group) {
+    	$result = mysql_query("              
+			  DELETE FROM locations WHERE Position = '$coord'
+  		            AND Groups = '$group'             
+             ");
+    	return $result;
+    }
+    
 }
  
 ?>
