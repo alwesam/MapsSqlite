@@ -10,9 +10,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MarkerDetailsActivity extends Activity {
 	
@@ -24,11 +24,13 @@ public class MarkerDetailsActivity extends Activity {
 	
 	MarkerDataManager marker;
 	
+	String group;
+	
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mygroupdetail);
+        setContentView(R.layout.activity_mymarkerdetail);
         
         Intent intent = this.getIntent();   
 		coordinates = intent.getStringExtra(Intent.EXTRA_TEXT);	
@@ -43,7 +45,7 @@ public class MarkerDetailsActivity extends Activity {
         //extractions
         String desc = details.get(0);
         String address = details.get(1);        
-        String group = details.get(3);
+        group = details.get(3);
         
       //get name and username
         textName = (TextView) findViewById(R.id.textName);
@@ -62,21 +64,39 @@ public class MarkerDetailsActivity extends Activity {
 
 	}
 	
-	public void deleteGroup(View view) {
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.markerdetail, menu);
+		return true;
+	}
+	
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.remove_marker){
+           deleteMarker();        	
+           return true;      
+           }    
+            
+        return super.onOptionsItemSelected(item);
+    }
+	
+	public void deleteMarker() {
 		marker.open();
-		marker.deleteMarker(new MyMarkerObj(coordinates));
+		marker.deleteMarker(new MyMarkerObj(coordinates));		
 		marker.close();
-		Toast.makeText(getApplicationContext(), 
-				 "marker deleted", 
-	              Toast.LENGTH_LONG).show();	
-        this.callHomeActivity(view);
+		
+		ServerUtilFunctions removeM = new ServerUtilFunctions(this);		
+		removeM.removeMarker(coordinates,group);		
+			
+        this.callHomeActivity();
     }
 	
 	/**
      * Navigate to Home Screen 
      * @param view
      */
-    public void callHomeActivity(View view) {        
+    public void callHomeActivity() {        
 		finish();
     }   
 	

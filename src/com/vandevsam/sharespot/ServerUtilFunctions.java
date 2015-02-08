@@ -110,53 +110,44 @@ public class ServerUtilFunctions {
 	 		
 	}
 	
-	//TODO delete this method
-	public void listGroup(String member){
-		   
-		   group_data = new GroupDataManager(mContext);
-           group_data.open();
+	//TODO temp fix
+	public void leaveGroup(String member, final String group){
+  		
 		   AsyncHttpClient client = new AsyncHttpClient();	       
 	       // Http Request Params Object
 	       RequestParams params = new RequestParams();
 	       // Show ProgressBar	       
-	       params.put("user", member);
-	       client.post("http://"+webServer+"/b/phpfiles/phplogin/list_group.php", 
+	       params.put("user", member);	  
+	       params.put("group", group);
+	       //TODO temp fix!!
+	       	    	     	       
+	       client.post("http://"+webServer+"/b/phpfiles/phplogin/leave_group.php", 
 	    		       params, 
 	    		       new AsyncHttpResponseHandler() {
 	               @Override
-	               public void onSuccess(String response) {	                    	            	   
-	            	   try {
-	            		   JSONArray arr = new JSONArray(response);
-	                       // If no of array elements is not zero
-	                       if(arr.length() != 0){
-	                           // Loop through each array element, get JSON object which id,title,snippet,position
-	                           for (int i = 0; i < arr.length(); i++) {
-	                               // Get JSON object
-	                               JSONObject obj = (JSONObject) arr.get(i);
-	                               if (!group_data.queryGroup(obj.get("group").toString()))  
-	                                    group_data.createGroup(new MyGroupObj(
-	                                    		                 obj.get("group").toString(),
-	                                    		                 "hi", //TODO fix
-	                                    		                 "open", //TODO fix
-	                                    		                 "yes" //join status!
-	                                    		                 ));		                           
-	                           }             		                         
-	                       }
-	                       
-	                       group_data.close();
+	               public void onSuccess(String response) {	  
+	            	   
+	            	 //  Toast.makeText(mContext, response, 
+	                   // 		  Toast.LENGTH_LONG).show();	  
 	           
+	            	   try {
+						JSONObject jObject = new JSONObject(response);						
+						 if (jObject.getBoolean("status")) {
+							 
+							 Toast.makeText(mContext, "Successfully left "+group+"!", 
+		                    	     	  Toast.LENGTH_LONG).show();							 					    
+							    
+		                   } 
 					    } catch (JSONException e) {					
 						   e.printStackTrace();
-						   Toast.makeText(mContext, 
-           				          "Error, "+response, 
-                          	      Toast.LENGTH_LONG).show();
-					    }            
+					    }     
+	            	 	            	   
 	               }
-	               // When error occured
+	               // When error occurred
 	               @Override
 	               public void onFailure(int statusCode, Throwable error, String content) {                   
 	                   // Hide ProgressBar
-	                   prgDialog.hide();
+	                   //prgDialog.hide();
 	                   if (statusCode == 404) {
 	                       Toast.makeText(mContext, "Requested resource not found", 
 	                    		   Toast.LENGTH_LONG).show();
@@ -168,9 +159,10 @@ public class ServerUtilFunctions {
 	                               Toast.LENGTH_LONG).show();
 	                   }
 	               }
-	       });			
-	}
-	
+	       });	
+	 		
+	}	
+		
 	//TODO combine this with the above
 	public void listAllGroup(String member){	  		   
 		   group_data = new GroupDataManager(mContext);
@@ -419,6 +411,56 @@ public class ServerUtilFunctions {
 	               }
 	       });
 	   }
+	   
+	 //TODO temp fix
+		public void removeMarker(String coordinates, String group){
+	  		
+			   AsyncHttpClient client = new AsyncHttpClient();	       
+		       // Http Request Params Object
+		       RequestParams params = new RequestParams();
+		       // Show ProgressBar	       
+		       params.put("coordinates", coordinates);	  
+		       params.put("group", group);
+		 	       	    	     	       
+		       client.post("http://"+webServer+"/b/phpfiles/removemarker.php", 
+		    		       params, 
+		    		       new AsyncHttpResponseHandler() {
+		               @Override
+		               public void onSuccess(String response) {	  
+		            	   
+		            	 //  Toast.makeText(mContext, response, 
+		                   // 		  Toast.LENGTH_LONG).show();	  
+		           
+		            	   try {
+							JSONObject jObject = new JSONObject(response);						
+							 if (jObject.getBoolean("status")) {
+								 Toast.makeText(mContext, "marker removed", 
+			                    		   Toast.LENGTH_LONG).show();
+			                   } 
+						    } catch (JSONException e) {					
+							   e.printStackTrace();
+						    }     
+		            	 	            	   
+		               }
+		               // When error occurred
+		               @Override
+		               public void onFailure(int statusCode, Throwable error, String content) {                   
+		                   // Hide ProgressBar
+		                   //prgDialog.hide();
+		                   if (statusCode == 404) {
+		                       Toast.makeText(mContext, "Requested resource not found", 
+		                    		   Toast.LENGTH_LONG).show();
+		                   } else if (statusCode == 500) {
+		                       Toast.makeText(mContext, "Something went wrong at server end", 
+		                    		   Toast.LENGTH_LONG).show();
+		                   } else {
+		                       Toast.makeText(mContext, "Device might not be connected to network",
+		                               Toast.LENGTH_LONG).show();
+		                   }
+		               }
+		       });	
+		 		
+		}	
 	
 
 }

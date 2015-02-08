@@ -50,7 +50,7 @@ public class GroupDetailActivity extends Activity {
 		   joinG.joinGroup(username,groupName);
 		   type.close();
 		} else {
-			Toast.makeText(this, "Cannot join... This group is private",
+			Toast.makeText(this, "This group is private... contact group admin to add you",
                     Toast.LENGTH_LONG).show();	
 			type.close();
 			return;

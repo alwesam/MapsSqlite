@@ -1,7 +1,6 @@
 package com.vandevsam.sharespot;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -134,10 +133,10 @@ public class MainActivity extends FragmentActivity implements LocationListener{
 				zoomToLocation(geoCode(city));
 			} catch (IOException e) {
 				e.printStackTrace();
-				Toast.makeText(getApplicationContext(), 
+				/*Toast.makeText(getApplicationContext(), 
 		    			  "Cannot zoom to selected address in Settings, \n" +
 		    			  "check network connection or restart device", 
-		    			  Toast.LENGTH_LONG).show();
+		    			  Toast.LENGTH_LONG).show(); */
 				zoomToLocation(Vancouver);				
 			}
         }
@@ -194,19 +193,21 @@ public class MainActivity extends FragmentActivity implements LocationListener{
 				
 			}
 	    });     
-	    
-	    if(session.checkLogin())
-	       checkoutGroups();		    
-	    
+		    
 	    //show selected markers
-	    listSelMarker();	 		    
+	    try {
+			listSelMarker();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	 
+	    
 	}
 	//end onCreate method
 	
 	private void checkoutGroups (){		
 		//list all groups in the remote db and populate the sqlite db
-		HashMap<String, String> user = session.getUserDetails();
-       
+		HashMap<String, String> user = session.getUserDetails();       
         ServerUtilFunctions list = new ServerUtilFunctions(this);
         list.listAllGroup(user.get(SessionManager.KEY_USERNAME));      
 	}
@@ -438,13 +439,14 @@ public class MainActivity extends FragmentActivity implements LocationListener{
         if (id == R.id.action_search){
            startActivityForResult(new Intent(this, SearchActivity.class), 90);        	
            return true;
-        }   
-        /**
-        if (id == R.id.refresh){
+        }           
+        if (id == R.id.group_connect){
         	//reloadActivity();
-        	listSelMarker();
+        	//listSelMarker();
+        	if(session.checkLogin())
+			   checkoutGroups();
         	return true;
-        }**/
+        }
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;

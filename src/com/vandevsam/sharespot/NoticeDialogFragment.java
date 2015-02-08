@@ -19,7 +19,7 @@ public class NoticeDialogFragment extends DialogFragment {
 	private EditText input;
 
     public interface NoticeDialogListener {
-        public void onDialogPositiveClick(DialogFragment dialog);
+        public void onDialogPositiveClick(DialogFragment dialog, String value);
 		public void onDialogNegativeClick(DialogFragment dialog);				
     }
     
@@ -47,24 +47,27 @@ public class NoticeDialogFragment extends DialogFragment {
     
 	@Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        // Build the dialog and set up the button click handlers
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());        
-        builder.setMessage("Delete marker?")
+       
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());   
+        
+        builder.setMessage("Add a user to this group?")
                .setView(input)
-               .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+               .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                        // Send the positive button event back to the host activity
-                	   //String value = input.getText().toString();
-                       mListener.onDialogPositiveClick(NoticeDialogFragment.this);
+                	   String value = input.getText().toString();
+                       mListener.onDialogPositiveClick(NoticeDialogFragment.this, value);
                    }
                })
-               .setNegativeButton("No", new DialogInterface.OnClickListener() {
+               .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                        // Send the negative button event back to the host activity
                        mListener.onDialogNegativeClick(NoticeDialogFragment.this);
                    }
                });
+        
         return builder.create();
+        
     }
 
     

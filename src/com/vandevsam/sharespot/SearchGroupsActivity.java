@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 public class SearchGroupsActivity extends Activity {
 	
@@ -93,11 +94,21 @@ public class SearchGroupsActivity extends Activity {
 	    }
 	}
    
-	private ArrayList<String> doMySearch (String search){			    
+	//TODO fix
+	private ArrayList<String> doMySearch (String search){				
           	
-		    ArrayList<String> searchList = new ArrayList<String>();
-	        searchList = (ArrayList<String>) data.getAllGroups();
-	        return searchList;		
+		//TODO investigate crashes
+		    try {
+				ArrayList<String> searchList = new ArrayList<String>();
+				searchList = (ArrayList<String>) data.getAllGroups();
+				return searchList;
+			} catch (Exception e) {
+				 Toast.makeText(this, "Try again later", 
+           	     	  Toast.LENGTH_LONG).show();	
+				e.printStackTrace();
+				return null;
+				
+			}		
 	}
 	
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
