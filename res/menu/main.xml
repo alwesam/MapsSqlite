@@ -21,13 +21,13 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_sync_from_mysql"/>
-    <!-- 
+     
     <item
-        android:id="@+id/refresh"
+        android:id="@+id/group_connect"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="@string/action_refresh"/>
-        -->
+        android:title="Checkout Groups"/>
+        
     
     <item
         android:id="@+id/action_settings"
