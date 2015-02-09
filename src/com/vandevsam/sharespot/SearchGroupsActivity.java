@@ -43,8 +43,15 @@ public class SearchGroupsActivity extends Activity {
         
         list = doMySearch("ALL");
         
+        if (list.isEmpty()) {
+        	Toast.makeText(this, 
+        			"Empty list, did you checkout groups?", 
+         	     	  Toast.LENGTH_LONG).show();
+        	finish();
+        }
+        
 	    searchIntent(getIntent());
-	    
+	    	    
 	    searchListAdapter = new ArrayAdapter<String>(
                 //the current context (this fragement's parent activity)
                 this,
@@ -95,8 +102,7 @@ public class SearchGroupsActivity extends Activity {
 	}
    
 	//TODO fix
-	private ArrayList<String> doMySearch (String search){				
-          	
+	private ArrayList<String> doMySearch (String search){
 		//TODO investigate crashes
 		    try {
 				ArrayList<String> searchList = new ArrayList<String>();

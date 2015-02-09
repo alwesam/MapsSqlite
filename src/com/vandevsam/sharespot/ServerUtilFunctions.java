@@ -50,8 +50,7 @@ public class ServerUtilFunctions {
 	       // Show ProgressBar	       
 	       params.put("user", member);	  
 	       params.put("group", group);
-	       //TODO temp fix!!
-	       	    	     	       
+	       
 	       client.post("http://"+webServer+"/b/phpfiles/phplogin/join_group.php", 
 	    		       params, 
 	    		       new AsyncHttpResponseHandler() {
@@ -168,6 +167,9 @@ public class ServerUtilFunctions {
 		   group_data = new GroupDataManager(mContext);
            group_data.open();
            group_data.clear();
+           
+           prgDialog.show();
+           
 		   AsyncHttpClient client = new AsyncHttpClient();	       
 	       // Http Request Params Object
 	       RequestParams params = new RequestParams();
@@ -177,7 +179,9 @@ public class ServerUtilFunctions {
 	    		       params, 
 	    		       new AsyncHttpResponseHandler() {
 	               @Override
-	               public void onSuccess(String response) {	    
+	               public void onSuccess(String response) {
+	            	   
+	            	   prgDialog.hide();
 	            		            	   
 	            	   try {
 	            		   JSONArray arr = new JSONArray(response);
@@ -195,7 +199,10 @@ public class ServerUtilFunctions {
                       		                           obj.get("join_status").toString()
                       		                            ));		
 	                            	                             	                               
-	                           }             		                         
+	                           }          
+	                           Toast.makeText(mContext, 
+	            				          "Groups successfully listed", 
+	                           	      Toast.LENGTH_LONG).show();
 	                       }
 	                       
 	                       group_data.close();
@@ -427,10 +434,7 @@ public class ServerUtilFunctions {
 		    		       new AsyncHttpResponseHandler() {
 		               @Override
 		               public void onSuccess(String response) {	  
-		            	   
-		            	 //  Toast.makeText(mContext, response, 
-		                   // 		  Toast.LENGTH_LONG).show();	  
-		           
+		          		           
 		            	   try {
 							JSONObject jObject = new JSONObject(response);						
 							 if (jObject.getBoolean("status")) {

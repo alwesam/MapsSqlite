@@ -208,8 +208,12 @@ public class MainActivity extends FragmentActivity implements LocationListener{
 	private void checkoutGroups (){		
 		//list all groups in the remote db and populate the sqlite db
 		HashMap<String, String> user = session.getUserDetails();       
-        ServerUtilFunctions list = new ServerUtilFunctions(this);
-        list.listAllGroup(user.get(SessionManager.KEY_USERNAME));      
+        ServerUtilFunctions list = new ServerUtilFunctions(this, "Searching Available Groups....");
+        list.listAllGroup(user.get(SessionManager.KEY_USERNAME));          
+        //now download markers
+        //ServerUtilFunctions down = new ServerUtilFunctions(this, "Now Downloading Associated Markers...");
+        //down.syncMySQLDBSQLite();
+        
 	}
 		
 	private String geoCode(String city) throws IOException{
@@ -228,7 +232,7 @@ public class MainActivity extends FragmentActivity implements LocationListener{
 	private void selectItem(String item, int position) {
 		DrawerListEnum enumval = DrawerListEnum.valueOf(item.toUpperCase().replace(" ", "_"));        
         switch (enumval) {
-        case SEARCH: //search
+        case SEARCH_MARKERS: //search
         	startActivityForResult(new Intent(context, SearchActivity.class), 90);
         	//startActivity(new Intent(context, SearchActivity.class));
             break;

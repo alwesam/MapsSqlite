@@ -28,8 +28,8 @@
     <string-array name="pref_gps_values"><item>enabled</item> <item>disabled</item></string-array>
     
     <string-array name="sidepane_array">
-        <item>Search</item>
         <item>Profile</item>
+        <item>Search Markers</item>        
         <item>Search Groups</item>
         <item>Create Group</item>
         <item>Settings</item>        

@@ -22,12 +22,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     
-    <Button
+    <!-- 
+        <Button
         android:id="@+id/btndelete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="Delete Marker"     
-        android:onClick="deleteGroup" />
+        android:onClick="deleteGroup" /> -->
       
 </LinearLayout>
