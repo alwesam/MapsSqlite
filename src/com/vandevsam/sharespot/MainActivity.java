@@ -468,7 +468,7 @@ public class MainActivity extends FragmentActivity implements LocationListener{
             return true;
         } 
         if (id == R.id.sync_from_DB) {
-            ServerUtilFunctions down = new ServerUtilFunctions(this, "Connecting to remote server...");
+            ServerUtilFunctions down = new ServerUtilFunctions(this, "Downloading markers...");
             down.syncMySQLDBSQLite();
             return true;
         }  

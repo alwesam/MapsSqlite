@@ -1,5 +1,7 @@
 package com.vandevsam.sharespot;
 
+import java.util.HashMap;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -74,9 +76,9 @@ public class AuthenticateActivity extends Activity {
 						JSONObject jObject = new JSONObject(response);						
 						 if (jObject.getBoolean("status")) {
 							 session.loginSession(jObject.getString("name"), username, jObject.getString("date"));
-							 Toast.makeText(getApplicationContext(), "Welcome "+jObject.getString("name"), 
-               		                     Toast.LENGTH_LONG).show();							 
-		                     loadMainActivity();
+							 //Toast.makeText(getApplicationContext(), "Welcome "+jObject.getString("name"), 
+               		          //           Toast.LENGTH_LONG).show();							 
+							 loadGroups();
 		                   } 
 					    } catch (JSONException e) {					
 						   e.printStackTrace();
@@ -110,8 +112,18 @@ public class AuthenticateActivity extends Activity {
     	startActivity(register);
     	finish();
     }
+    
+    public void loadGroups(){
+    	//checkout groups
+    	HashMap<String, String> user = session.getUserDetails();       
+        ServerUtilFunctions list = new ServerUtilFunctions(this, "Searching avaiable groups....");
+        list.listAllGroup(user.get(SessionManager.KEY_USERNAME)); 
+        Toast.makeText(getApplicationContext(), "Welcome "+user.get(SessionManager.KEY_NAME), 
+                  Toast.LENGTH_LONG).show();
+        loadMainActivity();
+    }
 
-    public void loadMainActivity() {
+    public void loadMainActivity() {   
         Intent objIntent = new Intent(getApplicationContext(), MainActivity.class);                                     
         objIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         objIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

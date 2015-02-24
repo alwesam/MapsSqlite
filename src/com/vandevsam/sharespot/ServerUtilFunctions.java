@@ -206,6 +206,11 @@ public class ServerUtilFunctions {
 	                       }
 	                       
 	                       group_data.close();
+	                       
+	                       //now download markers
+	                       prgDialog.setMessage("Downloading Markers...");
+	                       syncMySQLDBSQLite();
+	                       
 	                     
 					    } catch (JSONException e) {					
 						   e.printStackTrace();

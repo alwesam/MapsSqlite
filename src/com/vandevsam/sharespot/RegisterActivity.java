@@ -59,10 +59,7 @@ public class RegisterActivity extends Activity {
 	       String username = usernameField.getText().toString();
 	       String password = passwordField.getText().toString();
 	       String password2 = passwordField2.getText().toString();
-	       
-	       //NOTE: remember to compare string values, use .equals(), the == compares references (objects) not values
-	       
-	    // Create AsycHttpClient object
+
 	       AsyncHttpClient client = new AsyncHttpClient();	       
 	       // Http Request Params Object
 	       RequestParams params = new RequestParams();
@@ -73,7 +70,6 @@ public class RegisterActivity extends Activity {
 	       params.put("pass", password);
 	       params.put("repass", password2);
 	       //TODO connect via https
-	       //TODO write a register php file
 	       client.post("http://"+webServer+"/b/phpfiles/phplogin/register.php", params, new AsyncHttpResponseHandler() {
 	               @Override
 	               public void onSuccess(String response) {
