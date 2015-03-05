@@ -209,11 +209,8 @@ public class MainActivity extends FragmentActivity implements LocationListener{
 		//list all groups in the remote db and populate the sqlite db
 		HashMap<String, String> user = session.getUserDetails();       
         ServerUtilFunctions list = new ServerUtilFunctions(this, "Searching Available Groups....");
-        list.listAllGroup(user.get(SessionManager.KEY_USERNAME));          
-        //now download markers
-        //ServerUtilFunctions down = new ServerUtilFunctions(this, "Now Downloading Associated Markers...");
-        //down.syncMySQLDBSQLite();
-        
+        list.listAllGroup(user.get(SessionManager.KEY_USERNAME));         
+                
 	}
 		
 	private String geoCode(String city) throws IOException{
@@ -295,7 +292,7 @@ public class MainActivity extends FragmentActivity implements LocationListener{
 	protected void sendEmail() {
 	      Log.i("Send email", "");
 
-	      String[] TO = {"alwesam@gmail.com"};
+	      String[] TO = {"alwesam@vandevsam.com"};
 	      Intent emailIntent = new Intent(Intent.ACTION_SEND);
 	      emailIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 	      emailIntent.setData(Uri.parse("mailto:"));

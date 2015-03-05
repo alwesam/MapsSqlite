@@ -81,7 +81,11 @@ public class ServerUtilFunctions {
 							    List<Boolean> check = new ArrayList<Boolean>();
 							    name.add(group);
 							    check.add(true);  	   	    	
-							    pref.checkPref(name,check); 							    
+							    pref.checkPref(name,check); 		
+							    
+							    //now download markers
+			                       prgDialog.setMessage("Downloading Markers...");
+			                       syncMySQLDBSQLite();
 							    
 		                   } 
 					    } catch (JSONException e) {					

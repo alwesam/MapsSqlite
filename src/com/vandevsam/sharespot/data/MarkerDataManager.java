@@ -206,12 +206,13 @@ public class MarkerDataManager {
         return cursor.getString(cursor.getColumnIndex(MySQLHelper.POSITION));
     }
     
-    public ArrayList<String> getAddresses (String query) {     	
+    public ArrayList<String> getAddresses (String query, int group) {     	
     	ArrayList<String> addresses = new ArrayList<String>();
     	//TODO temp solution
     	Cursor cursor;
-    	if (query == "ALL")    		
-    		cursor = db.rawQuery("SELECT * FROM locations", null);     
+    	if (group==1)    		
+    		//cursor = db.rawQuery("SELECT * FROM locations", null);     
+    		cursor = db.rawQuery("SELECT * FROM locations WHERE groups LIKE '%"+query+"%'", null);
     	else 
 	        cursor = db.rawQuery("SELECT * FROM locations WHERE snippet LIKE '%"+query+"%'", null); 
     	

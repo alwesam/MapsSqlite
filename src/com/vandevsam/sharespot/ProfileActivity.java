@@ -70,7 +70,7 @@ public class ProfileActivity extends Activity {
 			//Make sure group is joined!!
 		 //if (data.queryStatus(groups.get(i))){
 		   if(i<groups.size()-1)
-			 result += groups.get(i)+", ";
+			 result += groups.get(i)+"\n";
 		   else
 			 result += groups.get(i);		   
 		 //}

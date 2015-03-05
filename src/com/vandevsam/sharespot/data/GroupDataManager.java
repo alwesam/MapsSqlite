@@ -94,6 +94,38 @@ public class GroupDataManager {
 		return groups;
 	}
 	
+	//TODO FIX and remove redundancies
+	public List<String> getGroups(int j){
+		List<String> groups = new ArrayList<String>();	
+		String selectQuery;
+		if (j == 0)
+		  selectQuery = "SELECT  * FROM groups where group_status = '"+"yes"+"' ";
+		else
+		  selectQuery = "SELECT  * FROM groups where group_status = '"+"no"+"' ";
+		Cursor cursor = db.rawQuery(selectQuery, null);		
+		cursor.moveToFirst();		
+		while (!cursor.isAfterLast()){
+			String g = cursor.getString(cursor.getColumnIndex(MySQLHelper.GROUP_NAME));
+			groups.add(g);
+			cursor.moveToNext();
+		}		
+		return groups;
+	}
+	
+	public ArrayList<String> getGroups (String query) {     	
+    	ArrayList<String> groups = new ArrayList<String>();
+    	
+    	Cursor cursor = db.rawQuery("SELECT * FROM groups WHERE group_name LIKE '%"+query+"%'", null);    	
+    	
+		if (cursor.moveToFirst()) {
+            do {            	            	
+            	groups.add(cursor.getString(cursor.getColumnIndex(MySQLHelper.GROUP_NAME)));
+            } while (cursor.moveToNext());
+        }
+		
+		return groups;
+     }  
+	
 	public List<String> getDetails(String group){		
 		List<String> details = new ArrayList<String>();		
 		String selectQuery = "SELECT  * FROM groups where group_name = '"+group+"'";

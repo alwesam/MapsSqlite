@@ -1,8 +1,10 @@
 package com.vandevsam.sharespot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import com.vandevsam.sharespot.data.GroupDataManager;
 import com.vandevsam.sharespot.data.MarkerDataManager;
 
 import android.annotation.TargetApi;
@@ -17,7 +19,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 
@@ -26,13 +27,15 @@ public class SearchActivity extends Activity {
 	
 	private Context context = this;	
 	private List<String> list;
-	private ArrayAdapter<String> searchListAdapter;
 	MarkerDataManager data;
-	//these variables are static because they're intended for the classes
-	//not the object
 	private String coordinates;
 	
 	SessionManager session;
+	
+	//new
+	HashMap<String, List<String>> group_address;
+	
+	AddressAdapter aa;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,30 +51,29 @@ public class SearchActivity extends Activity {
 			Log.i("hello", "hello");
 		} 	
         
-        list = doMySearch("ALL");
+        //I don't like this implementation, seems inefficient, TODO review
+        group_address = new HashMap<String, List<String>>();
+     
+        list = listAddresses();
         
-	    searchIntent(getIntent());
+	    searchIntent(getIntent());	 
 	    
-	    searchListAdapter = new ArrayAdapter<String>(
-                //the current context (this fragement's parent activity)
-                this,
-                //ID of list item layout
-                R.layout.list_search_item,
-                //ID of textView to populate
-                R.id.list_search_item_textview,
-                //forecast data
-                list);
-
-         ListView listView = (ListView) findViewById(R.id.listview_search);
-         listView.setAdapter(searchListAdapter); 
+	    aa = new AddressAdapter(list, group_address, this);
+	    
+        ListView listView = (ListView) findViewById(R.id.listview_search);
+        listView.setAdapter(aa); 
     
        //now when I click on a result!
          listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
            @Override
-           public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-	         coordinates = data.getPosition(searchListAdapter.getItem(position));
-	         if(data.queryPosition(coordinates))
-	            returnResults(coordinates); //return to map activity
+           public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {        	   
+        	 String item_str = (String) aa.getItem(position);
+        	 if(data.queryAddress(item_str)){        	   
+	            coordinates = data.getPosition(item_str);
+	            if(data.queryPosition(coordinates))
+	               returnResults(coordinates); //return to map activity
+        	 }
+        	 //else do nothing
            }			
          });	
 	}	
@@ -102,44 +104,32 @@ public class SearchActivity extends Activity {
 	    }
 	}
    
-	private ArrayList<String> doMySearch (String search){	
-		    //searchListAdapter.clear();
+	private ArrayList<String> doMySearch (String search){
 		    ArrayList<String> searchList = new ArrayList<String>();		      
-		    searchList = data.getAddresses(search);		    
-		    
-		    /**
-		    GroupDataManager groups = new GroupDataManager(this);		    
-		    try {
-				groups.open();
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-				Toast.makeText(getApplicationContext(), 
-		    			  "Cannot open groups database", 
-		    			  Toast.LENGTH_LONG).show();
-			}
-		    groups.close();		    
-		    //TODO temp fix
-		    //Note: no need since user could only downloads markers of groups
-		    //he's part of
-		    /**
-            if (!session.checkLogin()){
-            	searchList = data.getAddresses(search);
-            	return searchList;
-		     }		    
-		    try {
-				searchList = data.getSelAddresses(groups.getJoinedGroups());					
-				groups.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-				Toast.makeText(getApplicationContext(), 
-		    			  "List is empty", 
-		    			  Toast.LENGTH_LONG).show();
-				groups.close();
-			} **/
-	         		   
+		    searchList = data.getAddresses(search,0); 
 	        return searchList;		
 	}
+	
+	private ArrayList<String> listAddresses (){			
+					
+		GroupDataManager group = new GroupDataManager(context);
+        try {
+			group.open();
+		} catch (Exception e){
+			Log.i("hello", "hello");
+		} 
+        //TODO, test
+        List<String> groups = group.getJoinedGroups();
+             
+        ArrayList<String> searchList = new ArrayList<String>();
+        for (int i=0;i<groups.size();i++){
+        	searchList.add(groups.get(i));        	
+        	searchList.addAll(data.getAddresses(groups.get(i),1));                 	
+        	group_address.put(groups.get(i), data.getAddresses(groups.get(i),0));
+        }   
+        
+        return searchList;		
+}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

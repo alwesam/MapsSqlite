@@ -1,6 +1,7 @@
 package com.vandevsam.sharespot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.vandevsam.sharespot.data.GroupDataManager;
@@ -17,7 +18,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -26,8 +26,15 @@ public class SearchGroupsActivity extends Activity {
 	
 	private Context context = this;	
 	private List<String> list;
-	private ArrayAdapter<String> searchListAdapter;
+	//private ArrayAdapter<String> searchListAdapter;
 	GroupDataManager data;
+	
+	AddressAdapter aa;	
+	//new
+	HashMap<String, List<String>> group_type;
+	
+	private static String joined = "Joined";
+	private static String unjoined = "Non-Joined";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +47,10 @@ public class SearchGroupsActivity extends Activity {
 		} catch (Exception e){
 			Log.i("hello", "hello");
 		} 	
+  
+        group_type = new HashMap<String, List<String>>();
         
-        list = doMySearch("ALL");
+        list = listGroups();
         
         if (list.isEmpty()) {
         	Toast.makeText(this, 
@@ -49,10 +58,10 @@ public class SearchGroupsActivity extends Activity {
          	     	  Toast.LENGTH_LONG).show();
         	finish();
         }
-        
+                
 	    searchIntent(getIntent());
 	    	    
-	    searchListAdapter = new ArrayAdapter<String>(
+	    /**searchListAdapter = new ArrayAdapter<String>(
                 //the current context (this fragement's parent activity)
                 this,
                 //ID of list item layout
@@ -61,26 +70,35 @@ public class SearchGroupsActivity extends Activity {
                 R.id.list_search_item_textview,
                 //forecast data
                 list);
+         **/
+	    
+
+	     aa = new AddressAdapter(list, group_type, this);
 
          ListView listView = (ListView) findViewById(R.id.listview_search);
-         listView.setAdapter(searchListAdapter); 
+         //listView.setAdapter(searchListAdapter); 
+         listView.setAdapter(aa);
     
        //now when I click on a result!
          listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
            @Override
            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {	   
-        	  String group = searchListAdapter.getItem(position);
+        	 // String group = searchListAdapter.getItem(position);
+        	  
+        	  String group = aa.getItem(position);
         	          	          	         	  
         	  Intent detailActivity;
-        	   //TODO combine these activities into one   	  
-        	  if (data.queryStatus(group))
+        	   //TODO combine these activities into one   
+        	  if(data.queryGroup(group)){
+        	     if (data.queryStatus(group))
 	               detailActivity = new Intent(getBaseContext(), MyGroupDetailActivity.class)
                                         .putExtra("key", group);
-        	  else
+        	     else
         		   detailActivity = new Intent(getBaseContext(), GroupDetailActivity.class)
                                           .putExtra("key", group);   
         	  
-        	  startActivityForResult(detailActivity,0);
+        	     startActivityForResult(detailActivity,0);
+        	  }
            }			
          });	
 	}	
@@ -100,20 +118,38 @@ public class SearchGroupsActivity extends Activity {
 	         list = doMySearch(query);
 	    }
 	}
+	
+	private ArrayList<String> doMySearch (String search){
+	    ArrayList<String> searchList = new ArrayList<String>();		      
+	    searchList = data.getGroups(search); 
+        return searchList;		
+}
    
 	//TODO fix
-	private ArrayList<String> doMySearch (String search){
-		//TODO investigate crashes
+	private ArrayList<String> listGroups (){
+
 		    try {
 				ArrayList<String> searchList = new ArrayList<String>();
-				searchList = (ArrayList<String>) data.getAllGroups();
+								
+			  //idiotic implementation, but I'm having a headache, review later
+		        for (int i=0;i<2;i++){
+		        	if (i==0) {
+		        	  searchList.add(joined);
+		        	  group_type.put(joined, data.getGroups(0));
+		        	}
+		        	else{
+		              searchList.add(unjoined);
+		        	  group_type.put(unjoined, data.getGroups(1));
+		        	}		        	
+		        	searchList.addAll(data.getGroups(i));
+		        }  		
+				
 				return searchList;
 			} catch (Exception e) {
 				 Toast.makeText(this, "Try again later", 
            	     	  Toast.LENGTH_LONG).show();	
 				e.printStackTrace();
-				return null;
-				
+				return null;				
 			}		
 	}
 	
