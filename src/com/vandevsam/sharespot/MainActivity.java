@@ -44,22 +44,22 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class MainActivity extends FragmentActivity implements LocationListener{
-                               
+public class MainActivity extends FragmentActivity implements LocationListener {
+
 	Context context = this;
-	private GoogleMap map;	
+	private GoogleMap map;
 	private static final int zoom = 13;
-	
-	//TODO just in case
+
+	// TODO just in case
 	private static final String Vancouver = "49.25 -123.1";
-		
+
 	SessionManager session;
-		
+
 	private String[] mListTitles;
-    private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;	
-    private CharSequence mTitle;
-    
+	private DrawerLayout mDrawerLayout;
+	private ListView mDrawerList;
+	private CharSequence mTitle;
+
 	MarkerDataManager data;
 	GroupDataManager data_gr;
 	private ArrayAdapter<String> mDrawerAdapter;
@@ -67,453 +67,454 @@ public class MainActivity extends FragmentActivity implements LocationListener{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);			
+		setContentView(R.layout.activity_main);
 		/**
 		 * Here I'm initialzing drawer pane list variables and setting the
 		 * onItemclicklistnere method
-		 */		
+		 */
 		session = new SessionManager(getApplicationContext());
-		
-        if (session.checkLogin())
-		   mListTitles = getResources().getStringArray(R.array.sidepane_array);		 
-        else
-           mListTitles = getResources().getStringArray(R.array.sidepane_array_guest);			
-		
+
+		if (session.checkLogin())
+			mListTitles = getResources().getStringArray(R.array.sidepane_array);
+		else
+			mListTitles = getResources().getStringArray(
+					R.array.sidepane_array_guest);
+
 		mDrawerAdapter = new ArrayAdapter<String>(this,
-				                                  R.layout.drawer_list_item, 
-				                                  mListTitles);
-		
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
-        // Set the adapter for the list view
-        mDrawerList.setAdapter(mDrawerAdapter);
-        // Set the list's click listener
-        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-        	 @Override
-             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {  
-        		 //String item = mDrawerAdapter.getItem(position);
-        		 selectItem(mDrawerAdapter.getItem(position),position);
-             }
-		});    
-        
-        //location preferences
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String city = prefs.getString(getString(R.string.pref_location_key),
-        		   getString(R.string.pref_location_default));  
-        String gps = prefs.getString(getString(R.string.pref_gps_key),
-        		   getString(R.string.pref_gps_default));
-        
-        /**
+				R.layout.drawer_list_item, mListTitles);
+
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		mDrawerList = (ListView) findViewById(R.id.left_drawer);
+		// Set the adapter for the list view
+		mDrawerList.setAdapter(mDrawerAdapter);
+		// Set the list's click listener
+		mDrawerList
+				.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+					@Override
+					public void onItemClick(AdapterView<?> adapterView,
+							View view, int position, long id) {
+						// String item = mDrawerAdapter.getItem(position);
+						selectItem(mDrawerAdapter.getItem(position), position);
+					}
+				});
+
+		// location preferences
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		String city = prefs.getString(getString(R.string.pref_location_key),
+				getString(R.string.pref_location_default));
+		String gps = prefs.getString(getString(R.string.pref_gps_key),
+				getString(R.string.pref_gps_default));
+
+		/**
 		 * Map initialization
-		 */	             
-        //related to main framgment: map
-		//map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();	
-		
-		SupportMapFragment fm = (SupportMapFragment)   getSupportFragmentManager().findFragmentById(R.id.map);
-		map = fm.getMap();		
-		
-		 // Enabling MyLocation in Google Map
-        map.setMyLocationEnabled(true);
-        // Getting LocationManager object from System Service LOCATION_SERVICE
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        // Creating a criteria object to retrieve provider
-        Criteria criteria = new Criteria();
-        // Getting the name of the best provider
-        String provider = locationManager.getBestProvider(criteria, true);
-        // Getting Current Location From GPS
-        Location location = locationManager.getLastKnownLocation(provider);
-        locationManager.requestLocationUpdates(provider, 20000, 0, this);
-        // Find location from gps
-        if(location!=null && gps.equalsIgnoreCase("enabled")){
-            onLocationChanged(location);
-        }	else {
-        	//TODO: fix and clean up code        	
-        	  try {
-        		  //Zoom to selected location in settings
+		 */
+		// related to main framgment: map
+		// map = ((MapFragment)
+		// getFragmentManager().findFragmentById(R.id.map)).getMap();
+
+		SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager()
+				.findFragmentById(R.id.map);
+		map = fm.getMap();
+
+		// Enabling MyLocation in Google Map
+		map.setMyLocationEnabled(true);
+		// Getting LocationManager object from System Service LOCATION_SERVICE
+		LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+		// Creating a criteria object to retrieve provider
+		Criteria criteria = new Criteria();
+		// Getting the name of the best provider
+		String provider = locationManager.getBestProvider(criteria, true);
+		// Getting Current Location From GPS
+		Location location = locationManager.getLastKnownLocation(provider);
+		locationManager.requestLocationUpdates(provider, 20000, 0, this);
+		// Find location from gps
+		if (location != null && gps.equalsIgnoreCase("enabled")) {
+			onLocationChanged(location);
+		} else {
+			// TODO: fix and clean up code
+			try {
+				// Zoom to selected location in settings
 				zoomToLocation(geoCode(city));
 			} catch (IOException e) {
 				e.printStackTrace();
-				/*Toast.makeText(getApplicationContext(), 
-		    			  "Cannot zoom to selected address in Settings, \n" +
-		    			  "check network connection or restart device", 
-		    			  Toast.LENGTH_LONG).show(); */
-				zoomToLocation(Vancouver);				
+				/*
+				 * Toast.makeText(getApplicationContext(),
+				 * "Cannot zoom to selected address in Settings, \n" +
+				 * "check network connection or restart device",
+				 * Toast.LENGTH_LONG).show();
+				 */
+				zoomToLocation(Vancouver);
 			}
-        }
-              
-		//create new database to store markers
-        /**
-         * SQLITE database open
-         */
-		data = new MarkerDataManager(context);		    
+		}
+
+		// create new database to store markers
+		/**
+		 * SQLITE database open
+		 */
+		data = new MarkerDataManager(context);
 		try {
 			data.open();
-		} catch (Exception e){
+		} catch (Exception e) {
 			Log.i("Error!", "Cannot open SQLite DB");
-		}			
-		//show available markers
-		data_gr = new GroupDataManager(context);		    
+		}
+		// show available markers
+		data_gr = new GroupDataManager(context);
 		try {
 			data_gr.open();
-		} catch (Exception e){
+		} catch (Exception e) {
 			Log.i("Error!", "Cannot open SQLite DB");
-		}	
-				
-		//receiving intent workaround solution TODO temp fix
-		try {		 
-		   onActivityResult(90, RESULT_OK, this.getIntent());	
-		} catch (Exception e){
+		}
+
+		// receiving intent workaround solution TODO temp fix
+		try {
+			onActivityResult(90, RESULT_OK, this.getIntent());
+		} catch (Exception e) {
 			Log.i("Error!", "No intent passed back yet");
 		}
-		
-		//add markers			
-	    map.setOnMapClickListener(new OnMapClickListener() {	    	    
-	            @Override
-	            public void onMapClick(LatLng latlng) { 	            	
-	            	            	
-	            	String coordinates = String.valueOf(latlng.latitude)+" "+String.valueOf(latlng.longitude);					
-					Intent newLocation = new Intent(getBaseContext(), NewLocationActivity.class)
-	            	                               .putExtra(Intent.EXTRA_TEXT, coordinates);
-                    startActivityForResult(newLocation, 91);                    
-	            }
-	    });	 
-	    
-	    //delete markers
-	    map.setOnInfoWindowClickListener(new OnInfoWindowClickListener(){
+
+		// add markers
+		map.setOnMapClickListener(new OnMapClickListener() {
 			@Override
-			public void onInfoWindowClick(Marker marker) {	
-				
-				map.clear();
-							
-				String coordinates = String.valueOf(marker.getPosition().latitude+
-						" "+marker.getPosition().longitude);				
-				Intent markerDetails = new Intent(getBaseContext(), MarkerDetailsActivity.class)
-                                    .putExtra(Intent.EXTRA_TEXT, coordinates);
-                startActivity(markerDetails);  
-				
+			public void onMapClick(LatLng latlng) {
+
+				String coordinates = String.valueOf(latlng.latitude) + " "
+						+ String.valueOf(latlng.longitude);
+				Intent newLocation = new Intent(getBaseContext(),
+						NewLocationActivity.class).putExtra(Intent.EXTRA_TEXT,
+						coordinates);
+				startActivityForResult(newLocation, 91);
 			}
-	    });     
-		    
-	    //show selected markers
-	    try {
+		});
+
+		// delete markers
+		map.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
+			@Override
+			public void onInfoWindowClick(Marker marker) {
+
+				map.clear();
+
+				String coordinates = String.valueOf(marker.getPosition().latitude
+						+ " " + marker.getPosition().longitude);
+				Intent markerDetails = new Intent(getBaseContext(),
+						MarkerDetailsActivity.class).putExtra(
+						Intent.EXTRA_TEXT, coordinates);
+				startActivity(markerDetails);
+
+			}
+		});
+
+		// show selected markers
+		try {
 			listSelMarker();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}	 
-	    
+		}
+
 	}
-	//end onCreate method
-	
-	private void checkoutGroups (){		
-		//list all groups in the remote db and populate the sqlite db
-		HashMap<String, String> user = session.getUserDetails();       
-        ServerUtilFunctions list = new ServerUtilFunctions(this, "Searching Available Groups....");
-        list.listAllGroup(user.get(SessionManager.KEY_USERNAME));         
-                
+
+	// end onCreate method
+
+	private void checkoutGroups() {
+		// list all groups in the remote db and populate the sqlite db
+		HashMap<String, String> user = session.getUserDetails();
+		ServerUtilFunctions list = new ServerUtilFunctions(this,
+				"Searching Available Groups....");
+		list.listAllGroup(user.get(SessionManager.KEY_USERNAME));
+
 	}
-		
-	private String geoCode(String city) throws IOException{
-		
+
+	private String geoCode(String city) throws IOException {
+
 		Geocoder geocoder = new Geocoder(this, Locale.getDefault());
 		List<Address> addresses = geocoder.getFromLocationName(city, 1);
 		Address address = addresses.get(0);
-		String coordinates = String.valueOf(address.getLatitude())+
-				             " "+
-		                     String.valueOf(address.getLongitude());
+		String coordinates = String.valueOf(address.getLatitude()) + " "
+				+ String.valueOf(address.getLongitude());
 		return coordinates;
-		
+
 	}
-	
+
 	/** Swaps fragments in the map view */
 	private void selectItem(String item, int position) {
-		DrawerListEnum enumval = DrawerListEnum.valueOf(item.toUpperCase().replace(" ", "_"));        
-        switch (enumval) {
-        case SEARCH_MARKERS: //search
-        	startActivityForResult(new Intent(context, SearchActivity.class), 90);
-        	//startActivity(new Intent(context, SearchActivity.class));
-            break;
-        case SEARCH_GROUPS: //create a group        
-        	startActivity(new Intent(context, SearchGroupsActivity.class));        	
-            break;
-        case CREATE_GROUP: //create a group
-        	startActivity(new Intent(context, CreateGroupActivity.class));        	
-            break;
-        case PROFILE:  //profile        	
-        	startActivity(new Intent(context, ProfileActivity.class));
-            break; 
-        case SETTINGS://settings activity
-        	startActivity(new Intent(context, SettingsActivity.class));
-            break;
-        case LOGOUT: //Log out        
-        	session.logoutSession();
-        	//clear map
-        	map.clear();
-        	//clear databases
-        	data.clear();
-        	data.close();
-        	data_gr.clear();
-        	data_gr.close();
-        	//to reload activity
-        	reloadActivity();
-            break; 
-        case CONTACT_DEVELOPER: //send feedback
-        	sendEmail();
-            break; 
-        case LOGIN: //login
-        	map.clear();
-        	data.clear();
-        	data.close();
-        	startActivity(new Intent(context, AuthenticateActivity.class));
-        	finish();
-            break; 
-        case REGISTER: //register 
-        	//TODO fix code
-        	startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
-        	finish();
-            break;
-        default:
-            break;
-        }        
-	    // Highlight the selected item, update the title, and close the drawer
-	    mDrawerList.setItemChecked(position, true);
-	    setTitle(mListTitles[position]);
-	    mDrawerLayout.closeDrawer(mDrawerList);	    
+		DrawerListEnum enumval = DrawerListEnum.valueOf(item.toUpperCase()
+				.replace(" ", "_"));
+		switch (enumval) {
+		case SEARCH_MARKERS: // search
+			startActivityForResult(new Intent(context, SearchActivity.class),
+					90);
+			// startActivity(new Intent(context, SearchActivity.class));
+			break;
+		case SEARCH_GROUPS: // create a group
+			startActivity(new Intent(context, SearchGroupsActivity.class));
+			break;
+		case CREATE_GROUP: // create a group
+			startActivity(new Intent(context, CreateGroupActivity.class));
+			break;
+		case PROFILE: // profile
+			startActivity(new Intent(context, ProfileActivity.class));
+			break;
+		case SETTINGS:// settings activity
+			startActivity(new Intent(context, SettingsActivity.class));
+			break;
+		case LOGOUT: // Log out
+			session.logoutSession();
+			// clear map
+			map.clear();
+			// clear databases
+			data.clear();
+			data.close();
+			data_gr.clear();
+			data_gr.close();
+			// to reload activity
+			reloadActivity();
+			break;
+		case CONTACT_DEVELOPER: // send feedback
+			sendEmail();
+			break;
+		case LOGIN: // login
+			map.clear();
+			data.clear();
+			data.close();
+			startActivity(new Intent(context, AuthenticateActivity.class));
+			finish();
+			break;
+		case REGISTER: // register
+			// TODO fix code
+			startActivity(new Intent(getApplicationContext(),
+					RegisterActivity.class));
+			finish();
+			break;
+		default:
+			break;
+		}
+		// Highlight the selected item, update the title, and close the drawer
+		mDrawerList.setItemChecked(position, true);
+		setTitle(mListTitles[position]);
+		mDrawerLayout.closeDrawer(mDrawerList);
 	}
-	
+
 	@Override
 	public void setTitle(CharSequence title) {
-	    mTitle = title;
-	    //TODO fix
-	    getActionBar().setTitle(mTitle);
+		mTitle = title;
+		// TODO fix
+		getActionBar().setTitle(mTitle);
 	}
-	
-	//TODO review
-	protected void sendEmail() {
-	      Log.i("Send email", "");
 
-	      String[] TO = {"alwesam@vandevsam.com"};
-	      Intent emailIntent = new Intent(Intent.ACTION_SEND);
-	      emailIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-	      emailIntent.setData(Uri.parse("mailto:"));
-	      emailIntent.setType("text/plain");
-	      emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);	      
-	      emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
-	      emailIntent.putExtra(Intent.EXTRA_TEXT, "Feedback");
-	      try {
-	         startActivity(Intent.createChooser(emailIntent, "Send mail..."));
-	         finish();
-	         Log.i("Finished sending email...", "");
-	      } catch (android.content.ActivityNotFoundException ex) {
-	         Toast.makeText(MainActivity.this, 
-	         "There is no messaging client installed.", Toast.LENGTH_SHORT).show();
-	      }
-	   }	
-	
-	private void listSelMarker(){
-		
-		/**
-		List<String> selGroups;
-		int safety_count;		
+	// TODO review
+	protected void sendEmail() {
+		Log.i("Send email", "");
+
+		String[] TO = { "alwesam@vandevsam.com" };
+		Intent emailIntent = new Intent(Intent.ACTION_SEND);
+		emailIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+		emailIntent.setData(Uri.parse("mailto:"));
+		emailIntent.setType("text/plain");
+		emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
+		emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+		emailIntent.putExtra(Intent.EXTRA_TEXT, "Feedback");
 		try {
-			SaveGroupPreference pref = new SaveGroupPreference(this); 
-			List<String> groups = pref.getPrefGroup();
-			List<Boolean> groups_check = pref.getPrefCheck();			
-			selGroups = new ArrayList<String>();			
-			safety_count = 0;					
-			for (int i=0; i<groups.size(); i++) {			
-				if(groups_check.get(i)){
-					selGroups.add(groups.get(i));
-				    safety_count++;
-				}
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		}	
-		if (safety_count==0){
-			//Toast.makeText(getApplicationContext(), 
-				//	"No Markers", Toast.LENGTH_LONG).show();
-			return;}
-		**/
-		
+			startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+			finish();
+			Log.i("Finished sending email...", "");
+		} catch (android.content.ActivityNotFoundException ex) {
+			Toast.makeText(MainActivity.this,
+					"There is no messaging client installed.",
+					Toast.LENGTH_SHORT).show();
+		}
+	}
+
+	private void listSelMarker() {
+
+		/**
+		 * List<String> selGroups; int safety_count; try { SaveGroupPreference
+		 * pref = new SaveGroupPreference(this); List<String> groups =
+		 * pref.getPrefGroup(); List<Boolean> groups_check =
+		 * pref.getPrefCheck(); selGroups = new ArrayList<String>();
+		 * safety_count = 0; for (int i=0; i<groups.size(); i++) {
+		 * if(groups_check.get(i)){ selGroups.add(groups.get(i));
+		 * safety_count++; } } } catch (Exception e) { // TODO Auto-generated
+		 * catch block e.printStackTrace(); return; } if (safety_count==0){
+		 * //Toast.makeText(getApplicationContext(), // "No Markers",
+		 * Toast.LENGTH_LONG).show(); return;}
+		 **/
+
 		map.clear();
-				
+
 		float mapIcon = BitmapDescriptorFactory.HUE_ROSE;
-		//get select markers
-		//TODO fix later
-		//List <MyMarkerObj> n = data.getSelMarkers(selGroups);	
-		List <MyMarkerObj> n = data.getAllMarkers();
-		for (int i=0; i < n.size(); i++){
+		// get select markers
+		// TODO fix later
+		// List <MyMarkerObj> n = data.getSelMarkers(selGroups);
+		List<MyMarkerObj> n = data.getAllMarkers();
+		for (int i = 0; i < n.size(); i++) {
 			String[] slatlng = n.get(i).getPosition().split(" ");
-			LatLng latlng = new LatLng (Double.valueOf(slatlng[0]), Double.valueOf(slatlng[1]));			
-			if(n.get(i).getStatus().equalsIgnoreCase("no"))
+			LatLng latlng = new LatLng(Double.valueOf(slatlng[0]),
+					Double.valueOf(slatlng[1]));
+			if (n.get(i).getStatus().equalsIgnoreCase("no"))
 				mapIcon = BitmapDescriptorFactory.HUE_ROSE;
 			else
 				mapIcon = BitmapDescriptorFactory.HUE_GREEN;
-			map.addMarker(new MarkerOptions()			   
-			   .title(n.get(i).getTitle())
-			   .snippet(n.get(i).getSnippet())
-			   .position(latlng)
-			   .icon(BitmapDescriptorFactory.defaultMarker(mapIcon))
-			   .draggable(true));			
-		}			
+			map.addMarker(new MarkerOptions().title(n.get(i).getTitle())
+					.snippet(n.get(i).getSnippet()).position(latlng)
+					.icon(BitmapDescriptorFactory.defaultMarker(mapIcon))
+					.draggable(true));
+		}
 	}
-	
-	private Marker listAMarker(String pos){
+
+	private Marker listAMarker(String pos) {
 		map.clear();
 		float mapIcon = BitmapDescriptorFactory.HUE_ROSE;
-		MyMarkerObj n = data.getSelectMarker(pos);		
-	    String[] slatlng = n.getPosition().split(" ");
-		LatLng latlng = new LatLng (Double.valueOf(slatlng[0]), Double.valueOf(slatlng[1]));
-		if((n.getStatus()).equalsIgnoreCase("no")) //not synced, goes rose
-			mapIcon = BitmapDescriptorFactory.HUE_ROSE; //not synced
+		MyMarkerObj n = data.getSelectMarker(pos);
+		String[] slatlng = n.getPosition().split(" ");
+		LatLng latlng = new LatLng(Double.valueOf(slatlng[0]),
+				Double.valueOf(slatlng[1]));
+		if ((n.getStatus()).equalsIgnoreCase("no")) // not synced, goes rose
+			mapIcon = BitmapDescriptorFactory.HUE_ROSE; // not synced
 		else
-			mapIcon = BitmapDescriptorFactory.HUE_GREEN; //synced
-		Marker marker = map.addMarker(new MarkerOptions()			   
-		               .title(n.getTitle())
-		        	   .snippet(n.getSnippet())
-			           .position(latlng)
-			           .icon(BitmapDescriptorFactory.defaultMarker(mapIcon))
-			           .draggable(true));		
+			mapIcon = BitmapDescriptorFactory.HUE_GREEN; // synced
+		Marker marker = map.addMarker(new MarkerOptions().title(n.getTitle())
+				.snippet(n.getSnippet()).position(latlng)
+				.icon(BitmapDescriptorFactory.defaultMarker(mapIcon))
+				.draggable(true));
 		return marker;
-	}	
-	
-	private void findMarker(String slatlng){
-		
-		Marker marker = listAMarker(slatlng);
-		LatLng latLng = marker.getPosition();	 
-        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        map.animateCamera(CameraUpdateFactory.zoomTo(zoom+2));        
-		marker.showInfoWindow();		
 	}
-	
-	//call back from SearchActivity	
+
+	private void findMarker(String slatlng) {
+
+		Marker marker = listAMarker(slatlng);
+		LatLng latLng = marker.getPosition();
+		map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+		map.animateCamera(CameraUpdateFactory.zoomTo(zoom + 2));
+		marker.showInfoWindow();
+	}
+
+	// call back from SearchActivity
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent response) {
-	  //super.onActivityResult(requestCode, resultCode, response);
-     if (response != null){
-	    switch(requestCode) {
-	      case 0 : {	    	
-	        if (resultCode == RESULT_OK) {
-	    	   listSelMarker();
-	        }
-	       break;
-	      } 
-	      case 90 : {	    	
-	        if (resultCode == RESULT_OK) {
-	    	  String coordinates = response.getStringExtra("note");
-	    	  findMarker(coordinates);
-	        }
-	       break;
-	      } 
-	      case 91 : {	    	
-		        if (resultCode == RESULT_OK) {
-		    	  String result = response.getStringExtra("coord");
-		    	  boolean added = response.getExtras().getBoolean("added");		    	  
-		    	  if (added)
-		    	      findMarker(result);
-		    	  else
-		    		  zoomToLocation(result);
-		        }
-		       break;
-		      } 
-	    }
-      }  else {
-    	  Toast.makeText(getApplicationContext(), 
-    			  "Data NULL", 
-    			  Toast.LENGTH_LONG).show();
-      }    	       
-	}		
+	public void onActivityResult(int requestCode, int resultCode,
+			Intent response) {
+		// super.onActivityResult(requestCode, resultCode, response);
+		if (response != null) {
+			switch (requestCode) {
+			case 0: {
+				if (resultCode == RESULT_OK) {
+					listSelMarker();
+				}
+				break;
+			}
+			case 90: {
+				if (resultCode == RESULT_OK) {
+					String coordinates = response.getStringExtra("note");
+					findMarker(coordinates);
+				}
+				break;
+			}
+			case 91: {
+				if (resultCode == RESULT_OK) {
+					String result = response.getStringExtra("coord");
+					boolean added = response.getExtras().getBoolean("added");
+					if (added)
+						findMarker(result);
+					else
+						zoomToLocation(result);
+				}
+				break;
+			}
+			}
+		} else {
+			Toast.makeText(getApplicationContext(), "Data NULL",
+					Toast.LENGTH_LONG).show();
+		}
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-	
+
 	@Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        //When Sync action button is clicked
-        if (id == R.id.action_search){
-           startActivityForResult(new Intent(this, SearchActivity.class), 90);        	
-           return true;
-        }           
-        if (id == R.id.group_connect){
-        	//reloadActivity();
-        	//listSelMarker();
-        	if(session.checkLogin())
-			   checkoutGroups();
-        	return true;
-        }
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            return true;
-        }
-        if (id == R.id.sync_to_DB) {
-            //Sync SQLite DB markers to remote MySQL DB
-        	if (session.checkLogin()){
-               ServerUtilFunctions up = new ServerUtilFunctions(this, "");
-               up.syncSQLiteMySQLDB();
-        	}
-        	else
-        		Toast.makeText(getApplicationContext(), 
-        				"You have to logged in to upload markers to server", 
-        				Toast.LENGTH_LONG).show();
-            return true;
-        } 
-        if (id == R.id.sync_from_DB) {
-            ServerUtilFunctions down = new ServerUtilFunctions(this, "Downloading markers...");
-            down.syncMySQLDBSQLite();
-            return true;
-        }  
-        /** TODO reactivate later when fix group pref
-        if (id == R.id.group_pref){
-           startActivityForResult(new Intent(this, SetGroupPreference.class), 0);        	
-           return true;
-        }**/
-        
-        return super.onOptionsItemSelected(item);
-    }
-	
-   @Override
-   public void onLocationChanged(Location location) {
-        double mLatitude = location.getLatitude();
-        double mLongitude = location.getLongitude();
-        LatLng latLng = new LatLng(mLatitude, mLongitude);	 
-        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
-    }	
-   
-   private void zoomToLocation(String location) {		 
-	    String[] coordinates = location.split("\\s+");   	  
-        LatLng latLng = new LatLng(Double.parseDouble(coordinates[0]),
-       		       Double.parseDouble(coordinates[1]));	    	 
-	    map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-	    map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
-	}	
-  
-   // Reload MainActivity
-   public void reloadActivity() {
-       Intent objIntent = new Intent(getApplicationContext(), MainActivity.class);
-       startActivity(objIntent);
-   }     
-	
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		// When Sync action button is clicked
+		if (id == R.id.action_search) {
+			startActivityForResult(new Intent(this, SearchActivity.class), 90);
+			return true;
+		}
+		if (id == R.id.group_connect) {
+			// reloadActivity();
+			// listSelMarker();
+			if (session.checkLogin())
+				checkoutGroups();
+			return true;
+		}
+		if (id == R.id.action_settings) {
+			startActivity(new Intent(this, SettingsActivity.class));
+			return true;
+		}
+		if (id == R.id.sync_to_DB) {
+			// Sync SQLite DB markers to remote MySQL DB
+			if (session.checkLogin()) {
+				ServerUtilFunctions up = new ServerUtilFunctions(this, "");
+				up.syncSQLiteMySQLDB();
+			} else
+				Toast.makeText(getApplicationContext(),
+						"You have to logged in to upload markers to server",
+						Toast.LENGTH_LONG).show();
+			return true;
+		}
+		if (id == R.id.sync_from_DB) {
+			ServerUtilFunctions down = new ServerUtilFunctions(this,
+					"Downloading markers...");
+			down.syncMySQLDBSQLite();
+			return true;
+		}
+		/**
+		 * TODO reactivate later when fix group pref if (id == R.id.group_pref){
+		 * startActivityForResult(new Intent(this, SetGroupPreference.class),
+		 * 0); return true; }
+		 **/
+
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onLocationChanged(Location location) {
+		double mLatitude = location.getLatitude();
+		double mLongitude = location.getLongitude();
+		LatLng latLng = new LatLng(mLatitude, mLongitude);
+		map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+		map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
+	}
+
+	private void zoomToLocation(String location) {
+		String[] coordinates = location.split("\\s+");
+		LatLng latLng = new LatLng(Double.parseDouble(coordinates[0]),
+				Double.parseDouble(coordinates[1]));
+		map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+		map.animateCamera(CameraUpdateFactory.zoomTo(zoom));
+	}
+
+	// Reload MainActivity
+	public void reloadActivity() {
+		Intent objIntent = new Intent(getApplicationContext(),
+				MainActivity.class);
+		startActivity(objIntent);
+	}
+
 	@Override
 	public void onProviderDisabled(String arg0) {
-			
+
 	}
 
 	@Override
 	public void onProviderEnabled(String arg0) {
-				
+
 	}
 
 	@Override
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-				
-	}	
-	
+
+	}
+
 }

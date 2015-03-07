@@ -15,91 +15,89 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 public class MarkerDetailsActivity extends Activity {
-	
+
 	Context context = this;
 	private String coordinates;
-	private TextView textName;	
+	private TextView textName;
 	private TextView textDesc;
 	private TextView textType;
-	
+
 	MarkerDataManager marker;
-	
+
 	String group;
-	
-	
+
 	@Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mymarkerdetail);
-        
-        Intent intent = this.getIntent();   
-		coordinates = intent.getStringExtra(Intent.EXTRA_TEXT);	
-        
-        marker = new MarkerDataManager(context);
-        
-        marker.open();        
-        //fetch details
-        List<String> details = marker.getMarkerDetails(coordinates);             
-        marker.close();
-        
-        //extractions
-        String desc = details.get(0);
-        String address = details.get(1);        
-        group = details.get(3);
-        
-      //get name and username
-        textName = (TextView) findViewById(R.id.textName);
-        String htmlName = "<h3>Address: "+address+"</h3>";
-        textName.setText(Html.fromHtml(htmlName));
-        
-        textDesc = (TextView) findViewById(R.id.textDesc);
-        String htmlDate = "<h3>Description: "+desc+"</h3>";
-        textDesc.setText(Html.fromHtml(htmlDate));        
-        
-        //get groups signed in
-        //special case TODO review later
-        textType = (TextView) findViewById(R.id.textType);
-        String htmlGroup = "<h3>Group: "+group+"</h3>";
-        textType.setText(Html.fromHtml(htmlGroup));
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_mymarkerdetail);
+
+		Intent intent = this.getIntent();
+		coordinates = intent.getStringExtra(Intent.EXTRA_TEXT);
+
+		marker = new MarkerDataManager(context);
+
+		marker.open();
+		// fetch details
+		List<String> details = marker.getMarkerDetails(coordinates);
+		marker.close();
+
+		// extractions
+		String desc = details.get(0);
+		String address = details.get(1);
+		group = details.get(3);
+
+		// get name and username
+		textName = (TextView) findViewById(R.id.textName);
+		String htmlName = "<h3>Address: " + address + "</h3>";
+		textName.setText(Html.fromHtml(htmlName));
+
+		textDesc = (TextView) findViewById(R.id.textDesc);
+		String htmlDate = "<h3>Description: " + desc + "</h3>";
+		textDesc.setText(Html.fromHtml(htmlDate));
+
+		// get groups signed in
+		// special case TODO review later
+		textType = (TextView) findViewById(R.id.textType);
+		String htmlGroup = "<h3>Group: " + group + "</h3>";
+		textType.setText(Html.fromHtml(htmlGroup));
 
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.markerdetail, menu);
 		return true;
 	}
-	
+
 	@Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.remove_marker){
-           deleteMarker();        	
-           return true;      
-           }    
-            
-        return super.onOptionsItemSelected(item);
-    }
-	
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		if (id == R.id.remove_marker) {
+			deleteMarker();
+			return true;
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
+
 	public void deleteMarker() {
 		marker.open();
-		marker.deleteMarker(new MyMarkerObj(coordinates));		
+		marker.deleteMarker(new MyMarkerObj(coordinates));
 		marker.close();
-		
-		ServerUtilFunctions removeM = new ServerUtilFunctions(this);		
-		removeM.removeMarker(coordinates,group);		
-			
-        this.callHomeActivity();
-    }
-	
+
+		ServerUtilFunctions removeM = new ServerUtilFunctions(this);
+		removeM.removeMarker(coordinates, group);
+
+		this.callHomeActivity();
+	}
+
 	/**
-     * Navigate to Home Screen 
-     * @param view
-     */
-    public void callHomeActivity() {        
+	 * Navigate to Home Screen
+	 * 
+	 * @param view
+	 */
+	public void callHomeActivity() {
 		finish();
-    }   
-	
-	
+	}
 
 }

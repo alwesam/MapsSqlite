@@ -6,24 +6,24 @@ public class MyGroupObj {
 	private String description;
 	private String type;
 	private String status;
-	
-	
-	public MyGroupObj(){
-	}	
-	
-	public MyGroupObj(String name, String description, String type){		
+
+	public MyGroupObj() {
+	}
+
+	public MyGroupObj(String name, String description, String type) {
 		this.setName(name);
 		this.setDescription(description);
 		this.setType(type);
 	}
-	
-    public MyGroupObj(String name, String description, String type, String status){
-    	this.setName(name);
+
+	public MyGroupObj(String name, String description, String type,
+			String status) {
+		this.setName(name);
 		this.setDescription(description);
 		this.setType(type);
 		this.setStatus(status);
-	}	
-	
+	}
+
 	public String getDescription() {
 		return description;
 	}
@@ -63,6 +63,5 @@ public class MyGroupObj {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
 
 }
