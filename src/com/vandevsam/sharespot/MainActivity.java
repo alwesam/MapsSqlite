@@ -28,10 +28,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
@@ -43,6 +46,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+@SuppressLint("NewApi")
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class MainActivity extends FragmentActivity implements LocationListener {
 
@@ -57,6 +61,10 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
 	private String[] mListTitles;
 	private DrawerLayout mDrawerLayout;
+	
+	private ActionBarDrawerToggle mDrawerToggle;
+	private CharSequence mDrawerTitle;
+	
 	private ListView mDrawerList;
 	private CharSequence mTitle;
 
@@ -97,6 +105,20 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 						selectItem(mDrawerAdapter.getItem(position), position);
 					}
 				});
+		
+		//Initialize toggle		 
+		 mDrawerToggle = new ActionBarDrawerToggle(
+	                this,                  /* host Activity */
+	                mDrawerLayout,         /* DrawerLayout object */
+	                R.drawable.ic_drawer,  /* nav drawer icon to replace 'Up' caret */
+	                R.string.drawer_open,  /* "open drawer" description */
+	                R.string.drawer_close  /* "close drawer" description */
+	                );
+		
+	     // Set the drawer toggle as the DrawerListener
+	     mDrawerLayout.setDrawerListener(mDrawerToggle);
+	     getActionBar().setDisplayHomeAsUpEnabled(true);
+	     getActionBar().setHomeButtonEnabled(true);
 
 		// location preferences
 		SharedPreferences prefs = PreferenceManager
@@ -213,6 +235,19 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 		}
 
 	}
+	
+	 @Override
+	    protected void onPostCreate(Bundle savedInstanceState) {
+	        super.onPostCreate(savedInstanceState);
+	        // Sync the toggle state after onRestoreInstanceState has occurred.
+	        mDrawerToggle.syncState();
+	    }
+
+	    @Override
+	    public void onConfigurationChanged(Configuration newConfig) {
+	        super.onConfigurationChanged(newConfig);
+	        mDrawerToggle.onConfigurationChanged(newConfig);
+	    } 
 
 	// end onCreate method
 
@@ -435,6 +470,13 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		
+		// Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+          return true;
+        }
+		
 		int id = item.getItemId();
 		// When Sync action button is clicked
 		if (id == R.id.action_search) {

@@ -112,10 +112,7 @@ public class MarkerDataManager {
 				.getColumnIndex(MySQLHelper.SNIPPET)));
 		m.setPosition(cursor.getString(cursor
 				.getColumnIndex(MySQLHelper.POSITION)));
-		m.setGroup(cursor.getString(cursor.getColumnIndex(MySQLHelper.GROUPS))); // add
-																					// a
-																					// new
-																					// mark
+		m.setGroup(cursor.getString(cursor.getColumnIndex(MySQLHelper.GROUPS))); 
 		m.setStatus(cursor.getString(cursor.getColumnIndex(MySQLHelper.STATUS)));
 		return m;
 	}
