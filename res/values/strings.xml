@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">ShareLoc</string>
+    <string name="app_name">ShareSpot</string>
     <string name="action_settings">Settings</string>
     <string name="action_search">Search</string>
+    <string name="action_sync_to_server">Sync Database</string>
     <string name="action_sync_from_mysql">Download Markers</string>
     <string name="action_sync_to_mysql">Upload Markers</string>
     <string name="action_refresh">Show All Markers</string>
@@ -38,7 +39,6 @@
     </string-array>
     
     <string-array name="sidepane_array_guest">
-        <item>Search</item>
         <item>Login</item>
         <item>Register</item>
         <item>Contact</item>

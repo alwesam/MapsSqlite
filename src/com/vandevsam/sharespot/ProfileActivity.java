@@ -3,6 +3,8 @@ package com.vandevsam.sharespot;
 import java.util.HashMap;
 import java.util.List;
 
+import org.xml.sax.XMLReader;
+
 import com.vandevsam.sharespot.data.GroupDataManager;
 
 import android.app.Activity;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.text.Html;
 import android.widget.TextView;
 
+//TODO add a tag handler
 public class ProfileActivity extends Activity {
 
 	Context context = this;
@@ -35,26 +38,19 @@ public class ProfileActivity extends Activity {
 		name = user.get(SessionManager.KEY_NAME);
 		date = user.get(SessionManager.KEY_DATE);
 
-		// add groups to local db
-		// TODO fix this mess
-		// ServerUtilFunctions list = new ServerUtilFunctions(this);
-		// list.listGroup(name);
-		// ListGroups list = new ListGroups(this);
-		// list.listGroup(name); //return a list of groups
-
 		// get name and username
 		textName = (TextView) findViewById(R.id.textName);
-		String htmlName = "<h3>Name: " + name + "</h3>";
+		String htmlName = "<h4>Name: " + name + "</h4>";
 		textName.setText(Html.fromHtml(htmlName));
-
+		
 		textDate = (TextView) findViewById(R.id.textDate);
-		String htmlDate = "<h3>Date joined: " + date + "</h3>";
+		String htmlDate = "<h4>Date joined: " + date + "</h4>";
 		textDate.setText(Html.fromHtml(htmlDate));
 
 		// get groups signed in
 		// special case TODO review later
 		textGroup = (TextView) findViewById(R.id.textGroup);
-		String htmlGroup = "<h3>Group(s) joined: " + parseGroups() + "</h3>";
+		String htmlGroup = "<h4>Group(s) joined: </h4>" + parseGroups();
 		textGroup.setText(Html.fromHtml(htmlGroup));
 
 	}
@@ -67,14 +63,7 @@ public class ProfileActivity extends Activity {
 		String result = "";
 
 		for (int i = 0; i < groups.size(); i++) {
-			// Make sure group is joined!!
-			// if (data.queryStatus(groups.get(i))){
-			if (i < groups.size() - 1)
-				result += groups.get(i) + "\n";
-			else
-				result += groups.get(i);
-			// }
-
+			result += "<p>- " + groups.get(i) + "</p>";	
 		}
 		return result;
 	}

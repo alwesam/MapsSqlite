@@ -1,21 +1,35 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools"    
     tools:context=".MainActivity" >
-
+         
     <item
-        android:id="@+id/action_search"
-        android:icon="@drawable/ic_search"
+        android:id="@+id/action_refresh"
+        android:icon="@drawable/ic_action_refresh"
         android:orderInCategory="400"
         android:showAsAction="always"
         />      
     
     <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_search"
+        android:orderInCategory="800"
+        android:showAsAction="always"
+        />        
+    
+    <item
         android:id="@+id/sync_to_DB"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="@string/action_sync_to_mysql"/>
+        android:title="@string/action_sync_to_server"/>
     
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_settings"/>   
+    
+    <!--     
     <item
         android:id="@+id/sync_from_DB"
         android:orderInCategory="100"
@@ -26,15 +40,9 @@
         android:id="@+id/group_connect"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="Checkout Groups"/>
-        
+        android:title="Checkout Groups"/>        
     
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/action_settings"/>
-   <!--  
+     
     <item
         android:id="@+id/group_pref"
         android:orderInCategory="100"

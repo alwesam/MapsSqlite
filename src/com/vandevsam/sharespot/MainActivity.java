@@ -250,15 +250,14 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 	    } 
 
 	// end onCreate method
-
+	    //TODO remove
 	private void checkoutGroups() {
 		// list all groups in the remote db and populate the sqlite db
 		HashMap<String, String> user = session.getUserDetails();
 		ServerUtilFunctions list = new ServerUtilFunctions(this,
 				"Searching Available Groups....");
 		list.listAllGroup(user.get(SessionManager.KEY_USERNAME));
-
-	}
+	}	
 
 	private String geoCode(String city) throws IOException {
 
@@ -483,6 +482,22 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 			startActivityForResult(new Intent(this, SearchActivity.class), 90);
 			return true;
 		}
+		
+		if (id == R.id.action_refresh || id == R.id.sync_to_DB) {
+			// Sync SQLite DB markers to remote MySQL DB
+			if (session.checkLogin()) {
+				checkoutGroups();
+			} else
+				Toast.makeText(getApplicationContext(),
+							"You have to logged in to upload markers to server",
+							Toast.LENGTH_LONG).show();
+			return true;
+		}
+		if (id == R.id.action_settings) {
+			startActivity(new Intent(this, SettingsActivity.class));
+			return true;
+		}
+	/**	
 		if (id == R.id.group_connect) {
 			// reloadActivity();
 			// listSelMarker();
@@ -490,10 +505,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 				checkoutGroups();
 			return true;
 		}
-		if (id == R.id.action_settings) {
-			startActivity(new Intent(this, SettingsActivity.class));
-			return true;
-		}
+		
 		if (id == R.id.sync_to_DB) {
 			// Sync SQLite DB markers to remote MySQL DB
 			if (session.checkLogin()) {
@@ -510,8 +522,7 @@ public class MainActivity extends FragmentActivity implements LocationListener {
 					"Downloading markers...");
 			down.syncMySQLDBSQLite();
 			return true;
-		}
-		/**
+		}		
 		 * TODO reactivate later when fix group pref if (id == R.id.group_pref){
 		 * startActivityForResult(new Intent(this, SetGroupPreference.class),
 		 * 0); return true; }

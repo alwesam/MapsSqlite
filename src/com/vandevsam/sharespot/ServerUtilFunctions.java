@@ -24,6 +24,14 @@ public class ServerUtilFunctions {
 	Context mContext;
 	private static final String webServer = "108.59.82.39"; // my google CE ip
 															// address
+	
+	//Error messages
+	private static final String status404 = "Requested resource cannot found";
+	private static final String status500 = "Error at server side. Try again later";
+	private static final String statusOther = "Device might not be connected to network. " +
+											"Try again later or restart device";
+	
+	private static final String jsonInvalid = "Server JSON response might be invalid";
 
 	GroupDataManager group_data;
 	MarkerDataManager marker_data;
@@ -41,8 +49,6 @@ public class ServerUtilFunctions {
 		prgDialog.setCancelable(false);
 	}
 
-	// join a group
-	// TODO temp fix
 	public void joinGroup(String member, final String group) {
 
 		AsyncHttpClient client = new AsyncHttpClient();
@@ -57,9 +63,6 @@ public class ServerUtilFunctions {
 				new AsyncHttpResponseHandler() {
 					@Override
 					public void onSuccess(String response) {
-
-						// Toast.makeText(mContext, response,
-						// Toast.LENGTH_LONG).show();
 
 						try {
 							JSONObject jObject = new JSONObject(response);
@@ -85,18 +88,18 @@ public class ServerUtilFunctions {
 								name.add(group);
 								check.add(true);
 								pref.checkPref(name, check);
-
 								// now download markers
 								prgDialog.setMessage("Downloading Markers...");
 								syncMySQLDBSQLite();
-
 							}
 						} catch (JSONException e) {
+							Toast.makeText(mContext,
+									jsonInvalid,
+									Toast.LENGTH_LONG).show();
 							e.printStackTrace();
 						}
 
 					}
-
 					// When error occurred
 					@Override
 					public void onFailure(int statusCode, Throwable error,
@@ -105,23 +108,22 @@ public class ServerUtilFunctions {
 						// prgDialog.hide();
 						if (statusCode == 404) {
 							Toast.makeText(mContext,
-									"Requested resource not found",
+									status404,
 									Toast.LENGTH_LONG).show();
 						} else if (statusCode == 500) {
 							Toast.makeText(mContext,
-									"Something went wrong at server end",
+									status500,
 									Toast.LENGTH_LONG).show();
 						} else {
 							Toast.makeText(mContext,
-									"Device might not be connected to network",
+									statusOther,
 									Toast.LENGTH_LONG).show();
 						}
 					}
 				});
 
 	}
-
-	// TODO temp fix
+	
 	public void leaveGroup(String member, final String group) {
 
 		AsyncHttpClient client = new AsyncHttpClient();
@@ -138,9 +140,6 @@ public class ServerUtilFunctions {
 					@Override
 					public void onSuccess(String response) {
 
-						// Toast.makeText(mContext, response,
-						// Toast.LENGTH_LONG).show();
-
 						try {
 							JSONObject jObject = new JSONObject(response);
 							if (jObject.getBoolean("status")) {
@@ -148,14 +147,15 @@ public class ServerUtilFunctions {
 								Toast.makeText(mContext,
 										"Successfully left " + group + "!",
 										Toast.LENGTH_LONG).show();
-
 							}
 						} catch (JSONException e) {
+							Toast.makeText(mContext,
+									jsonInvalid,
+									Toast.LENGTH_LONG).show();
 							e.printStackTrace();
 						}
 
 					}
-
 					// When error occurred
 					@Override
 					public void onFailure(int statusCode, Throwable error,
@@ -164,15 +164,15 @@ public class ServerUtilFunctions {
 						// prgDialog.hide();
 						if (statusCode == 404) {
 							Toast.makeText(mContext,
-									"Requested resource not found",
+									status404,
 									Toast.LENGTH_LONG).show();
 						} else if (statusCode == 500) {
 							Toast.makeText(mContext,
-									"Something went wrong at server end",
+									status500,
 									Toast.LENGTH_LONG).show();
 						} else {
 							Toast.makeText(mContext,
-									"Device might not be connected to network",
+									statusOther,
 									Toast.LENGTH_LONG).show();
 						}
 					}
@@ -185,9 +185,7 @@ public class ServerUtilFunctions {
 		group_data = new GroupDataManager(mContext);
 		group_data.open();
 		group_data.clear();
-
 		prgDialog.show();
-
 		AsyncHttpClient client = new AsyncHttpClient();
 		// Http Request Params Object
 		RequestParams params = new RequestParams();
@@ -234,29 +232,28 @@ public class ServerUtilFunctions {
 
 						} catch (JSONException e) {
 							e.printStackTrace();
-							Toast.makeText(mContext, "Error, " + response,
+							Toast.makeText(mContext, jsonInvalid,
 									Toast.LENGTH_LONG).show();
 						}
 					}
 
-					// When error occured
+					// When error occurred
 					@Override
 					public void onFailure(int statusCode, Throwable error,
 							String content) {
 						// Hide ProgressBar
-						prgDialog.hide();
+						// prgDialog.hide();
 						if (statusCode == 404) {
 							Toast.makeText(mContext,
-									"Requested resource not found",
+									status404,
 									Toast.LENGTH_LONG).show();
 						} else if (statusCode == 500) {
-							Toast.makeText(
-									mContext,
-									"Error at server side, maybe php file syntax error",
+							Toast.makeText(mContext,
+									status500,
 									Toast.LENGTH_LONG).show();
 						} else {
 							Toast.makeText(mContext,
-									"Device might not be connected to network",
+									statusOther,
 									Toast.LENGTH_LONG).show();
 						}
 					}
@@ -294,26 +291,30 @@ public class ServerUtilFunctions {
 
 							}
 						} catch (JSONException e) {
+							Toast.makeText(mContext,
+									jsonInvalid,
+									Toast.LENGTH_LONG).show();
 							e.printStackTrace();
 						}
 					}
 
-					// When error occured
+					// When error occurred
 					@Override
 					public void onFailure(int statusCode, Throwable error,
 							String content) {
 						// Hide ProgressBar
-						prgDialog.hide();
+						// prgDialog.hide();
 						if (statusCode == 404) {
-							Toast.makeText(mContext, "Group name invalid",
+							Toast.makeText(mContext,
+									status404,
 									Toast.LENGTH_LONG).show();
 						} else if (statusCode == 500) {
 							Toast.makeText(mContext,
-									"Something went terrible at server end",
+									status500,
 									Toast.LENGTH_LONG).show();
 						} else {
 							Toast.makeText(mContext,
-									"Device might not be connected to network",
+									statusOther,
 									Toast.LENGTH_LONG).show();
 						}
 					}
@@ -338,8 +339,10 @@ public class ServerUtilFunctions {
 							// TODO review this logic, doesn't come across as
 							// right
 							int count = 0;
+							int flag = 0;
 							JSONArray arr = new JSONArray(response);
 							for (int i = 0; i < arr.length(); i++) {
+								flag = 1;
 								JSONObject obj = (JSONObject) arr.get(i);
 								marker_data.updateSyncStatus(obj.get("id")
 										.toString(), obj.get("status")
@@ -348,43 +351,42 @@ public class ServerUtilFunctions {
 										.equalsIgnoreCase("no"))
 									count++;
 							}
-
-							if (count > 0)
-								Toast.makeText(
-										mContext,
-										count
-												+ " markers were not uploaded to remote server",
-										Toast.LENGTH_LONG).show();
-							else
-								Toast.makeText(
-										mContext,
-										"All markers were uploaded to remote server!",
-										Toast.LENGTH_LONG).show();
+							
+							if (flag==1) {
+									if (count > 0)
+										Toast.makeText(mContext,
+												count+ " markers were not uploaded to remote server",
+												Toast.LENGTH_LONG).show();
+									else
+										Toast.makeText(mContext,
+												"Markers successfully uploaded",
+												Toast.LENGTH_LONG).show();
+							}
 
 						} catch (JSONException e) {
 							Toast.makeText(mContext,
-									"Server's JSON response might be invalid!",
+									jsonInvalid,
 									Toast.LENGTH_LONG).show();
 							e.printStackTrace();
 						}
 					}
-
+					// When error occurred
 					@Override
 					public void onFailure(int statusCode, Throwable error,
 							String content) {
-						prgDialog.hide();
+						// Hide ProgressBar
+						// prgDialog.hide();
 						if (statusCode == 404) {
 							Toast.makeText(mContext,
-									"Requested resource not found",
+									status404,
 									Toast.LENGTH_LONG).show();
 						} else if (statusCode == 500) {
 							Toast.makeText(mContext,
-									"Something went wrong at server end",
+									status500,
 									Toast.LENGTH_LONG).show();
 						} else {
-							Toast.makeText(
-									mContext,
-									"Device might not be connected to Internet]",
+							Toast.makeText(mContext,
+									statusOther,
 									Toast.LENGTH_LONG).show();
 						}
 					}
@@ -414,10 +416,6 @@ public class ServerUtilFunctions {
 					public void onSuccess(String response) {
 						// Hide ProgressBar
 						prgDialog.hide();
-
-						// Toast.makeText(mContext,
-						// response,
-						// Toast.LENGTH_LONG).show();
 
 						try {
 							// Extract JSON array from the response
@@ -452,31 +450,35 @@ public class ServerUtilFunctions {
 												Toast.LENGTH_LONG).show();
 									}
 								}
-								// Reload the Main Activity
-								// reloadActivity();
+								//TODO put a conditional
+								prgDialog.setMessage("Uploading Markers...");
+								syncSQLiteMySQLDB();
 							}
 						} catch (JSONException e) {
+							Toast.makeText(mContext,
+									jsonInvalid,
+									Toast.LENGTH_LONG).show();
 							e.printStackTrace();
 						}
 					}
 
-					// When error occured
+					// When error occurred
 					@Override
 					public void onFailure(int statusCode, Throwable error,
 							String content) {
 						// Hide ProgressBar
-						prgDialog.hide();
+						// prgDialog.hide();
 						if (statusCode == 404) {
 							Toast.makeText(mContext,
-									"Requested resource not found",
+									status404,
 									Toast.LENGTH_LONG).show();
 						} else if (statusCode == 500) {
 							Toast.makeText(mContext,
-									"Something went wrong at server end",
+									status500,
 									Toast.LENGTH_LONG).show();
 						} else {
 							Toast.makeText(mContext,
-									"Device might not be connected to network",
+									statusOther,
 									Toast.LENGTH_LONG).show();
 						}
 					}
@@ -505,9 +507,11 @@ public class ServerUtilFunctions {
 										Toast.LENGTH_LONG).show();
 							}
 						} catch (JSONException e) {
+							Toast.makeText(mContext,
+									jsonInvalid,
+									Toast.LENGTH_LONG).show();
 							e.printStackTrace();
 						}
-
 					}
 
 					// When error occurred
@@ -518,20 +522,19 @@ public class ServerUtilFunctions {
 						// prgDialog.hide();
 						if (statusCode == 404) {
 							Toast.makeText(mContext,
-									"Requested resource not found",
+									status404,
 									Toast.LENGTH_LONG).show();
 						} else if (statusCode == 500) {
 							Toast.makeText(mContext,
-									"Something went wrong at server end",
+									status500,
 									Toast.LENGTH_LONG).show();
 						} else {
 							Toast.makeText(mContext,
-									"Device might not be connected to network",
+									statusOther,
 									Toast.LENGTH_LONG).show();
 						}
 					}
 				});
-
 	}
 
 }

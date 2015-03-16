@@ -3,24 +3,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"    
-    android:background="#CCCCCC"
+    android:background="#e0e2ef"
     android:paddingLeft="@dimen/activity_horizontal_margin"    
     android:paddingTop="@dimen/activity_vertical_margin" >
     
     <TextView
         android:id="@+id/textName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        style="@style/CodeFont"/>
     
     <TextView
         android:id="@+id/textDesc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>    
+        style="@style/CodeFont"/>    
     
     <TextView
         android:id="@+id/textType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        style="@style/CodeFont"/>
    <!--  
     <Button
         android:id="@+id/btndelete"

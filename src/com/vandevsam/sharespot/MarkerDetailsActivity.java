@@ -48,17 +48,17 @@ public class MarkerDetailsActivity extends Activity {
 
 		// get name and username
 		textName = (TextView) findViewById(R.id.textName);
-		String htmlName = "<h3>Address: " + address + "</h3>";
+		String htmlName = "<h4>Address: </h4>" + "<p>" + address + "</p>";
 		textName.setText(Html.fromHtml(htmlName));
 
 		textDesc = (TextView) findViewById(R.id.textDesc);
-		String htmlDate = "<h3>Description: " + desc + "</h3>";
+		String htmlDate = "<h4>Description: </h4>" + "<p>" + desc + "</p>";
 		textDesc.setText(Html.fromHtml(htmlDate));
 
 		// get groups signed in
 		// special case TODO review later
 		textType = (TextView) findViewById(R.id.textType);
-		String htmlGroup = "<h3>Group: " + group + "</h3>";
+		String htmlGroup = "<h4>Group: </h4>" + "<p>" + group + "</p>";
 		textType.setText(Html.fromHtml(htmlGroup));
 
 	}
