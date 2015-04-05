@@ -1,5 +1,7 @@
 package com.vandevsam.sharespot;
 
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 import java.util.HashMap;
 
 import org.json.JSONException;
@@ -32,6 +34,7 @@ public class AuthenticateActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Fabric.with(this, new Crashlytics());
 		setContentView(R.layout.activity_authenticate);
 
 		session = new SessionManager(getApplicationContext());

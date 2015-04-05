@@ -105,7 +105,7 @@ public class ServerUtilFunctions {
 					public void onFailure(int statusCode, Throwable error,
 							String content) {
 						// Hide ProgressBar
-						// prgDialog.hide();
+						//prgDialog.hide();
 						if (statusCode == 404) {
 							Toast.makeText(mContext,
 									status404,
@@ -161,7 +161,7 @@ public class ServerUtilFunctions {
 					public void onFailure(int statusCode, Throwable error,
 							String content) {
 						// Hide ProgressBar
-						// prgDialog.hide();
+						//prgDialog.hide();
 						if (statusCode == 404) {
 							Toast.makeText(mContext,
 									status404,
@@ -242,7 +242,7 @@ public class ServerUtilFunctions {
 					public void onFailure(int statusCode, Throwable error,
 							String content) {
 						// Hide ProgressBar
-						// prgDialog.hide();
+						prgDialog.hide();
 						if (statusCode == 404) {
 							Toast.makeText(mContext,
 									status404,
@@ -303,7 +303,7 @@ public class ServerUtilFunctions {
 					public void onFailure(int statusCode, Throwable error,
 							String content) {
 						// Hide ProgressBar
-						// prgDialog.hide();
+						prgDialog.hide();
 						if (statusCode == 404) {
 							Toast.makeText(mContext,
 									status404,
@@ -332,8 +332,7 @@ public class ServerUtilFunctions {
 		client.post("http://" + webServer + "/b/phpfiles/insertmarker.php",
 				params, new AsyncHttpResponseHandler() {
 					@Override
-					public void onSuccess(String response) {
-						;
+					public void onSuccess(String response) {						
 						prgDialog.hide();
 						try {
 							// TODO review this logic, doesn't come across as
@@ -375,7 +374,7 @@ public class ServerUtilFunctions {
 					public void onFailure(int statusCode, Throwable error,
 							String content) {
 						// Hide ProgressBar
-						// prgDialog.hide();
+						prgDialog.hide();
 						if (statusCode == 404) {
 							Toast.makeText(mContext,
 									status404,
@@ -467,7 +466,7 @@ public class ServerUtilFunctions {
 					public void onFailure(int statusCode, Throwable error,
 							String content) {
 						// Hide ProgressBar
-						// prgDialog.hide();
+						prgDialog.hide();
 						if (statusCode == 404) {
 							Toast.makeText(mContext,
 									status404,
@@ -519,7 +518,7 @@ public class ServerUtilFunctions {
 					public void onFailure(int statusCode, Throwable error,
 							String content) {
 						// Hide ProgressBar
-						// prgDialog.hide();
+						prgDialog.hide();
 						if (statusCode == 404) {
 							Toast.makeText(mContext,
 									status404,

@@ -51,7 +51,7 @@
         android:layout_alignLeft="@+id/GroupType"
         android:layout_below="@+id/GroupType"
         android:layout_marginTop="32dp"
-        android:text="Join"     
+        android:text="@string/join"     
         android:onClick="joinGroup" />   
       
 
